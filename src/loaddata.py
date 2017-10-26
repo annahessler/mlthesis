@@ -3,14 +3,15 @@ import numpy as np
 import cv2
 import matplotlib.pyplot as plt
 
-VULNERABLE_RADIUS = 300
+VULNERABLE_RADIUS = 300 
 os.chdir('../data')
 
 def openLandData():
     dem = cv2.imread('raw/dem.tif', cv2.IMREAD_UNCHANGED)
     slope = cv2.imread('raw/slope.tif',cv2.IMREAD_UNCHANGED)
     landsat = cv2.imread('raw/landsat.png', cv2.IMREAD_UNCHANGED)
-    return np.dstack((dem, slope, landsat))
+    ndvi = cv2.imread('raw/NDVI_1.tif', cv2.IMREAD_UNCHANGED)
+    return np.dstack((dem, slope, landsat, ndvi))
 
 def openStartingPerim(dateString):
     perimFileName = 'raw/perims/' + dateString + '.tif'
