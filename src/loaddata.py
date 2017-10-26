@@ -1,17 +1,19 @@
+import os
 import numpy as np
 import cv2
 import matplotlib.pyplot as plt
 
 VULNERABLE_RADIUS = 300
+os.chdir('../data')
 
 def openLandData():
-    dem = cv2.imread('data/dem.tif', cv2.IMREAD_UNCHANGED)
-    slope = cv2.imread('data/slope.tif',cv2.IMREAD_UNCHANGED)
-    landsat = cv2.imread('data/landsat.png', cv2.IMREAD_UNCHANGED)
+    dem = cv2.imread('raw/dem.tif', cv2.IMREAD_UNCHANGED)
+    slope = cv2.imread('raw/slope.tif',cv2.IMREAD_UNCHANGED)
+    landsat = cv2.imread('raw/landsat.png', cv2.IMREAD_UNCHANGED)
     return np.dstack((dem, slope, landsat))
 
 def openStartingPerim(dateString):
-    perimFileName = 'data/perims/' + dateString + '.tif'
+    perimFileName = 'raw/perims/' + dateString + '.tif'
     perim = cv2.imread(perimFileName, cv2.IMREAD_UNCHANGED)*255
     return perim
 
@@ -20,14 +22,14 @@ def openEndingPerim(dateString):
     month, day = dateString[:2], dateString[2:]
     nextDay = str(int(day)+1).zfill(2)
     guess = month+nextDay
-    perimFileName = 'data/perims/' + guess + '.tif'
+    perimFileName = 'raw/perims/' + guess + '.tif'
     # print(perimFileName)
     perim = cv2.imread(perimFileName, cv2.IMREAD_UNCHANGED)
     if perim is None:
         # overflowed the month, that file didnt exist
         nextMonth = str(int(month)+1).zfill(2)
         guess = nextMonth+'01'
-        perimFileName = 'data/perims/' + guess + '.tif'
+        perimFileName = 'raw/perims/' + guess + '.tif'
         # print(perimFileName)
         perim = cv2.imread(perimFileName, cv2.IMREAD_UNCHANGED)
         if perim is None:
@@ -47,7 +49,7 @@ def findVulnerablePixels(startingPerim, radius=VULNERABLE_RADIUS):
     return np.where(border)
 
 def openWeatherData(dateString):
-    fname = './data/weather/' + dateString + '.csv'
+    fname = 'raw/weather/' + dateString + '.csv'
     # the first row is the headers, and only cols 4-11 are actual data
     data = np.loadtxt(fname, skiprows=1, usecols=range(5,12), delimiter=',').T
     return data
@@ -93,7 +95,14 @@ def chooseDatasets(data, ratio=.75, shuffle=True):
     test  = (xs[si:], ys[si:])
     return train, test
 
-data = createData('0731')
+def saveData(data, dateString):
+    np.savetxt('forModel/'+ dateString+'.csv', list(data.reshape(-1, data.shape[-1])), delimiter=',')
+
+date = '0731'
+data = createData(date)
 train, test = chooseDatasets(data)
 
-print(data[train])
+print(data)
+saveData(data, '0731')
+
+# print(data[train])
