@@ -17,25 +17,15 @@ print(trainSet, testSet, trainSet.shape, testSet.shape)
 train_today, train_tomorrow = trainSet[:,0:11], trainSet[:,11]
 test_today, test_tomorrow = testSet[:,0:11], testSet[:,11]
 
-model = Sequential()
-model.add(Dense(32, activation='relu', input_dim=(11)))
-model.add(Dropout(0.5))
-model.add(Dense(1, activation='sigmoid'))
 
-sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
-
-
-model.compile(optimizer='rmsprop',
-              loss='binary_crossentropy',
-              metrics=['accuracy'])
-
+m = Model()
 # Train the model, iterating on the data in batches of 32 samples
-model.fit(train_today, train_tomorrow, epochs=500, batch_size=17500, validation_data=(test_today, test_tomorrow))
+m.fit(train_today, train_tomorrow)
 
-predictions_test = model.predict(test_today)
+predictions_test = m.predict(test_today)
 print(predictions_test)
 
-predictions_train = model.predict(train_today)
+predictions_train = m.predict(train_today)
 print(predictions_train)
 
 numpy.savetxt('output/predictions_test.csv', predictions_test, delimiter = ',')
@@ -43,5 +33,5 @@ numpy.savetxt('output/predictions_train.csv', predictions_train, delimiter = ','
 
 
 # evaluate the model
-scores = model.evaluate(test_today, test_tomorrow)
-print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
+scores = m.evaluate(test_today, test_tomorrow)
+print("\n%s: %.2f%%" % (m.metrics_names[1], scores[1]*100))
