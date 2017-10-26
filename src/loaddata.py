@@ -4,6 +4,7 @@ import cv2
 import matplotlib.pyplot as plt
 
 VULNERABLE_RADIUS = 300
+PIXEL_SIZE = 30
 os.chdir('../data')
 
 def openLandData():
@@ -39,7 +40,7 @@ def openEndingPerim(dateString):
 def findVulnerablePixels(startingPerim, radius=VULNERABLE_RADIUS):
     '''Return the indices of the pixels that are candidates for our testing'''
     kernel = np.ones((3,3))
-    its = int(round((2*(radius/30)**2)**.5))
+    its = int(round((2*(radius/PIXEL_SIZE)**2)**.5))
     dilated = cv2.dilate(startingPerim, kernel, iterations=its)
     border = dilated - startingPerim
     # cv2.imshow('start',startingPerim)
@@ -85,6 +86,7 @@ def findDistance(startingPerim):
 def chooseDatasets(data, ratio=.75, shuffle=True):
     startingPerim = data[:,:,0]
     vulnerableIndices = findVulnerablePixels(startingPerim)
+    print(vulnerableIndices[0].size)
     if shuffle:
         xs,ys = vulnerableIndices
         p = np.random.permutation(len(xs))
@@ -103,7 +105,8 @@ date = '0731'
 data = createData(date)
 train, test = chooseDatasets(data)
 
-print(data)
-saveData(data, '0731')
+# print(train)
+saveData(data[train], 'train')
+saveData(data[test], 'test')
 
 # print(data[train])
