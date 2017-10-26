@@ -96,7 +96,7 @@ def chooseDatasets(data, ratio=.75, shuffle=True):
     return train, test
 
 def saveData(data, dateString):
-    np.savetxt('forModel/'+ dateString+'.csv', list(data.reshape(-1, data.shape[-1])), delimiter=',')
+    np.savetxt('data/forModel/'+ dateString+'.csv', list(data.reshape(-1, data.shape[-1])), delimiter=',')
 
 date = '0731'
 data = createData(date)
