@@ -2,8 +2,10 @@ from keras.models import Sequential
 from keras.layers import Dense, Activation, Dropout
 from keras.optimizers import SGD
 import numpy
+import os
 
-dataset = numpy.loadtxt('0731.csv', delimiter = ',')
+os.chdir('..')
+dataset = numpy.loadtxt('data/forModel/0731.csv', delimiter = ',')
 today = dataset[:,0:11]
 tomorrow = dataset[:,11]
 
@@ -36,8 +38,8 @@ print(predictions_test)
 predictions_train = model.predict(train_today)
 print(predictions_train)
 
-numpy.savetxt('predictions_test.csv', predictions_test, delimiter = ',')
-numpy.savetxt('predictions_train.csv', predictions_train, delimiter = ',')
+numpy.savetxt('output/predictions_test.csv', predictions_test, delimiter = ',')
+numpy.savetxt('output/predictions_train.csv', predictions_train, delimiter = ',')
 
 
 # evaluate the model

@@ -96,6 +96,7 @@ def chooseDatasets(data, ratio=.75, shuffle=True):
     return train, test
 
 def saveData(data, dateString):
+    print(os.getcwd())
     np.savetxt('forModel/'+ dateString+'.csv', list(data.reshape(-1, data.shape[-1])), delimiter=',')
 
 date = '0731'
