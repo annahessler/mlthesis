@@ -2,6 +2,8 @@ import numpy as np
 import cv2
 import matplotlib.pyplot as plt
 
+VULNERABLE_RADIUS = 300
+
 def openLandData():
     dem = cv2.imread('data/dem.tif', cv2.IMREAD_UNCHANGED)
     slope = cv2.imread('data/slope.tif',cv2.IMREAD_UNCHANGED)
@@ -10,7 +12,6 @@ def openLandData():
 
 def openStartingPerim(dateString):
     perimFileName = 'data/perims/' + dateString + '.tif'
-    print(perimFileName)
     perim = cv2.imread(perimFileName, cv2.IMREAD_UNCHANGED)*255
     return perim
 
@@ -33,12 +34,10 @@ def openEndingPerim(dateString):
             raise RuntimeError('Could not find a perimeter for the day after ' + dateString)
     return perim
 
-def choosePixels(startingPerim, radius):
+def findVulnerablePixels(startingPerim, radius=VULNERABLE_RADIUS):
     '''Return the indices of the pixels that are candidates for our testing'''
-    print(startingPerim)
     kernel = np.ones((3,3))
     its = int(round((2*(radius/30)**2)**.5))
-    print(its)
     dilated = cv2.dilate(startingPerim, kernel, iterations=its)
     border = dilated - startingPerim
     # cv2.imshow('start',startingPerim)
@@ -62,31 +61,39 @@ def createWeatherMetrics(weatherData):
     return np.array( [max(temp), avgWSpeed, avgWDir, totalPrecip, avgHum])
 
 def createData(dateString):
-    landData = openLandData()
-    endingPerim = openEndingPerim(dateString)
-    combined = np.dstack((landData, endingPerim))
-
+    # create inputs
     startingPerim = openStartingPerim(dateString)
-    # in meters
-    radius = 500
-    testPixels = combined[choosePixels(startingPerim, radius)]
-
-    # print(testPixels, combined.size, testPixels.size)
+    landData = openLandData()
+    distance = findDistance(startingPerim)
 
     weatherData = createWeatherMetrics(openWeatherData(dateString))
-    tiledWeather = np.tile(weatherData,(testPixels.shape[0],1))
-    # print(tiledWeather)
-    # print(tiledWeather.shape, testPixels.shape)
+    h,w = landData.shape[:2]
+    tiledWeather = np.tile(weatherData,(h,w,1))
 
-    # there 18000 pixels of data, each with 11 inputs and one output
-    everything = np.hstack((tiledWeather, testPixels))
-    # print(everything, everything.shape)
+    # combine inputs, then combine with outputs
+    inputs = np.dstack((startingPerim, distance, landData, tiledWeather))
+    output = openEndingPerim(dateString)
+    return np.dstack((inputs, output))
 
-    toPrint = list(everything)
-    np.savetxt(dateString + '.csv', toPrint, delimiter = ',')
+def findDistance(startingPerim):
+    inverted = 255-startingPerim
+    dist = cv2.distanceTransform(inverted, cv2.DIST_L2, 5)
+    return dist
 
-    return everything
+def chooseDatasets(data, ratio=.75, shuffle=True):
+    startingPerim = data[:,:,0]
+    vulnerableIndices = findVulnerablePixels(startingPerim)
+    if shuffle:
+        xs,ys = vulnerableIndices
+        p = np.random.permutation(len(xs))
+        xs,ys = xs[p], ys[p]
+    # now split them into train and test sets
+    splitIndex = si = int(ratio*len(xs))
+    train = (xs[:si], ys[:si])
+    test  = (xs[si:], ys[si:])
+    return train, test
 
+data = createData('0731')
+train, test = chooseDatasets(data)
 
-
-print(createData('0731'))
+print(data[train])
