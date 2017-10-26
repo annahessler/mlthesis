@@ -5,7 +5,7 @@ import numpy
 import os
 
 os.chdir('..')
-dataset = numpy.loadtxt('data/0731.csv', delimiter = ',')
+dataset = numpy.loadtxt('data/forModel/0731.csv', delimiter = ',')
 today = dataset[:,0:11]
 tomorrow = dataset[:,11]
 
