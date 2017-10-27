@@ -1,21 +1,27 @@
-import os
 import numpy as np
 import cv2
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
 VULNERABLE_RADIUS = 300
 PIXEL_SIZE = 30
-os.chdir('../data')
+
+class Dataset(np.ndarray):
+
+    # def __init__(self, data):
+    #     super().__init__(data)
+
+    def getX(self):
+        return self[:,:]
 
 def openLandData():
-    dem = cv2.imread('raw/dem.tif', cv2.IMREAD_UNCHANGED)
-    slope = cv2.imread('raw/slope.tif',cv2.IMREAD_UNCHANGED)
-    landsat = cv2.imread('raw/landsat.png', cv2.IMREAD_UNCHANGED)
-    ndvi = cv2.imread('raw/NDVI_1.tif', cv2.IMREAD_UNCHANGED)
+    dem = cv2.imread('data/raw/dem.tif', cv2.IMREAD_UNCHANGED)
+    slope = cv2.imread('data/raw/slope.tif',cv2.IMREAD_UNCHANGED)
+    landsat = cv2.imread('data/raw/landsat.png', cv2.IMREAD_UNCHANGED)
+    ndvi = cv2.imread('data/raw/NDVI_1.tif', cv2.IMREAD_UNCHANGED)
     return np.dstack((dem, slope, landsat, ndvi))
 
 def openStartingPerim(dateString):
-    perimFileName = 'raw/perims/' + dateString + '.tif'
+    perimFileName = 'data/raw/perims/' + dateString + '.tif'
     perim = cv2.imread(perimFileName, cv2.IMREAD_UNCHANGED)*255
     return perim
 
@@ -24,37 +30,33 @@ def openEndingPerim(dateString):
     month, day = dateString[:2], dateString[2:]
     nextDay = str(int(day)+1).zfill(2)
     guess = month+nextDay
-    perimFileName = 'raw/perims/' + guess + '.tif'
+    perimFileName = 'data/raw/perims/' + guess + '.tif'
     # print(perimFileName)
     perim = cv2.imread(perimFileName, cv2.IMREAD_UNCHANGED)
     if perim is None:
         # overflowed the month, that file didnt exist
         nextMonth = str(int(month)+1).zfill(2)
         guess = nextMonth+'01'
-        perimFileName = 'raw/perims/' + guess + '.tif'
+        perimFileName = 'data/raw/perims/' + guess + '.tif'
         # print(perimFileName)
         perim = cv2.imread(perimFileName, cv2.IMREAD_UNCHANGED)
         if perim is None:
             raise RuntimeError('Could not find a perimeter for the day after ' + dateString)
     return perim
 
+def openWeatherData(dateString):
+    fname = 'data/raw/weather/' + dateString + '.csv'
+    # the first row is the headers, and only cols 4-11 are actual data
+    data = np.loadtxt(fname, skiprows=1, usecols=range(5,12), delimiter=',').T
+    return data
+
 def findVulnerablePixels(startingPerim, radius=VULNERABLE_RADIUS):
-    '''Return the indices of the pixels that are candidates for our testing'''
+    '''Return the indices of the pixels that close to the current fire perimeter'''
     kernel = np.ones((3,3))
     its = int(round((2*(radius/PIXEL_SIZE)**2)**.5))
     dilated = cv2.dilate(startingPerim, kernel, iterations=its)
     border = dilated - startingPerim
-    # cv2.imshow('start',startingPerim)
-    # cv2.imshow('dil',dilated)
-    # cv2.imshow('border', border)
-    # cv2.waitKey(0)
     return np.where(border)
-
-def openWeatherData(dateString):
-    fname = 'raw/weather/' + dateString + '.csv'
-    # the first row is the headers, and only cols 4-11 are actual data
-    data = np.loadtxt(fname, skiprows=1, usecols=range(5,12), delimiter=',').T
-    return data
 
 def createWeatherMetrics(weatherData):
     temp, dewpt, temp2, wdir, wspeed, precip, hum = weatherData
@@ -64,20 +66,28 @@ def createWeatherMetrics(weatherData):
     avgHum = sum(hum)/len(hum)
     return np.array( [max(temp), avgWSpeed, avgWDir, totalPrecip, avgHum])
 
-def createData(dateString):
+def createRawData(dateString):
     # create inputs
     startingPerim = openStartingPerim(dateString)
     landData = openLandData()
-    distance = findDistance(startingPerim)
-
     weatherData = createWeatherMetrics(openWeatherData(dateString))
     h,w = landData.shape[:2]
     tiledWeather = np.tile(weatherData,(h,w,1))
 
-    # combine inputs, then combine with outputs
-    inputs = np.dstack((startingPerim, distance, landData, tiledWeather))
+    return np.dstack((startingPerim, landData, tiledWeather))
+
+def createData(dateString):
+    # open all of our raw data, read directly from data files
+    raw = createRawData(dateString)
+    # there are some secondary inputs to model, such as distance to fire, etc
+    derived = createDerivedData(raw)
     output = openEndingPerim(dateString)
-    return np.dstack((inputs, output))
+    return np.dstack((raw, derived, output))
+
+def createDerivedData(rawData):
+    startingPerim = rawData[:,:,0].astype(np.uint8)
+    distance = findDistance(startingPerim)
+    return np.dstack((distance,))
 
 def findDistance(startingPerim):
     inverted = 255-startingPerim
@@ -98,8 +108,7 @@ def chooseDatasets(data, ratio=.75, shuffle=True):
     return train, test
 
 def saveData(data, dateString):
-    print(os.getcwd())
-    np.savetxt('forModel/'+ dateString+'.csv', list(data.reshape(-1, data.shape[-1])), delimiter=',')
+    np.savetxt('data/forModel/'+ dateString+'.csv', list(data.reshape(-1, data.shape[-1])), delimiter=',')
 
 date = '0731'
 data = createData(date)
