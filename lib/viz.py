@@ -12,7 +12,7 @@ def reassemblePredictions(predictions, indices, shape):
     return result
 
 def show(*imgs):
-    for i, img in enumerate(imgs):
+#    for i, img in enumerate(imgs):
 #        plt.figure(i)
 #        plt.imshow(img)
 #    plt.show()
