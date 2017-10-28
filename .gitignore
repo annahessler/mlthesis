@@ -2,3 +2,5 @@
 data/forModel/train.csv
 data/forModel/test.csv
 output/
+lib/__pycache__/*
+data/forModel/*
