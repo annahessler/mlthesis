@@ -2,7 +2,7 @@
 import numpy as np
 import lib.model
 import lib.data
-import lib.viz as viz
+#import lib.viz as viz
 
 data = lib.data.createData('0731')
 trainIndices, testIndices = lib.data.chooseDatasets(data)
