@@ -18,7 +18,8 @@ def openLandData():
     slope = cv2.imread('data/raw/slope.tif',cv2.IMREAD_UNCHANGED)
     landsat = cv2.imread('data/raw/landsat.png', cv2.IMREAD_UNCHANGED)
     ndvi = cv2.imread('data/raw/NDVI_1.tif', cv2.IMREAD_UNCHANGED)
-    return np.dstack((dem, slope, landsat, ndvi))
+    aspect = cv2.imread('data/raw/aspect.tif', cv2.IMREAD_UNCHANGED)
+    return np.dstack((dem, slope, landsat, ndvi, aspect))
 
 def openStartingPerim(dateString):
     perimFileName = 'data/raw/perims/' + dateString + '.tif'
