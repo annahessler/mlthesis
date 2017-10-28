@@ -1,6 +1,6 @@
 import numpy as np
 import cv2
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 
 def reassemblePredictions(predictions, indices, shape):
     assert type(shape) == type((1,))
@@ -13,6 +13,6 @@ def reassemblePredictions(predictions, indices, shape):
 
 def show(*imgs):
     for i, img in enumerate(imgs):
-        plt.figure(i)
-        plt.imshow(img)
-    plt.show()
+#        plt.figure(i)
+#        plt.imshow(img)
+#    plt.show()
