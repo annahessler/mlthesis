@@ -1,5 +1,6 @@
 
 import numpy as np
+<<<<<<< HEAD
 # import lib.model
 from lib.datamodule import Data
 from lib.dataset import Dataset
@@ -25,10 +26,18 @@ print(aois.shape)
 
 # cnnModel = lib.model.ImageBranch(nchannels, aoisize)
 # ccnModel.fit(inputForModel)
-# print(trainIndices)
 
-# m = lib.model.Model(trainData)
-# m.fit(trainData)
+
+
+# print('aois shape ', aois.shape)
+nchannels = aois.shape[1]
+print('THIS IS INPUT: ', aois.shape)
+aoisize = [aois.shape[2], aois.shape[3]] #
+
+cnnModel = lib.model.Model(weather.shape[0],nchannels, aoisize)
+
+
+
 
 # predictions_test = m.predict(trainData)
 # print(predictions_test)

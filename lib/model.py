@@ -1,7 +1,8 @@
 print('importing keras...')
 from keras.models import Sequential
-from keras.layers import Dense, Activation, Dropout, Merge
+from keras.layers import Dense, Activation, Dropout, Flatten, Merge
 from keras.optimizers import SGD
+from keras.layers import Conv2D, MaxPooling2D
 print('done.')
 
 
@@ -23,6 +24,7 @@ class ImageBranch(Sequential):
         img_y = aoisize[1]
 
         input_shape = (img_x, img_y, nchannels)
+        print('inputshape is ', input_shape)
 
         self.add(Conv2D(32, kernel_size=(5,5), strides=(1,1),
                         activation='relu',
@@ -30,21 +32,23 @@ class ImageBranch(Sequential):
         self.add(MaxPooling2D(pool_size=(2,2), strides=(2,2)))
         self.add(Conv2D(64, (5,5), activation='relu'))
         self.add(MaxPooling2D(pool_size=(2,2)))
-
         self.add(Flatten())
         #want to flatten it together with weather data in model class
 
-
-        # self.add(Dense(32, activation='relu', input_dim=(inputSize)))
-        # self.add(Dropout(0.5))
+        # self.add(Dense(32, activation='relu', input_dim=(input_shape)))
+        # # self.add(Dropout(0.5))
         # self.add(Dense(1, activation='sigmoid'))
 
         # sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
 
-        # self.compile(optimizer='rmsprop',
-        #       loss='binary_crossentropy',
-        #       metrics=['accuracy'])
+        self.compile(optimizer='rmsprop',
+              loss='binary_crossentropy',
+              metrics=['accuracy'])
 
+    def fit(self, traindata, validatedata):
+
+        traindata = traindata.astype('float32')
+        validatedata = validatedata.astype('float32')
 
 
 class Model(Sequential):
@@ -78,6 +82,19 @@ class Model(Sequential):
         # inp = data[:,:-1]
         # out = data[:,-1]
         # super().fit(inp, out, epochs=100, batch_size=17500, validation_data=(inp, out))
+        print('traindata shape', traindata.shape)
+        print('validatedata shape', validatedata.shape)
+
+        print('traindata:  ', traindata[0])
+
+        # guarantee the data is a 1D array of vectors
+        # traindata = traindata.reshape(-1, traindata.shape[-1])
+        # print('traindata reshape', traindata.shape)
+        # the last entry in each vector is the output
+        # inp = traindata[:,:-1]
+        # out = traindata[:,-1]
+        # super().fit(inp, out, epochs=100, batch_size=17500, validation_data=(inp, out))
+        
 
     def predict(self, data):
         # guarantee the data is a 1D array of vectors
