@@ -26,7 +26,7 @@ class ImageBranch(Sequential):
         self.add(Flatten())
         #want to flatten it together with weather data in model class
 
-        self.add(Dense(32, activation='relu', input_dim=(input_dim)))
+        self.add(Dense(32, activation='relu', input_dim=(input_shape)))
         # self.add(Dropout(0.5))
         self.add(Dense(1, activation='sigmoid'))
 
