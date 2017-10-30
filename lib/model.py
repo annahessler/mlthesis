@@ -36,7 +36,7 @@ class ImageBranch(Sequential):
               loss='binary_crossentropy',
               metrics=['accuracy'])
 
-    def fit(self, traindata, testdata):
+    def fitModel(self, traindata, testdata):
 
         traindata = traindata.astype('float32')
         testdata = testdata.astype('float32')
