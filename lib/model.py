@@ -46,7 +46,7 @@ class ImageBranch(Sequential):
         print('traindata shape', traindata.shape)
         print('validatedata shape', validatedata.shape)
 
-        print('traindata:  ', traindata.shape(0))
+        print('traindata:  ', traindata.shape[0])
 
         # guarantee the data is a 1D array of vectors
         # traindata = traindata.reshape(-1, traindata.shape[-1])
