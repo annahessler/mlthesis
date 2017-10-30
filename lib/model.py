@@ -15,6 +15,7 @@ class ImageBranch(Sequential):
         img_y = aoisize[1]
 
         input_shape = (img_x, img_y, nchannels)
+        print('inputshape is ', input_shape)
 
         self.add(Conv2D(32, kernel_size=(5,5), strides=(1,1),
                         activation='relu',
