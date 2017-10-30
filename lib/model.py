@@ -14,7 +14,7 @@ class ImageBranch(Sequential):
         img_x = aoisize[0]
         img_y = aoisize[1]
 
-        input_shape = (img_x, img_y, nchannels)
+        input_shape = (None, img_x, img_y, nchannels)
         print('inputshape is ', input_shape)
 
         self.add(Conv2D(32, kernel_size=(5,5), strides=(1,1),
@@ -23,10 +23,8 @@ class ImageBranch(Sequential):
         self.add(MaxPooling2D(pool_size=(2,2), strides=(2,2)))
         self.add(Conv2D(64, (5,5), activation='relu'))
         self.add(MaxPooling2D(pool_size=(2,2)))
-
         self.add(Flatten())
         #want to flatten it together with weather data in model class
-
 
         self.add(Dense(32, activation='relu', input_dim=(input_shape)))
         # self.add(Dropout(0.5))
