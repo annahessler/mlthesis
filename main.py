@@ -1,15 +1,30 @@
 
 import numpy as np
 # import lib.model
-import lib.data
+from lib.datamodule import Data
+from lib.dataset import Dataset
 
-dataset = lib.data.Dataset.defaultDataset('0731')
-# print(dataset)
-# print(dataset.getInputs())
+data = Data.defaultData('0731')
+dataset = Dataset(data)
+usedLayers = ['ndvi', 'slope', 'aspect']
+dataset.usedLayers = usedLayers
+trainData, testData = dataset.split()
 
-trainIndices, testIndices = lib.data.chooseDatasets(dataset)
-usedLayers = ['slope', 'ndvi']
-dataset.getAOIs(usedLayers, trainIndices)
+inp = trainData.getData()
+weather, aois, out = inp
+print(aois.shape)
+
+# inputForModel = data.getAOIs(usedLayers, trainIndices)
+# inputForTest = data.getAOIs(usedLayers, testIndices)
+# # print('trainind shape ', trainIndices.size)
+# nchannels = trainIndices[1]
+# print(trainIndices[1])
+# print(trainIndices[2])
+# print(trainIndices[3])
+# aoisize = [trainIndices[2],trainIndices[3]]
+
+# cnnModel = lib.model.ImageBranch(nchannels, aoisize)
+# ccnModel.fit(inputForModel)
 # print(trainIndices)
 
 # m = lib.model.Model(trainData)
