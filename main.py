@@ -1,28 +1,32 @@
 
 import numpy as np
-import lib.model
+# import lib.model
 import lib.data
-import lib.viz as viz
 
-data = lib.data.createData('0731')
-trainIndices, testIndices = lib.data.chooseDatasets(data)
-trainData = data[trainIndices]
+dataset = lib.data.Dataset.defaultDataset('0731')
+# print(dataset)
+# print(dataset.getInputs())
 
-m = lib.model.Model(trainData)
-m.fit(trainData)
+trainIndices, testIndices = lib.data.chooseDatasets(dataset)
+usedLayers = ['slope', 'ndvi']
+dataset.getAOIs(usedLayers, trainIndices)
+# print(trainIndices)
 
-predictions_test = m.predict(trainData)
-print(predictions_test)
+# m = lib.model.Model(trainData)
+# m.fit(trainData)
 
-testData = data[testIndices]
-predictions_train = m.predict(testData)
-print(predictions_train)
+# predictions_test = m.predict(trainData)
+# print(predictions_test)
 
-np.savetxt('output/predictions_test.csv', predictions_test, delimiter = ',')
-np.savetxt('output/predictions_train.csv', predictions_train, delimiter = ',')
+# testData = data[testIndices]
+# predictions_train = m.predict(testData)
+# print(predictions_train)
 
-res = viz.reassemblePredictions(predictions_test, trainIndices, data.shape)
-viz.show(res)
+# np.savetxt('output/predictions_test.csv', predictions_test, delimiter = ',')
+# np.savetxt('output/predictions_train.csv', predictions_train, delimiter = ',')
+
+# res = viz.reassemblePredictions(predictions_test, trainIndices, data.shape)
+# viz.show(res)
 # evaluate the model
 # scores = m.evaluate(test_today, test_tomorrow)
 # print("\n%s: %.2f%%" % (m.metrics_names[1], scores[1]*100))

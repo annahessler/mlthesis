@@ -5,13 +5,155 @@ import cv2
 VULNERABLE_RADIUS = 300
 PIXEL_SIZE = 30
 
-class Dataset(np.ndarray):
+class Dataset(object):
+    '''Contains an layered image of input data and an image of output data
 
-    # def __init__(self, data):
-    #     super().__init__(data)
+    Some layers are actually used by the NN, others are just internal layers used to calculate other layers.
+    Only some of the pixels within the dataset are actually used by the NN (eg ignore pixels way far away from the fire).
+    '''
+    def __init__(self):
+        self.shape = None
 
-    def getX(self):
-        return self[:,:]
+        self.layers = {}
+        self.data = {}
+        self.output = None
+
+        self.usedVariables = []
+        self.usedPixels = None
+
+    def setUsedPixels(self, indices):
+        '''Select which of the pixels we will use as inputs to the model'''
+        assert len(indices) == 2
+        assert type(indices[0]) == type(np.ndarray([])) and type(indices[1]) == type(np.ndarray([]))
+        assert len(indices[0].shape) == len(indices[1].shape) == 1
+        assert indices[0].size == indices[1].size
+        self.usedPixels = indices
+
+    def addLayer(self, layerName, data, use=True):
+        '''Add the actual layer of data(either spatial 2D or 1D weather/spatial-invariant) to our set'''
+        assert len(data.shape) == 2
+        if self.shape is not None:
+            if self.shape != data.shape:
+                raise ValueError("All spatial data must be the same dimension.")
+        else:
+            self.shape = data.shape
+        self.layers[layerName] = data
+        if use and layerName not in self.usedVariables:
+            self.usedVariables.append(layerName)
+
+    def addData(self, variableName, data, use=True):
+        self.data[variableName] = data
+        if use and variableName not in self.usedVariables:
+            self.usedVariables.append(variableName)
+
+    def addOutput(self, data):
+        self.output = data
+
+    def addInput(self, variableName):
+        '''Select a layer to be used as an input variable to the model'''
+        if variableName not in self.data or variableName not in self.layers:
+            raise ValueError("{} doesn't exist in data or layers".format(variableName))
+        if variableName not in self.usedVariables:
+            self.usedVariables.append(variableName)
+
+    def removeInput(self, variableName):
+        self.usedVariables.remove(variableName)
+
+    def getInputDimension(self):
+        '''How many variables does each data point use as input in our model'''
+        return len(self.usedVariables)
+
+    def getInputs(self):
+        '''Return a 1D array of input vectors, ready to be used by the model'''
+        if len(self.usedVariables) < 1:
+            raise ValueError("At least one variable must be selected as input.")
+        if self.shape is None:
+            raise ValueError("At least one layer must be used")
+
+        usedLayers = []
+        for name in self.usedVariables:
+            if name in self.layers:
+                usedLayers.append(self.layers[name])
+            else:
+                h,w = self.shape
+                d = self.data[name]
+                usedLayers.append(np.tile(d,(h,w,1)))
+        # print(self.usedVariables)
+        stacked = np.dstack(tuple(usedLayers))
+        # print(stacked)
+
+        if self.usedPixels is None:
+            return stacked
+        else:
+            return stacked[self.usedPixels]
+
+    def stackLayers(self, layerNames):
+        layers = [self.layers[name] for name in layerNames]
+        stacked = np.dstack(tuple(layers))
+        return stacked
+
+    def getAOIs(self, layerNames, indices, radius=15):
+        stacked = self.stackLayers(layerNames)
+        aois = []
+        r = radius
+        for y,x in zip(*indices):
+            aois.append(stacked[y-r:y+r+1,x-r:x+r+1,:])
+        arr = np.array(aois)
+        # print(arr, arr.shape)
+        swapped = np.swapaxes(arr,1,3)
+        swapped = np.swapaxes(swapped,2,3)
+        print(swapped, swapped.shape)
+        return swapped
+
+    @staticmethod
+    def semiFlatten(data):
+        '''Ensure the data is an array of vectors, what keras wants'''
+        return data.reshape(-1, data.shape[-1])
+
+    def getOutput(self):
+        '''Return a 1D array of output values, ready to be used by the model'''
+        if self.output is None:
+            raise ValueError("Output data must be set.")
+        if self.usedPixels is None:
+            return self.output
+        else:
+            return self.output[self.usedPixels]
+
+    @staticmethod
+    def defaultDataset(dateString):
+        d = Dataset()
+
+        dem = cv2.imread('data/raw/dem.tif', cv2.IMREAD_UNCHANGED)
+        slope = cv2.imread('data/raw/slope.tif',cv2.IMREAD_UNCHANGED)
+        landsat = cv2.imread('data/raw/landsat.png', cv2.IMREAD_UNCHANGED)
+        ndvi = cv2.imread('data/raw/NDVI_1.tif', cv2.IMREAD_UNCHANGED)
+        d.addLayer('dem', dem)
+        d.addLayer('slope', slope)
+        for name, band in zip(['r','g','b','nir'], cv2.split(landsat)):
+            d.addLayer(name,band)
+        d.addLayer('ndvi', ndvi)
+
+        perim = openStartingPerim(dateString)
+        d.addLayer('perim', perim)
+
+        weatherData = createWeatherMetrics(openWeatherData(dateString))
+        for name, data in zip(['maxTemp', 'avgWSpeed', 'avgWDir', 'precip', 'avgHum'], weatherData):
+            d.addData(name, data)
+
+        output = openEndingPerim(dateString)
+        d.addOutput(output)
+
+        return d
+
+    def __repr__(self):
+        res = "Dataset("
+        res += "layers:" + repr(self.layers.keys())
+        res += ", data:" + repr(self.data.keys())
+        res += ", used:" + repr(self.usedVariables)
+        return res
+
+
+
 
 def openLandData():
     dem = cv2.imread('data/raw/dem.tif', cv2.IMREAD_UNCHANGED)
@@ -94,8 +236,8 @@ def findDistance(startingPerim):
     dist = cv2.distanceTransform(inverted, cv2.DIST_L2, 5)
     return dist
 
-def chooseDatasets(data, ratio=.75, shuffle=True):
-    startingPerim = data[:,:,0]
+def chooseDatasets(dataset, ratio=.75, shuffle=True):
+    startingPerim = dataset.layers['perim']
     vulnerableIndices = findVulnerablePixels(startingPerim)
     if shuffle:
         xs,ys = vulnerableIndices
@@ -110,12 +252,3 @@ def chooseDatasets(data, ratio=.75, shuffle=True):
 def saveData(data, dateString):
     np.savetxt('data/forModel/'+ dateString+'.csv', list(data.reshape(-1, data.shape[-1])), delimiter=',')
 
-date = '0731'
-data = createData(date)
-train, test = chooseDatasets(data)
-
-# print(train)
-saveData(data[train], 'train')
-saveData(data[test], 'test')
-
-# print(data[train])
