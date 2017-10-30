@@ -5,7 +5,7 @@ import cv2
 VULNERABLE_RADIUS = 300
 PIXEL_SIZE = 30
 
-class Dataset(object):
+class Data(object):
     '''Contains an layered image of input data and an image of output data
 
     Some layers are actually used by the NN, others are just internal layers used to calculate other layers.
@@ -19,7 +19,7 @@ class Dataset(object):
         self.output = None
 
         self.usedVariables = []
-        self.usedPixels = None
+        self.datasets = {}
 
     def setUsedPixels(self, indices):
         '''Select which of the pixels we will use as inputs to the model'''
@@ -56,37 +56,6 @@ class Dataset(object):
         if variableName not in self.usedVariables:
             self.usedVariables.append(variableName)
 
-    def removeInput(self, variableName):
-        self.usedVariables.remove(variableName)
-
-    def getInputDimension(self):
-        '''How many variables does each data point use as input in our model'''
-        return len(self.usedVariables)
-
-    def getInputs(self):
-        '''Return a 1D array of input vectors, ready to be used by the model'''
-        if len(self.usedVariables) < 1:
-            raise ValueError("At least one variable must be selected as input.")
-        if self.shape is None:
-            raise ValueError("At least one layer must be used")
-
-        usedLayers = []
-        for name in self.usedVariables:
-            if name in self.layers:
-                usedLayers.append(self.layers[name])
-            else:
-                h,w = self.shape
-                d = self.data[name]
-                usedLayers.append(np.tile(d,(h,w,1)))
-        # print(self.usedVariables)
-        stacked = np.dstack(tuple(usedLayers))
-        # print(stacked)
-
-        if self.usedPixels is None:
-            return stacked
-        else:
-            return stacked[self.usedPixels]
-
     def stackLayers(self, layerNames):
         layers = [self.layers[name] for name in layerNames]
         stacked = np.dstack(tuple(layers))
@@ -99,16 +68,34 @@ class Dataset(object):
         for y,x in zip(*indices):
             aois.append(stacked[y-r:y+r+1,x-r:x+r+1,:])
         arr = np.array(aois)
-        # print(arr, arr.shape)
+
+        # we need the tensor to have dimensions (nsamples, nchannels, AOIwidth,AOIheight)
+        # it starts as (nsamples, AOIwidth,AOIheight, nchannels)
         swapped = np.swapaxes(arr,1,3)
         swapped = np.swapaxes(swapped,2,3)
-        print(swapped, swapped.shape)
         return swapped
 
-    @staticmethod
-    def semiFlatten(data):
-        '''Ensure the data is an array of vectors, what keras wants'''
-        return data.reshape(-1, data.shape[-1])
+    def findVulnerablePixels(self, radius=VULNERABLE_RADIUS):
+        '''Return the indices of the pixels that close to the current fire perimeter'''
+        startingPerim = self.layers['perim']
+        kernel = np.ones((3,3))
+        its = int(round((2*(radius/PIXEL_SIZE)**2)**.5))
+        dilated = cv2.dilate(startingPerim, kernel, iterations=its)
+        border = dilated - startingPerim
+        return np.where(border)
+
+    def chooseDatasets(self, ratio=.75, shuffle=True):
+        startingPerim = self.layers['perim']
+        xs,ys = findVulnerableIndices(self)
+        if shuffle:
+            p = np.random.permutation(len(xs))
+            xs,ys = xs[p], ys[p]
+        # now split them into train and test sets
+        splitIndex = si = int(ratio*len(xs))
+        train = (xs[:si], ys[:si])
+        test  = (xs[si:], ys[si:])
+        self.datasets['train'] = train
+        self.datasets['test']  = test
 
     def getOutput(self):
         '''Return a 1D array of output values, ready to be used by the model'''
@@ -149,10 +136,7 @@ class Dataset(object):
         res = "Dataset("
         res += "layers:" + repr(self.layers.keys())
         res += ", data:" + repr(self.data.keys())
-        res += ", used:" + repr(self.usedVariables)
         return res
-
-
 
 
 def openLandData():
@@ -192,14 +176,6 @@ def openWeatherData(dateString):
     data = np.loadtxt(fname, skiprows=1, usecols=range(5,12), delimiter=',').T
     return data
 
-def findVulnerablePixels(startingPerim, radius=VULNERABLE_RADIUS):
-    '''Return the indices of the pixels that close to the current fire perimeter'''
-    kernel = np.ones((3,3))
-    its = int(round((2*(radius/PIXEL_SIZE)**2)**.5))
-    dilated = cv2.dilate(startingPerim, kernel, iterations=its)
-    border = dilated - startingPerim
-    return np.where(border)
-
 def createWeatherMetrics(weatherData):
     temp, dewpt, temp2, wdir, wspeed, precip, hum = weatherData
     avgWSpeed = sum(wspeed)/len(wspeed)
@@ -208,47 +184,8 @@ def createWeatherMetrics(weatherData):
     avgHum = sum(hum)/len(hum)
     return np.array( [max(temp), avgWSpeed, avgWDir, totalPrecip, avgHum])
 
-def createRawData(dateString):
-    # create inputs
-    startingPerim = openStartingPerim(dateString)
-    landData = openLandData()
-    weatherData = createWeatherMetrics(openWeatherData(dateString))
-    h,w = landData.shape[:2]
-    tiledWeather = np.tile(weatherData,(h,w,1))
-
-    return np.dstack((startingPerim, landData, tiledWeather))
-
-def createData(dateString):
-    # open all of our raw data, read directly from data files
-    raw = createRawData(dateString)
-    # there are some secondary inputs to model, such as distance to fire, etc
-    derived = createDerivedData(raw)
-    output = openEndingPerim(dateString)
-    return np.dstack((raw, derived, output))
-
 def createDerivedData(rawData):
     startingPerim = rawData[:,:,0].astype(np.uint8)
     distance = findDistance(startingPerim)
     return np.dstack((distance,))
-
-def findDistance(startingPerim):
-    inverted = 255-startingPerim
-    dist = cv2.distanceTransform(inverted, cv2.DIST_L2, 5)
-    return dist
-
-def chooseDatasets(dataset, ratio=.75, shuffle=True):
-    startingPerim = dataset.layers['perim']
-    vulnerableIndices = findVulnerablePixels(startingPerim)
-    if shuffle:
-        xs,ys = vulnerableIndices
-        p = np.random.permutation(len(xs))
-        xs,ys = xs[p], ys[p]
-    # now split them into train and test sets
-    splitIndex = si = int(ratio*len(xs))
-    train = (xs[:si], ys[:si])
-    test  = (xs[si:], ys[si:])
-    return train, test
-
-def saveData(data, dateString):
-    np.savetxt('data/forModel/'+ dateString+'.csv', list(data.reshape(-1, data.shape[-1])), delimiter=',')
 
