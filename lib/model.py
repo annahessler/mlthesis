@@ -48,8 +48,8 @@ class ImageBranch(Sequential):
         print('testdata shape', testdata.shape)
 
         # guarantee the data is a 1D array of vectors
-        traindata = traindata.reshape(-1, traindata.shape[-1])
-        print('traindata reshape', traindata.shape)
+        # traindata = traindata.reshape(-1, traindata.shape[-1])
+        # print('traindata reshape', traindata.shape)
         # the last entry in each vector is the output
         inp = traindata[:,:-1]
         out = traindata[:,-1]
