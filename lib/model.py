@@ -54,7 +54,7 @@ class ImageBranch(Sequential):
 class Model(Sequential):
 
     def __init__(self, weatherDataSize, spatialChannels, aoiSize):
-
+        super().__init__()
         self.wb = WeatherBranch(weatherDataSize)
         self.ib = ImageBranch(spatialChannels, aoiSize)
 
