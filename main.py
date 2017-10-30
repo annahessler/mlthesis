@@ -13,6 +13,9 @@ inputForModel = dataset.getAOIs(usedLayers, trainIndices)
 inputForTest = dataset.getAOIs(usedLayers, testIndices)
 # print('trainind shape ', trainIndices.size)
 nchannels = trainIndices[1]
+print(trainIndices[1])
+print(trainIndices[2])
+print(trainIndices[3])
 aoisize = [trainIndices[2],trainIndices[3]]
 
 cnnModel = lib.model.ImageBranch(nchannels, aoisize)
