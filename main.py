@@ -1,6 +1,6 @@
 
 import numpy as np
-# import lib.model
+import lib.model
 import lib.data
 
 dataset = lib.data.Dataset.defaultDataset('0731')
@@ -9,7 +9,14 @@ dataset = lib.data.Dataset.defaultDataset('0731')
 
 trainIndices, testIndices = lib.data.chooseDatasets(dataset)
 usedLayers = ['slope', 'ndvi']
-dataset.getAOIs(usedLayers, trainIndices)
+inputForModel = dataset.getAOIs(usedLayers, trainIndices)
+inputForTest = dataset.getAOIs(usedLayers, testIndices)
+# print('trainind shape ', trainIndices.size)
+nchannels = trainIndices[1]
+aoisize = [trainIndices[2],trainIndices[3]]
+
+cnnModel = lib.model.ImageBranch(nchannels, aoisize)
+ccnModel.fit(inputForModel)
 # print(trainIndices)
 
 # m = lib.model.Model(trainData)
