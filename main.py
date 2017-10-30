@@ -17,7 +17,7 @@ print('THIS IS INPUT: ', inputForModel.shape)
 aoisize = [inputForModel.shape[2], inputForModel.shape[3]]
 
 cnnModel = lib.model.ImageBranch(nchannels, aoisize)
-cnnModel.fitModel(inputForModel, inputForTest)
+cnnModel.fit(inputForModel, inputForTest)
 # print(trainIndices)
 
 # m = lib.model.Model(trainData)
