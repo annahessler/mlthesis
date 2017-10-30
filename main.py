@@ -1,7 +1,7 @@
 
 import numpy as np
 
-# import lib.model
+import lib.model
 from lib.datamodule import Data
 from lib.dataset import Dataset
 
