@@ -36,23 +36,26 @@ class ImageBranch(Sequential):
               loss='binary_crossentropy',
               metrics=['accuracy'])
 
-    def fitModel(self, traindata, testdata):
+    def fit(self, traindata, validatedata):
 
         traindata = traindata.astype('float32')
-        testdata = testdata.astype('float32')
+        validatedata = validatedata.astype('float32')
 
         # figure out normalization
 
         print('traindata shape', traindata.shape)
-        print('testdata shape', testdata.shape)
+        print('validatedata shape', validatedata.shape)
+
+        print('traindata:  ', traindata.shape(0))
 
         # guarantee the data is a 1D array of vectors
         # traindata = traindata.reshape(-1, traindata.shape[-1])
         # print('traindata reshape', traindata.shape)
         # the last entry in each vector is the output
-        inp = traindata[:,:-1]
-        out = traindata[:,-1]
-        super().fit(inp, out, epochs=100, batch_size=17500, validation_data=(inp, out))
+        # inp = traindata[:,:-1]
+        # out = traindata[:,-1]
+        # super().fit(inp, out, epochs=100, batch_size=17500, validation_data=(inp, out))
+        super().fit(inp, out, epochs=100, batch_size=17500, validation_data=(validatedata))
 
     def predict(self, data):
         # guarantee the data is a 1D array of vectors
