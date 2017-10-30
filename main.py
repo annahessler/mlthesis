@@ -1,6 +1,6 @@
 
 import numpy as np
-<<<<<<< HEAD
+
 # import lib.model
 from lib.datamodule import Data
 from lib.dataset import Dataset
