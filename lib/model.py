@@ -49,7 +49,7 @@ class FireModel(Model):
 
         concat = Concatenate()([self.wb,self.ib.output])
         print('concat ' , concat.shape)
-        out = Dense(79, kernel_initializer = 'normal', activation = 'sigmoid')(concat)
+        out = Dense(1, kernel_initializer = 'normal', activation = 'sigmoid')(concat)
         print("concat and out info:", concat.shape, out.shape)
         super().__init__([self.wb, self.ib.input], out)
 
