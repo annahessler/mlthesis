@@ -1,6 +1,7 @@
 print('importing keras...')
 from keras.models import Sequential
-from keras.layers import Dense, Activation, Dropout, Flatten, Merge, Add
+from keras.layers import Dense, Activation, Dropout, Flatten, Merge
+from keras.layers.merge import Concatenate
 from keras.optimizers import SGD
 from keras.layers import Conv2D, MaxPooling2D
 print('done.')
@@ -58,7 +59,8 @@ class Model(Sequential):
         self.wb = WeatherBranch(weatherDataSize)
         self.ib = ImageBranch(spatialChannels, aoiSize)
 
-        self.add(Add([self.wb, self.ib]))
+        merged = Concatenate([self.wb, self.ib])
+        self.add(merged)
         self.add(Dense(1, init = 'normal', activation = 'sigmoid'))
         sgd = SGD(lr = 0.1, momentum = 0.9, decay = 0, nesterov = False)
         self.compile(loss = 'binary_crossentropy', optimizer = sgd, metrics = ['accuracy'])
