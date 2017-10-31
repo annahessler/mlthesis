@@ -48,6 +48,7 @@ class FireModel(Model):
         print('image branch info:', self.ib.input_shape, self.ib.output_shape, self.ib.output)
 
         concat = Concatenate()([self.wb,self.ib.output])
+        print('concat ' , concat.shape)
         out = Dense(64, kernel_initializer = 'normal', activation = 'sigmoid')(concat)
         print("concat and out info:", concat.shape, out.shape)
         super().__init__([self.wb, self.ib.input], out)
