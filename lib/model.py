@@ -48,13 +48,14 @@ class FireModel(Model):
         print('image branch info:', self.ib.input_shape, self.ib.output_shape, self.ib.output)
 
         concat = Concatenate()([self.wb,self.ib.output])
-        out = Dense(1, kernel_initializer = 'normal', activation = 'sigmoid')(concat)
+        out = Dense(64, kernel_initializer = 'normal', activation = 'sigmoid')(concat)
         print("concat and out info:", concat.shape, out.shape)
         super().__init__([self.wb, self.ib.input], out)
 
         # self.add(Concatenate([self.wb, self.ib]))
         sgd = SGD(lr = 0.1, momentum = 0.9, decay = 0.1, nesterov = False)
-        self.compile(loss = 'binary_crossentropy', optimizer = sgd, metrics = ['accuracy'])
+        adam2 = Adam(lr=0.1, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
+        self.compile(loss = 'binary_crossentropy', optimizer = adam2, metrics = ['accuracy'])
 
 
     def fit(self, trainData):
