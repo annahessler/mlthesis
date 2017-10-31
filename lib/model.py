@@ -60,7 +60,14 @@ class Model(Sequential):
         self.ib = ImageBranch(spatialChannels, aoiSize)
 
         merged = Concatenate([self.wb, self.ib])
-        print(merged.shape)
+        print(merged)
+        img_x = aoiSize[0]
+        img_y = aoiSize[1]
+        print('spacial channels are ', spatialChannels)
+        print('weatherdata size is ', weatherDataSize)
+
+        input_shape = (img_x, img_y, nchannels)
+        
         self.add(merged)
         self.add(Dense(1, init = 'normal', activation = 'sigmoid'))
         sgd = SGD(lr = 0.1, momentum = 0.9, decay = 0, nesterov = False)
