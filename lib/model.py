@@ -20,16 +20,20 @@ class ImageBranch(Sequential):
         img_y = aoisize[1]
         input_shape = (img_x, img_y, nchannels)
 
-        self.add(Conv2D(32, kernel_size=(3,3), strides=(1,1),
-                        activation='relu',
+        self.add(Conv2D(128, kernel_size=(3,3), strides=(1,1),
+                        activation='sigmoid',
+                        input_shape=input_shape))
+        self.add(MaxPooling2D(pool_size=(3,3), strides=(2,2)))
+        self.add(Conv2D(64, kernel_size=(3,3), strides=(1,1),
+                        activation='sigmoid',
                         input_shape=input_shape))
         self.add(MaxPooling2D(pool_size=(2,2), strides=(2,2)))
         # self.add(Conv2D(64, (5,5), activation='relu'))
         # self.add(MaxPooling2D(pool_size=(2,2)))
         self.add(Flatten())
-        self.add(Dense(128, activation='relu'))
+        self.add(Dense(64, activation='sigmoid'))
 
-        self.compile(optimizer='rmsprop',
+        self.compile(optimizer=Adam(),
               loss='binary_crossentropy',
               metrics=['accuracy'])
 
@@ -49,7 +53,7 @@ class FireModel(Model):
         super().__init__([self.wb, self.ib.input], out)
 
         # self.add(Concatenate([self.wb, self.ib]))
-        sgd = SGD(lr = 0.1, momentum = 0.9, decay = 0, nesterov = False)
+        sgd = SGD(lr = 0.1, momentum = 0.9, decay = 0.1, nesterov = False)
         self.compile(loss = 'binary_crossentropy', optimizer = sgd, metrics = ['accuracy'])
 
 
