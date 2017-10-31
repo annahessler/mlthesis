@@ -1,62 +1,89 @@
 print('importing keras...')
-from keras.models import Sequential, Model
-from keras.layers import Dense, Activation, Dropout, Flatten, Concatenate, Input
+from keras.models import Sequential
+from keras.layers import Dense, Activation, Dropout, Merge
 from keras.optimizers import SGD
-from keras.layers import Conv2D, MaxPooling2D
 print('done.')
 
 
-# class WeatherBranch(Sequential):
+class WeatherBranch(Sequential):
 
-#     def __init__(self, inputSize):
-#         super().__init__()
-#         self.add(Dense(32, activation='relu', input_dim=(inputSize)))
+    def __init__(self, inputSize):
+        super().__init__()
+        self.add(Dense(32, activation='relu', input_dim=(inputSize)))
+        self.add(Dropout(0.5))
+        self.add(Dense(1, activation='sigmoid'))
 
 class ImageBranch(Sequential):
 
     def __init__(self, nchannels, aoisize):
         super().__init__()
+        # inputSize = traindata.shape[-1]-1
+        # train dataset passed in main
         img_x = aoisize[0]
         img_y = aoisize[1]
+
         input_shape = (img_x, img_y, nchannels)
 
-        self.add(Conv2D(32, kernel_size=(3,3), strides=(1,1),
+        self.add(Conv2D(128, kernel_size=(5,5), strides=(1,1),
                         activation='relu',
                         input_shape=input_shape))
         self.add(MaxPooling2D(pool_size=(2,2), strides=(2,2)))
-        # self.add(Conv2D(64, (5,5), activation='relu'))
-        # self.add(MaxPooling2D(pool_size=(2,2)))
+        self.add(Conv2D(64, (5,5), activation='relu'))
+        self.add(MaxPooling2D(pool_size=(2,2)))
+
         self.add(Flatten())
-        self.add(Dense(128, activation='relu'))
+        #want to flatten it together with weather data in model class
 
-        self.compile(optimizer='rmsprop',
-              loss='binary_crossentropy',
-              metrics=['accuracy'])
 
-class FireModel(Model):
+        # self.add(Dense(32, activation='relu', input_dim=(inputSize)))
+        # self.add(Dropout(0.5))
+        # self.add(Dense(1, activation='sigmoid'))
+
+        # sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+
+        # self.compile(optimizer='rmsprop',
+        #       loss='binary_crossentropy',
+        #       metrics=['accuracy'])
+
+
+
+class Model(Sequential):
 
     def __init__(self, weatherDataSize, spatialChannels, aoiSize):
-        print("creating network with shape", weatherDataSize, spatialChannels, aoiSize)
-        self.wb = Input((weatherDataSize,))
+
+        self.wb = WeatherBranch(weatherDataSize)
         self.ib = ImageBranch(spatialChannels, aoiSize)
 
-        print('weather branch info:', self.wb.shape)
-        print('image branch info:', self.ib.input_shape, self.ib.output_shape, self.ib.output)
-
-        concat = Concatenate()([self.wb,self.ib.output])
-        out = Dense(1, kernel_initializer = 'normal', activation = 'sigmoid')(concat)
-        print("concat and out info:", concat.shape, out.shape)
-        super().__init__([self.wb, self.ib.input], out)
-
-        # self.add(Concatenate([self.wb, self.ib]))
+        self.add(Merge([self.wb, self.ib], mode = 'concat'))
+        self.add(Dense(32, init = 'normal', activation = 'sigmoid'))
+        self.add(Dense(1, init = 'normal', activation = 'relu'))
         sgd = SGD(lr = 0.1, momentum = 0.9, decay = 0, nesterov = False)
-        self.compile(loss = 'binary_crossentropy', optimizer = sgd, metrics = ['accuracy'])
+        self.compile(loss = 'binary_crossentropy', optimizer = Adam(), metrics = ['accuracy'])
 
 
-    def fit(self, trainData):
-        weather,spatialData, outputs = trainData.getData()
-        super().fit([weather, spatialData], outputs, batch_size = 2000, epochs = 50, verbose = 1)
+    def fit(self, weatherData, spatialData, outputs):
 
-    def predict(self, dataset):
-        weather,spatialData, outputs = dataset.getData()
-        return super().predict([weather, spatialData])
+        super().fit([weather, spatialData], outputs, batch_size = 2000, nb_epoch = 100, verbose = 1)
+
+        # traindata = traindata.astype('float32')
+        # testdata = testdata.astype('float32')
+
+        # # figure out normalization
+
+        # print('traindata shape', traindata.shape)
+        # print('testdata shape', testdata.shape)
+        # # guarantee the data is a 1D array of vectors
+        # traindata = traindata.reshape(-1, data.shape[-1])
+        # print('traindata reshape', traindata.shape)
+        # # the last entry in each vector is the output
+        # inp = data[:,:-1]
+        # out = data[:,-1]
+        # super().fit(inp, out, epochs=100, batch_size=17500, validation_data=(inp, out))
+
+    def predict(self, data):
+        # guarantee the data is a 1D array of vectors
+        data = data.reshape(-1, data.shape[-1])
+        # the last entry in each vector is the output
+        inp = data[:,:-1]
+
+        return super().predict(inp).flatten()
