@@ -5,12 +5,13 @@ from .datamodule import PIXEL_SIZE
 VULNERABLE_RADIUS = 300
 
 class Dataset(object):
-
     def __init__(self, data, indices=None, usedLayers=None, usedWeather=None):
         self.data = data
         if indices is None:
             # use every pixel
-            self.indices = np.ndindex(self.data.shape)
+            i = np.array(list(np.ndindex(self.data.shape)))
+            xs, ys = i[:,0], i[:,1]
+            self.indices = (xs, ys)
         else:
             self.indices = indices
 
@@ -24,11 +25,6 @@ class Dataset(object):
         for y,x in zip(*self.indices):
             aois.append(stacked[y-r:y+r+1,x-r:x+r+1,:])
         arr = np.array(aois)
-
-        # we need the tensor to have dimensions (nsamples, nchannels, AOIwidth,AOIheight)
-        # it starts as (nsamples, AOIwidth,AOIheight, nchannels)
-        # arr = np.swapaxes(arr,1,3)
-        # arr = np.swapaxes(arr,2,3)
         return arr
 
     def getWeather(self):
@@ -41,6 +37,17 @@ class Dataset(object):
 
     def getData(self):
         return self.getWeather(), self.getAOIs(), self.getOutput()
+
+    def getLayer(self, layerName, which='used'):
+        l = self.data.layers[layerName]
+        if which == 'used':
+            res = np.zeros_like(l)
+            res[self.indices] = l[self.indices]
+            return res
+        elif which == 'all':
+            return l
+        else:
+            raise ValueError("Expected 'used' or 'all' as argument for parameter which")
 
     @staticmethod
     def findVulnerablePixels(startingPerim, radius=VULNERABLE_RADIUS):
@@ -69,10 +76,15 @@ class Dataset(object):
     def normalize(self): #this still needs to be called
         for key in self.data.layers:
             layer = self.data.layers[key].astype(np.float32)
-            minimum = min(layer)
+            minimum = layer.min()
             layer = layer - minimum
-            maximum = max(layer)
+            maximum = layer.max()
             layer = layer/maximum
             self.data.layers[key] = layer
 
+    def __len__(self):
+        return len(self.indices[0])
 
+# class Result(Dataset):
+#
+#     def __init__(self, startingData)

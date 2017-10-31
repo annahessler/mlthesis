@@ -22,12 +22,15 @@ class ImageBranch(Sequential):
 
         self.add(Conv2D(64, kernel_size=(3,3), strides=(1,1),
                         activation='relu',
-                        input_shape=input_shape))
-        self.add(MaxPooling2D(pool_size=(2,2), strides=(2,2)))
+                        input_shape=input_shape,
+                        name='imageInput'))
+        self.add(MaxPooling2D(pool_size=(2,2),
+                            strides=(2,2),
+                            name='pool1'))
         # self.add(Conv2D(64, (5,5), activation='relu'))
         # self.add(MaxPooling2D(pool_size=(2,2)))
-        self.add(Flatten())
-        self.add(Dense(128, activation='relu'))
+        self.add(Flatten(name='flat'))
+        self.add(Dense(128, activation='relu',name='dense1'))
 
         self.compile(optimizer='rmsprop',
             loss='binary_crossentropy',
@@ -37,14 +40,14 @@ class FireModel(Model):
 
     def __init__(self, weatherDataSize, spatialChannels, aoiSize):
         # print("creating network with shape", weatherDataSize, spatialChannels, aoiSize)
-        self.wb = Input((weatherDataSize,))
+        self.wb = Input((weatherDataSize,),name='weatherInput')
         self.ib = ImageBranch(spatialChannels, aoiSize)
 
         # print('weather branch info:', self.wb.shape)
         # print('image branch info:', self.ib.input_shape, self.ib.output_shape, self.ib.output)
 
-        concat = Concatenate()([self.wb,self.ib.output])
-        out = Dense(1, kernel_initializer = 'normal', activation = 'sigmoid')(concat)
+        concat = Concatenate(name='mergedBranches')([self.wb,self.ib.output])
+        out = Dense(1, kernel_initializer = 'normal', activation = 'sigmoid',name='output')(concat)
         # print("concat and out info:", concat.shape, out.shape)
         super().__init__([self.wb, self.ib.input], out)
 
@@ -55,7 +58,10 @@ class FireModel(Model):
 
     def fit(self, trainData):
         weather,spatialData, outputs = trainData.getData()
-        super().fit([weather, spatialData], outputs, batch_size = 1000, epochs = 50, verbose = 1)
+        super().fit([weather, spatialData], outputs, batch_size = 1000, epochs = 15, verbose = 1)
+        from time import localtime, strftime
+        timeString = strftime("%d%b%H:%M", localtime())
+        self.save('models/{}.h5'.format(timeString))
 
     def predict(self, dataset):
         weather,spatialData, outputs = dataset.getData()
