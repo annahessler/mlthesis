@@ -58,7 +58,7 @@ class Model(Sequential):
         self.wb = WeatherBranch(weatherDataSize)
         self.ib = ImageBranch(spatialChannels, aoiSize)
 
-        self.add(Merge([self.wb, self.ib], mode = 'concat'))
+        self.add([self.wb, self.ib])
         self.add(Dense(1, init = 'normal', activation = 'sigmoid'))
         sgd = SGD(lr = 0.1, momentum = 0.9, decay = 0, nesterov = False)
         self.compile(loss = 'binary_crossentropy', optimizer = sgd, metrics = ['accuracy'])
