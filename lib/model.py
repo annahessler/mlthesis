@@ -60,6 +60,7 @@ class Model(Sequential):
         self.ib = ImageBranch(spatialChannels, aoiSize)
 
         merged = Concatenate([self.wb, self.ib])
+        print(merged.shape)
         self.add(merged)
         self.add(Dense(1, init = 'normal', activation = 'sigmoid'))
         sgd = SGD(lr = 0.1, momentum = 0.9, decay = 0, nesterov = False)
