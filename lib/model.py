@@ -1,7 +1,7 @@
 print('importing keras...')
 from keras.models import Sequential, Model
 from keras.layers import Dense, Activation, Dropout, Flatten, Concatenate, Input
-from keras.optimizers import SGD
+from keras.optimizers import SGD, Adam
 from keras.layers import Conv2D, MaxPooling2D
 print('done.')
 
@@ -33,7 +33,7 @@ class ImageBranch(Sequential):
         self.add(Flatten())
         self.add(Dense(64, activation='sigmoid'))
 
-        self.compile(optimizer=Adam(),
+        self.compile(optimizer='Adam',
               loss='binary_crossentropy',
               metrics=['accuracy'])
 
