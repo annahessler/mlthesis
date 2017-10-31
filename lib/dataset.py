@@ -17,6 +17,15 @@ class Dataset(object):
         self.usedLayers = usedLayers
         self.usedWeather = usedWeather
 
+    def normalize(self): #this still needs to be called
+        for key in self.data.layers:
+            layer = self.data.layers[key].astype(np.float32)
+            minimum = min(layer)
+            layer = layer - minimum
+            maximum = max(layer)
+            layer = layer/maximum
+            self.data.layers[key] = layer
+
     def getAOIs(self, radius=15):
         stacked = self.data.stackLayers(self.usedLayers)
         aois = []
@@ -65,5 +74,3 @@ class Dataset(object):
         train = Dataset(self.data, trainIndices, self.usedLayers, self.usedWeather)
         test = Dataset(self.data, testIndices, self.usedLayers, self.usedWeather)
         return train, test
-
-

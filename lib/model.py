@@ -1,6 +1,6 @@
 print('importing keras...')
 from keras.models import Sequential
-from keras.layers import Dense, Activation, Dropout, Flatten, Merge
+from keras.layers import Dense, Activation, Dropout, Flatten, concatenate, Concatenate
 from keras.optimizers import SGD
 from keras.layers import Conv2D, MaxPooling2D
 print('done.')
@@ -24,9 +24,8 @@ class ImageBranch(Sequential):
         img_y = aoisize[1]
 
         input_shape = (img_x, img_y, nchannels)
-        print('inputshape is ', input_shape)
 
-        self.add(Conv2D(32, kernel_size=(5,5), strides=(1,1),
+        self.add(Conv2D(64, kernel_size=(3,3), strides=(1,1),
                         activation='relu',
                         input_shape=input_shape))
         self.add(MaxPooling2D(pool_size=(2,2), strides=(2,2)))
@@ -58,7 +57,7 @@ class Model(Sequential):
         self.wb = WeatherBranch(weatherDataSize)
         self.ib = ImageBranch(spatialChannels, aoiSize)
 
-        self.add(Merge([self.wb, self.ib], mode = 'concat'))
+        self.add(Concatenate([self.wb, self.ib]))
         self.add(Dense(1, init = 'normal', activation = 'sigmoid'))
         sgd = SGD(lr = 0.1, momentum = 0.9, decay = 0, nesterov = False)
         self.compile(loss = 'binary_crossentropy', optimizer = sgd, metrics = ['accuracy'])
@@ -94,7 +93,7 @@ class Model(Sequential):
         # inp = traindata[:,:-1]
         # out = traindata[:,-1]
         # super().fit(inp, out, epochs=100, batch_size=17500, validation_data=(inp, out))
-        
+
 
     def predict(self, data):
         # guarantee the data is a 1D array of vectors
