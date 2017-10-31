@@ -49,7 +49,7 @@ class FireModel(Model):
 
         concat = Concatenate()([self.wb,self.ib.output])
         print('concat ' , concat.shape)
-        out = Dense(1, kernel_initializer = 'normal', activation = 'sigmoid')(concat)
+        out = Dense(1, kernel_initializer = 'normal', activation = 'relu')(concat)
         print("concat and out info:", concat.shape, out.shape)
         super().__init__([self.wb, self.ib.input], out)
 
@@ -61,7 +61,7 @@ class FireModel(Model):
 
     def fit(self, trainData):
         weather,spatialData, outputs = trainData.getData()
-        super().fit([weather, spatialData], outputs, batch_size = 2000, epochs = 50, verbose = 1)
+        super().fit([weather, spatialData], outputs, batch_size = 2000, epochs = 15, verbose = 1)
 
     def predict(self, dataset):
         weather,spatialData, outputs = dataset.getData()
