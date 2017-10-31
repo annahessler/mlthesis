@@ -1,7 +1,7 @@
 print('importing keras...')
 from keras.models import Sequential, Model
 from keras.layers import Dense, Activation, Dropout, Flatten, Concatenate, Input
-from keras.optimizers import SGD
+from keras.optimizers import SGD, RMSprop
 from keras.layers import Conv2D, MaxPooling2D
 print('done.')
 
@@ -21,11 +21,11 @@ class ImageBranch(Sequential):
         input_shape = (img_x, img_y, nchannels)
 
         self.add(Conv2D(32, kernel_size=(3,3), strides=(1,1),
-                        activation='relu',
+                        activation='sigmoid',
                         input_shape=input_shape))
         self.add(MaxPooling2D(pool_size=(2,2), strides=(2,2)))
-        # self.add(Conv2D(64, (5,5), activation='relu'))
-        # self.add(MaxPooling2D(pool_size=(2,2)))
+        self.add(Conv2D(64, (3,3), activation='relu'))
+        self.add(MaxPooling2D(pool_size=(2,2)))
         self.add(Flatten())
         self.add(Dense(128, activation='relu'))
 
@@ -50,12 +50,13 @@ class FireModel(Model):
 
         # self.add(Concatenate([self.wb, self.ib]))
         sgd = SGD(lr = 0.1, momentum = 0.9, decay = 0, nesterov = False)
+        #rms = RMSprop(lr=0.001, rho=0.9, epsilon=1e-08, decay=0.0)
         self.compile(loss = 'binary_crossentropy', optimizer = sgd, metrics = ['accuracy'])
 
 
     def fit(self, trainData):
         weather,spatialData, outputs = trainData.getData()
-        super().fit([weather, spatialData], outputs, batch_size = 2000, epochs = 50, verbose = 1)
+        super().fit([weather, spatialData], outputs, batch_size = 1000, epochs = 50, verbose = 1)
 
     def predict(self, dataset):
         weather,spatialData, outputs = dataset.getData()
