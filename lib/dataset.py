@@ -17,15 +17,6 @@ class Dataset(object):
         self.usedLayers = usedLayers
         self.usedWeather = usedWeather
 
-    def normalize(self): #this still needs to be called
-        for key in self.data.layers:
-            layer = self.data.layers[key].astype(np.float32)
-            minimum = min(layer)
-            layer = layer - minimum
-            maximum = max(layer)
-            layer = layer/maximum
-            self.data.layers[key] = layer
-
     def getAOIs(self, radius=15):
         stacked = self.data.stackLayers(self.usedLayers)
         aois = []
@@ -36,9 +27,9 @@ class Dataset(object):
 
         # we need the tensor to have dimensions (nsamples, nchannels, AOIwidth,AOIheight)
         # it starts as (nsamples, AOIwidth,AOIheight, nchannels)
-        swapped = np.swapaxes(arr,1,3)
-        swapped = np.swapaxes(swapped,2,3)
-        return swapped
+        # arr = np.swapaxes(arr,1,3)
+        # arr = np.swapaxes(arr,2,3)
+        return arr
 
     def getWeather(self):
         weather = self.data.stackWeather(self.usedWeather)
@@ -49,7 +40,7 @@ class Dataset(object):
         return self.data.output[self.indices]
 
     def getData(self):
-        return [self.getWeather(), self.getAOIs(), self.getOutput()]
+        return self.getWeather(), self.getAOIs(), self.getOutput()
 
     @staticmethod
     def findVulnerablePixels(startingPerim, radius=VULNERABLE_RADIUS):
@@ -74,3 +65,12 @@ class Dataset(object):
         train = Dataset(self.data, trainIndices, self.usedLayers, self.usedWeather)
         test = Dataset(self.data, testIndices, self.usedLayers, self.usedWeather)
         return train, test
+
+    def normalize(self): #this still needs to be called
+        for key in self.data.layers:
+            layer = self.data.layers[key].astype(np.float32)
+            minimum = min(layer)
+            layer = layer - minimum
+            maximum = max(layer)
+            layer = layer/maximum
+            self.data.layers[key] = layer
