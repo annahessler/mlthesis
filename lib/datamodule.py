@@ -1,6 +1,5 @@
 import numpy as np
 import cv2
-# import matplotlib.pyplot as plt
 
 PIXEL_SIZE = 30
 
@@ -73,14 +72,14 @@ class Data(object):
         d.addLayer('ndvi', ndvi)
         d.addLayer('aspect', aspect)
 
-        perim = openStartingPerim(dateString)
+        perim = Data.openStartingPerim(dateString)
         d.addLayer('perim', perim)
 
-        weatherData = createWeatherMetrics(openWeatherData(dateString))
+        weatherData = Data.createWeatherMetrics(Data.openWeatherData(dateString))
         for name, data in zip(['maxTemp', 'avgWSpeed', 'avgWDir', 'precip', 'avgHum'], weatherData):
             d.addData(name, data)
 
-        output = openEndingPerim(dateString)
+        output = Data.openEndingPerim(dateString)
         d.addOutput(output)
 
         return d
@@ -91,41 +90,41 @@ class Data(object):
         res += ", data:" + repr(self.weather.keys())
         return res
 
-def openStartingPerim(dateString):
-    perimFileName = 'data/raw/perims/' + dateString + '.tif'
-    perim = cv2.imread(perimFileName, cv2.IMREAD_UNCHANGED)*255
-    return perim
+    def openStartingPerim(dateString):
+        perimFileName = 'data/raw/perims/' + dateString + '.tif'
+        perim = cv2.imread(perimFileName, cv2.IMREAD_UNCHANGED)*255
+        return perim
 
-def openEndingPerim(dateString):
-    '''Get the fire perimeter on the next day'''
-    month, day = dateString[:2], dateString[2:]
-    nextDay = str(int(day)+1).zfill(2)
-    guess = month+nextDay
-    perimFileName = 'data/raw/perims/' + guess + '.tif'
-    # print(perimFileName)
-    perim = cv2.imread(perimFileName, cv2.IMREAD_UNCHANGED)
-    if perim is None:
-        # overflowed the month, that file didnt exist
-        nextMonth = str(int(month)+1).zfill(2)
-        guess = nextMonth+'01'
+    def openEndingPerim(dateString):
+        '''Get the fire perimeter on the next day'''
+        month, day = dateString[:2], dateString[2:]
+        nextDay = str(int(day)+1).zfill(2)
+        guess = month+nextDay
         perimFileName = 'data/raw/perims/' + guess + '.tif'
         # print(perimFileName)
         perim = cv2.imread(perimFileName, cv2.IMREAD_UNCHANGED)
         if perim is None:
-            raise RuntimeError('Could not find a perimeter for the day after ' + dateString)
-    return perim
+            # overflowed the month, that file didnt exist
+            nextMonth = str(int(month)+1).zfill(2)
+            guess = nextMonth+'01'
+            perimFileName = 'data/raw/perims/' + guess + '.tif'
+            # print(perimFileName)
+            perim = cv2.imread(perimFileName, cv2.IMREAD_UNCHANGED)
+            if perim is None:
+                raise RuntimeError('Could not find a perimeter for the day after ' + dateString)
+        return perim
 
-def openWeatherData(dateString):
-    fname = 'data/raw/weather/' + dateString + '.csv'
-    # the first row is the headers, and only cols 4-11 are actual data
-    data = np.loadtxt(fname, skiprows=1, usecols=range(5,12), delimiter=',').T
-    return data
+    def openWeatherData(dateString):
+        fname = 'data/raw/weather/' + dateString + '.csv'
+        # the first row is the headers, and only cols 4-11 are actual data
+        data = np.loadtxt(fname, skiprows=1, usecols=range(5,12), delimiter=',').T
+        return data
 
-def createWeatherMetrics(weatherData):
-    temp, dewpt, temp2, wdir, wspeed, precip, hum = weatherData
-    avgWSpeed = sum(wspeed)/len(wspeed)
-    totalPrecip = sum(precip)
-    avgWDir= sum(wdir)/len(wdir)
-    avgHum = sum(hum)/len(hum)
-    return np.array( [max(temp), avgWSpeed, avgWDir, totalPrecip, avgHum])
+    def createWeatherMetrics(weatherData):
+        temp, dewpt, temp2, wdir, wspeed, precip, hum = weatherData
+        avgWSpeed = sum(wspeed)/len(wspeed)
+        totalPrecip = sum(precip)
+        avgWDir= sum(wdir)/len(wdir)
+        avgHum = sum(hum)/len(hum)
+        return np.array( [max(temp), avgWSpeed, avgWDir, totalPrecip, avgHum])
 
