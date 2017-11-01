@@ -24,10 +24,13 @@ class ImageBranch(Sequential):
                         activation='sigmoid',
                         input_shape=input_shape))
         self.add(MaxPooling2D(pool_size=(2,2), strides=(2,2)))
+        self.add(Dropout(0.5))
         self.add(Conv2D(64, (3,3), activation='relu'))
         self.add(MaxPooling2D(pool_size=(2,2)))
+        self.add(Dropout(0.5))
         self.add(Flatten())
         self.add(Dense(128, activation='relu'))
+        self.add(Dropout(0.5))
 
         self.compile(optimizer='rmsprop',
               loss='binary_crossentropy',
