@@ -1,7 +1,7 @@
 
 import numpy as np
 
-# from lib import model
+from lib import model
 from lib import datamodule
 from lib import dataset
 from lib import viz
@@ -13,15 +13,12 @@ usedLayers = ['perim', 'ndvi', 'slope', 'aspect']
 dataset.usedLayers = usedLayers
 dataset.usedWeather = []
 #dataset.usedWeather = ['maxTemp','avgHum']
-trainData, testData = dataset.split()
+trainData, validateData, testData = dataset.split()
 
-weather, aois, out = trainData.getData()
-nsamples, height, width, nchannels = aois.shape
-
-mod = lib.model.FireModel(weather.shape[1], nchannels, (height, width))
-mod.fit(trainData)
-res = mod.predict(testData)
-np.savetxt("res.csv", res, delimiter=',')
+mod = model.FireModel(*trainData.getModelParams())
+mod.fit(trainData, validateData)
+predictions = mod.predict(testData)
+np.savetxt("res.csv", predictions, delimiter=',')
 
 # plt.plot(range(1, 11), history.acc)
 # plt.xlabel('Epochs')
