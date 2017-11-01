@@ -1,11 +1,11 @@
 from time import localtime, strftime
 import numpy as np
 import cv2
-try:
-    import matplotlib.pyplot as plt
-    print('Successfully imported pyplot')
-except:
-    print('Failed to import pyplot ')
+import matplotlib as mpl
+mpl.use('Agg')
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+
 
 
 def renderPredictions(dataset):
@@ -22,7 +22,7 @@ def renderLayer(dataset, layerName, which='used'):
     normed = normalize(layer)
     return (normed*255).astype(np.uint8)
 
-def visualizePredictions(dataset):
+def visualizePredictions(dataset, predictions):
     w,h = dataset.data.shape
     result = np.full((w,h,3), (0,0,255), dtype=np.uint8)
     endingPerim = dataset.data.output
@@ -30,9 +30,9 @@ def visualizePredictions(dataset):
     startingPerim = renderLayer(dataset, 'perim', which='all')
     result[startingPerim==255] = (0,255,0)
     xs,ys = dataset.indices
-    result[xs,ys,0] = dataset.predictions*255
-    result[xs,ys,1] = dataset.predictions*255
-    result[xs,ys,2] = dataset.predictions*255
+    result[xs,ys,0] = predictions*255
+    result[xs,ys,1] = predictions*255
+    result[xs,ys,2] = predictions*255
     return result
 
 def normalize(layer):
@@ -61,3 +61,42 @@ def saveModel(model):
     timeString = strftime("%d%b%H:%M", localtime())
     fname = 'output/modelViz/{}.png'.format(timeString)
     plot_model(model, to_file=fname, show_shapes=True)
+
+
+# save the animation
+
+
+# def visualize_training(history, name, vd, trainData):
+#     fig = plt.figure(figsize=(5, 2.5))
+#     # print('vd shape is ', vd[0])
+#     # print('traindata shape is ' + trainData[0] + " " + trainData[1] )
+#     plt.plot(vd, trainData, label='data')
+#     line, = plt.plot(vd, history.predictions[0],  label='prediction')
+#     plt.legend()
+
+#     def update_line(num):
+#         plt.title('iteration: {0}'.format((history.save_every * (num + 1))))
+#         line.set_xdata(vd)
+#         line.set_ydata(history.predictions[num])
+#         return []
+
+#     ani = animation.FuncAnimation(fig, update_line, len(history.predictions),
+#                                        interval=50, blit=True)
+#     ani.save('{0}.mp4'.format(name), dpi=100, extra_args=['-vcodec', 'libx264', '-pix_fmt','yuv420p'])
+#     plt.close()
+
+#     plt.figure(figsize=(5, 2.5))
+#     plt.plot(vd, trainData, label='data')
+#     plt.plot(vd, history.predictions[0], label='prediction')
+#     plt.legend()
+#     plt.title('iteration: 0')
+#     plt.savefig('{0}.png'.format(name))
+#     plt.close()
+
+#     plt.figure(figsize=(6, 3))
+#     plt.plot(history.losses)
+#     plt.ylabel('error')
+#     plt.xlabel('iteration')
+#     plt.ylim([0, 0.5])
+#     plt.title('training error')
+#     plt.show()

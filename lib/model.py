@@ -3,6 +3,8 @@ from keras.models import Sequential, Model
 from keras.layers import Dense, Activation, Dropout, Flatten, Concatenate, Input
 from keras.optimizers import SGD, RMSprop
 from keras.layers import Conv2D, MaxPooling2D
+from lib import histories
+from lib import viz
 print('done.')
 
 
@@ -31,6 +33,7 @@ class ImageBranch(Sequential):
             loss='binary_crossentropy',
             metrics=['accuracy'])
 
+
 class FireModel(Model):
 
     def __init__(self, weatherDataSize, spatialChannels, kernelSize):
@@ -50,16 +53,22 @@ class FireModel(Model):
         sgd = SGD(lr = 0.1, momentum = 0.9, decay = 0, nesterov = False)
         #rms = RMSprop(lr=0.001, rho=0.9, epsilon=1e-08, decay=0.0)
         self.compile(loss = 'binary_crossentropy', optimizer = sgd, metrics = ['accuracy'])
+        self.history = None
 
 
-    def fit(self, trainData, validateData):
+    def fit(self, trainData, validateData, testData):
+
+        self.history = histories.Histories(validateData)
+        print("history callback losses are " , self.history.losses)
         inputs, outputs = trainData.getData()
-        history = super().fit(inputs, outputs, batch_size = 1000, epochs = 15, validation_data=validateData.getData())
+        super().fit(inputs, outputs, batch_size = 1000, epochs = 5, validation_data=validateData.getData(), callbacks=[self.history])
+        # print("after history callback losses are " , self.history.__dir__())
+        # viz.visualize_training(self.history, 'testviz', validateData.getData(), trainData)
         from time import localtime, strftime
         timeString = strftime("%d%b%H:%M", localtime())
         self.save('models/{}.h5'.format(timeString))
-        return history
+        
 
     def predict(self, dataset):
         inputs, outputs = dataset.getData()
-        return super().predict(inputs)
+        return super().predict(inputs).flatten()
