@@ -4,13 +4,12 @@ from .datamodule import PIXEL_SIZE
 
 class Dataset(object):
 
-    def __init__(self, data, whichPixels=None, whichBurns=None, whichDays=None, whichLayers=None, weatherMetrics = None):
+    def __init__(self, data, whichBurns=None, whichDays=None, whichPixels=None):
         self.data = data
-        self.pixels = whichPixels
-        self.burns = whichBurns
-        self.days = whichDays
-        self.layers = whichLayers #this will be kept track of in main...wont change
-        self.metrics = weatherMetrics #this will be created in another class, kept track of in main...wont change
+
+        self.whichBurns = whichBurns   if whichBurns  is not None else 'all'
+        self.whichDays = whichDays     if whichDays   is not None else 'all'
+        self.whichPixels = whichPixels if whichPixels is not None else 'all'
 
     def getData(self):
         return self.data #return input/output?
@@ -26,3 +25,13 @@ class Dataset(object):
 
     def getLayers(self):
         return self.layers
+
+    def findVulnerablePixels(self, startingPerim, radius=None):
+        if radius is None:
+            radius = self.VULNERABLE_RADIUS
+        '''Return the indices of the pixels that close to the current fire perimeter'''
+        kernel = np.ones((3,3))
+        its = int(round((2*(radius/PIXEL_SIZE)**2)**.5))
+        dilated = cv2.dilate(startingPerim, kernel, iterations=its)
+        border = dilated - startingPerim
+        return np.where(border)

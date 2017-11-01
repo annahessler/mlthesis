@@ -22,7 +22,7 @@ def renderLayer(dataset, layerName, which='used'):
     normed = normalize(layer)
     return (normed*255).astype(np.uint8)
 
-def visualizePredictions(dataset):
+def visualizePredictions(dataset, predictions):
     w,h = dataset.data.shape
     result = np.full((w,h,3), (0,0,255), dtype=np.uint8)
     endingPerim = dataset.data.output
@@ -30,9 +30,9 @@ def visualizePredictions(dataset):
     startingPerim = renderLayer(dataset, 'perim', which='all')
     result[startingPerim==255] = (0,255,0)
     xs,ys = dataset.indices
-    result[xs,ys,0] = dataset.predictions*255
-    result[xs,ys,1] = dataset.predictions*255
-    result[xs,ys,2] = dataset.predictions*255
+    result[xs,ys,0] = predictions*255
+    result[xs,ys,1] = predictions*255
+    result[xs,ys,2] = predictions*255
     return result
 
 def normalize(layer):
