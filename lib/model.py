@@ -2,7 +2,7 @@ print('importing keras...')
 from keras.models import Sequential, Model
 from keras.layers import Dense, Activation, Dropout, Flatten, Concatenate, Input
 from keras.optimizers import SGD, RMSprop
-from keras.layers import Conv2D, MaxPooling2D
+from keras.layers import Conv2D, MaxPooling2D, AveragePooling2D
 print('done.')
 
 
@@ -14,15 +14,13 @@ print('done.')
 
 class ImageBranch(Sequential):
 
-    def __init__(self, nchannels, aoisize):
+    def __init__(self, nchannels, kernelSize):
         super().__init__()
-        img_x = aoisize[0]
-        img_y = aoisize[1]
-        input_shape = (img_x, img_y, nchannels)
+        input_shape = (kernelSize, kernelSize, nchannels)
 
+        self.add(AveragePooling2D(pool_size=(2,2), strides=(2,2), input_shape=input_shape))
         self.add(Conv2D(32, kernel_size=(3,3), strides=(1,1),
-                        activation='sigmoid',
-                        input_shape=input_shape))
+                        activation='sigmoid'))
         self.add(MaxPooling2D(pool_size=(2,2), strides=(2,2)))
         self.add(Dropout(0.5))
         self.add(Conv2D(64, (3,3), activation='relu'))
@@ -33,22 +31,22 @@ class ImageBranch(Sequential):
         self.add(Dropout(0.5))
 
         self.compile(optimizer='rmsprop',
-              loss='binary_crossentropy',
-              metrics=['accuracy'])
+            loss='binary_crossentropy',
+            metrics=['accuracy'])
 
 class FireModel(Model):
 
-    def __init__(self, weatherDataSize, spatialChannels, aoiSize):
-        print("creating network with shape", weatherDataSize, spatialChannels, aoiSize)
-        self.wb = Input((weatherDataSize,))
-        self.ib = ImageBranch(spatialChannels, aoiSize)
+    def __init__(self, weatherDataSize, spatialChannels, kernelSize):
+        # print("creating network with shape", weatherDataSize, spatialChannels, aoiSize)
+        self.wb = Input((weatherDataSize,),name='weatherInput')
+        self.ib = ImageBranch(spatialChannels, kernelSize)
 
-        print('weather branch info:', self.wb.shape)
-        print('image branch info:', self.ib.input_shape, self.ib.output_shape, self.ib.output)
+        # print('weather branch info:', self.wb.shape)
+        # print('image branch info:', self.ib.input_shape, self.ib.output_shape, self.ib.output)
 
-        concat = Concatenate()([self.wb,self.ib.output])
-        out = Dense(1, kernel_initializer = 'normal', activation = 'sigmoid')(concat)
-        print("concat and out info:", concat.shape, out.shape)
+        concat = Concatenate(name='mergedBranches')([self.wb,self.ib.output])
+        out = Dense(1, kernel_initializer = 'normal', activation = 'sigmoid',name='output')(concat)
+        # print("concat and out info:", concat.shape, out.shape)
         super().__init__([self.wb, self.ib.input], out)
 
         # self.add(Concatenate([self.wb, self.ib]))
@@ -57,10 +55,14 @@ class FireModel(Model):
         self.compile(loss = 'binary_crossentropy', optimizer = sgd, metrics = ['accuracy'])
 
 
-    def fit(self, trainData):
-        weather,spatialData, outputs = trainData.getData()
-        super().fit([weather, spatialData], outputs, batch_size = 2000, epochs = 1000, verbose = 1)
+    def fit(self, trainData, validateData):
+        inputs, outputs = trainData.getData()
+        history = super().fit(inputs, outputs, batch_size = 1000, epochs = 2, validation_data=validateData.getData())
+        from time import localtime, strftime
+        timeString = strftime("%d%b%H:%M", localtime())
+        self.save('models/{}.h5'.format(timeString))
+        return history
 
     def predict(self, dataset):
-        weather,spatialData, outputs = dataset.getData()
-        return super().predict([weather, spatialData])
+        inputs, outputs = dataset.getData()
+        return super().predict(inputs).flatten()
