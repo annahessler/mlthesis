@@ -23,9 +23,5 @@ mod.fit(trainData)
 res = mod.predict(testData)
 np.savetxt("res.csv", res, delimiter=',')
 
-# plt.plot(range(1, 11), history.acc)
-# plt.xlabel('Epochs')
-# plt.ylabel('Accuracy')
-# plt.show()
 
 print(res)
