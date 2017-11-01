@@ -85,6 +85,3 @@ class Dataset(object):
     def __len__(self):
         return len(self.indices[0])
 
-# class Result(Dataset):
-#
-#     def __init__(self, startingData)
