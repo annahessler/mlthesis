@@ -19,6 +19,9 @@ class RawData(object):
             burns = [Burn.load(n, dates[n]) for n in burnNames]
         return RawData(burns)
 
+    def __repr__(self):
+        return str(self.burns)
+
 class Burn(object):
 
     def __init__(self, name, days, layers=None):
@@ -51,6 +54,9 @@ class Burn(object):
         days = [Day(burnName, date) for date in dates]
         return Burn(burnName, days)
 
+    def __repr__(self):
+        return "Burn({}, {})".format(self.name, [d.date for d in self.days])
+
 class Day(object):
 
     def __init__(self, burnName, date, weather=None, startingPerim=None, endingPerim=None):
@@ -75,20 +81,19 @@ class Day(object):
         return perim
 
     def loadEndingPerim(self):
-        print('opening perim for day after', self.date)
         guess1, guess2 = Day.nextDay(self.date)
         fname = 'data/raw/{}/perims/{}.tif'.format(self.burnName, guess1)
-        print(fname)
         perim = cv2.imread(fname, cv2.IMREAD_UNCHANGED)
         if perim is None:
             # overflowed the month, that file didnt exist
             fname = 'data/raw/{}/perims/{}.tif'.format(self.burnName, guess2)
-            print('first guess didnt work')
-            print(fname)
             perim = cv2.imread(fname, cv2.IMREAD_UNCHANGED)
             if perim is None:
                 raise RuntimeError('Could not open a perimeter for the fire {} for the day {} or {}'.format(self.burnName, guess1, guess2))
         return perim
+
+    def __repr__(self):
+        return "Day({},{})".format(self.burnName, self.date)
 
     @staticmethod
     def nextDay(dateString):
@@ -109,30 +114,34 @@ class Day(object):
         directory = 'data/raw/{}/'.format(burnName)
 
         weatherFiles = listdir_nohidden(directory+'weather/')
-        weatherDays = [fname[:-len('.csv')] for fname in weatherFiles if isValid(fname)]
+        weatherDates = [fname[:-len('.csv')] for fname in weatherFiles]
+
 
         perimFiles = listdir_nohidden(directory+'perims/')
-        perimDays = [fname[:-len('.tif')] for fname in perimFiles if isValid]
+        perimDates = [fname[:-len('.tif')] for fname in perimFiles if isValidImg(directory+'perims/'+fname)]
 
         # we can only use days which have perimeter data on the following day
         daysWithFollowingPerims = []
-        for d in perimDays:
+        for d in perimDates:
             nextDay1, nextDay2 = Day.nextDay(d)
-            if nextDay1 in perimDays or nextDay2 in perimDays:
+            if nextDay1 in perimDates or nextDay2 in perimDates:
                 daysWithFollowingPerims.append(d)
 
         # now we have to verify that we have weather for these days as well
-        daysWithWeatherAndPerims = [d for d in daysWithFollowingPerims if d in weatherDays]
+        daysWithWeatherAndPerims = [d for d in daysWithFollowingPerims if d in weatherDates]
         daysWithWeatherAndPerims.sort()
         return daysWithWeatherAndPerims
 
-def isValid(imgName):
-    return cv2.imread(imgName, cv2.IMREAD_UNCHANGED) is not None
+def isValidImg(imgName):
+    img = cv2.imread(imgName, cv2.IMREAD_UNCHANGED)
+    return img is not None
 
 def listdir_nohidden(path):
+    result = []
     for f in listdir(path):
         if not f.startswith('.'):
-            yield f
+            result.append(f)
+    return result
 
 if __name__ == '__main__':
     raw = RawData.load()
