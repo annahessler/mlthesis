@@ -89,7 +89,7 @@ class Day(object):
 
         for i in np.shape(weatherData)[0]:
             if weatherData[i][col] > 90 and weatherData[i][col] < 270: #going north
-            ''' sin(wind direction) * wind speed '''
+                ''' sin(wind direction) * wind speed '''
                 n += (np.sin(weatherData[i][col]) * weatherData[i][col + 1])
             if weatherData[i][col] < 90 and weatherData[i][col] > 270: #going south
                 s += (np.sin(weatherData[i][col]) * weatherData[i][col + 1])
