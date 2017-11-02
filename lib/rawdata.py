@@ -82,6 +82,26 @@ class Day(object):
         data = np.loadtxt(fname, skiprows=1, usecols=range(5,12), delimiter=',').T
         return data
 
+    @staticmethod
+    def windMetrics(weatherData):
+        col = 4
+        n, s, e, w = 0
+
+        for i in np.shape(weatherData)[0]:
+            if weatherData[i][col] > 90 and weatherData[i][col] < 270: #going north
+            ''' sin(wind direction) * wind speed '''
+                n += (np.sin(weatherData[i][col]) * weatherData[i][col + 1])
+            if weatherData[i][col] < 90 and weatherData[i][col] > 270: #going south
+                s += (np.sin(weatherData[i][col]) * weatherData[i][col + 1])
+            if weatherData[i][col] < 360 and weatherData[i][col] > 180: #going east
+                e += (np.cos(weatherData[i][col]) * weatherData[i][col + 1])
+            if weatherData[i][col] > 0 and weatherData[i][col] < 180: #going west
+                w += (np.cos(weatherData[i][col]) * weatherData[i][col + 1])
+
+        weather = [n, s, e, w]
+        return weather
+
+
     def loadStartingPerim(self):
         fname = 'data/raw/{}/perims/{}.tif'.format(self.burnName, self.date)
         perim = cv2.imread(fname, cv2.IMREAD_UNCHANGED)
