@@ -64,39 +64,27 @@ def saveModel(model):
 
 
 # save the animation
+# def createGif(size):
+#     # Load an color image in grayscale
+#     toBeGifed = []
+#     for i in range(0,size):
+#         img = cv2.imread('output/imgs/predictions at ' + str(i) + '.png' ,0)
+#         toBeGifed.append(img)
 
 
-# def visualize_training(history, name, vd, trainData):
-#     fig = plt.figure(figsize=(5, 2.5))
-#     # print('vd shape is ', vd[0])
-#     # print('traindata shape is ' + trainData[0] + " " + trainData[1] )
-#     plt.plot(vd, trainData, label='data')
-#     line, = plt.plot(vd, history.predictions[0],  label='prediction')
-#     plt.legend()
+#     print('tobegifed is' , toBeGifed)
+#     fig = plt.figure()
+#     ax = fig.add_subplot(111)
+#     ax.set_axis_off()
+#     ims = map(lambda x: (ax.imshow(x), ax.set_title('title')), toBeGifed)
 
-#     def update_line(num):
-#         plt.title('iteration: {0}'.format((history.save_every * (num + 1))))
-#         line.set_xdata(vd)
-#         line.set_ydata(history.predictions[num])
-#         return []
+#     im_ani = animation.ArtistAnimation(fig, ims, interval=800, repeat_delay=0, blit=False)
+#     im_ani.save('animation.htm', writer='imagemagick')
+    # return
 
-#     ani = animation.FuncAnimation(fig, update_line, len(history.predictions),
-#                                        interval=50, blit=True)
-#     ani.save('{0}.mp4'.format(name), dpi=100, extra_args=['-vcodec', 'libx264', '-pix_fmt','yuv420p'])
-#     plt.close()
 
-#     plt.figure(figsize=(5, 2.5))
-#     plt.plot(vd, trainData, label='data')
-#     plt.plot(vd, history.predictions[0], label='prediction')
-#     plt.legend()
-#     plt.title('iteration: 0')
-#     plt.savefig('{0}.png'.format(name))
-#     plt.close()
 
-#     plt.figure(figsize=(6, 3))
-#     plt.plot(history.losses)
-#     plt.ylabel('error')
-#     plt.xlabel('iteration')
-#     plt.ylim([0, 0.5])
-#     plt.title('training error')
-#     plt.show()
+
+
+
+

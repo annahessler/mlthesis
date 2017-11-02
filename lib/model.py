@@ -59,11 +59,9 @@ class FireModel(Model):
     def fit(self, trainData, validateData, testData):
 
         self.history = histories.Histories(validateData)
-        print("history callback losses are " , self.history.losses)
+        # print("history callback losses are " , self.history.losses)
         inputs, outputs = trainData.getData()
         super().fit(inputs, outputs, batch_size = 1000, epochs = 5, validation_data=validateData.getData(), callbacks=[self.history])
-        # print("after history callback losses are " , self.history.__dir__())
-        # viz.visualize_training(self.history, 'testviz', validateData.getData(), trainData)
         from time import localtime, strftime
         timeString = strftime("%d%b%H:%M", localtime())
         self.save('models/{}.h5'.format(timeString))

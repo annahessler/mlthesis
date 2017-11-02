@@ -1,6 +1,10 @@
 import keras
 from sklearn.metrics import roc_auc_score
 from lib import viz
+from matplotlib import animation
+import matplotlib as mpl
+mpl.use('Agg')
+import matplotlib.pyplot as plt
 
 class Histories(keras.callbacks.Callback):
 
@@ -11,15 +15,12 @@ class Histories(keras.callbacks.Callback):
         self.predictions = []
         self.i = 0
         self.save_every = 1
+        self.images = []
+        self.toanimate = plt.plot([], 'ro', animated=True)
+
         
 
     def on_train_begin(self, logs={}):
-        # self.aucs = []
-        # self.losses = []
-        # self.losses = []
-        # self.predictions = []
-        # self.i = 0
-        # self.save_every = 1
         return
 
     def on_train_end(self, logs={}):
@@ -29,27 +30,38 @@ class Histories(keras.callbacks.Callback):
         return
 
     def on_epoch_end(self, epoch, logs={}):
-        # self.losses.append(logs.get('loss'))
-        # inputs, output  = self.vd.getData()
-        # y_pred = self.model.predict(self.vd)
-        # self.aucs.append(roc_auc_score(output, y_pred))
-        return
-
-    def on_batch_begin(self, batch, logs={}):
-        return
-
-    def on_batch_end(self, batch, logs={}):
+        # return
         self.losses.append(logs.get('loss'))
+        fig1 = plt.figure()
         self.i += 1        
         if self.i % self.save_every == 0:        
             pred = self.model.predict(self.vd)
             self.predictions.append(pred)
             res = viz.visualizePredictions(self.vd, pred)
-            viz.save(res, 'precictions at ' +  str(self.i))
-            # print("history losses are this " , self.losses)
+            self.images.append(res)
+            # self.toanimate.set_data(self.images)
+            # update(self.images, res)
+            viz.save(res, 'precictions_at_' +  str(self.i))
 
+    def on_batch_begin(self, batch, logs={}):
+        return
 
-
+    def on_batch_end(self, batch, logs={}):
+        # self.losses.append(logs.get('loss'))
+        # fig1 = plt.figure()
+        # self.i += 1        
+        # if self.i % self.save_every == 0:        
+        #     pred = self.model.predict(self.vd)
+        #     self.predictions.append(pred)
+        #     res = viz.visualizePredictions(self.vd, pred)
+        #     self.images.append(res)
+        #     # self.toanimate.set_data(self.images)
+        #     # update(self.images, res)
+        #     viz.save(res, 'precictions at ' +  str(self.i))
+        # print("images are ", self.images)
+        # viz.createGif(self.i)  
+        return 
+        
 
 # def on_train_begin(self, logs={}):
 #         self.losses = []
