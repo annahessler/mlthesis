@@ -6,7 +6,6 @@ class Dataset(object):
 
     def __init__(self, data, whichBurns=None, whichDays=None, whichPixels=None):
         self.data = data
-
         self.whichBurns = whichBurns   if whichBurns  is not None else 'all'
         self.whichDays = whichDays     if whichDays   is not None else 'all'
         self.whichPixels = whichPixels if whichPixels is not None else 'all'
