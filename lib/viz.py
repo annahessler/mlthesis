@@ -43,12 +43,13 @@ def normalize(layer):
         l = l/l.max()
     return l
 
-def show(*imgs):
+def show(*imgs, imm=True):
     try:
         for i, img in enumerate(imgs):
             plt.figure(i)
             plt.imshow(img)
-        plt.show()
+        if imm:
+            plt.show()
     except:
         print("Not able to show because plt not imported")
 

@@ -36,9 +36,11 @@ class ImageBranch(Sequential):
 
 class FireModel(Model):
 
-    def __init__(self, weatherDataSize, spatialChannels, kernelSize):
+    def __init__(self, InputSettings):
+        self.InputSettings = InputSettings
+
         # print("creating network with shape", weatherDataSize, spatialChannels, aoiSize)
-        self.wb = Input((weatherDataSize,),name='weatherInput')
+        self.wb = Input((self.variableSet.weatherDataSize,),name='weatherInput')
         self.ib = ImageBranch(spatialChannels, kernelSize)
 
         # print('weather branch info:', self.wb.shape)
@@ -55,8 +57,8 @@ class FireModel(Model):
         self.compile(loss = 'binary_crossentropy', optimizer = sgd, metrics = ['accuracy'])
 
 
-    def fit(self, trainData, validateData):
-        inputs, outputs = trainData.getData()
+    def fit(self, trainingSamples, validateSamples):
+        inputs, outputs = trainingSamples.getData()
         history = super().fit(inputs, outputs, batch_size = 1000, epochs = 2, validation_data=validateData.getData())
         from time import localtime, strftime
         timeString = strftime("%d%b%H:%M", localtime())
@@ -66,3 +68,14 @@ class FireModel(Model):
     def predict(self, dataset):
         inputs, outputs = dataset.getData()
         return super().predict(inputs).flatten()
+
+class InputSettings(object):
+
+    def __init__(self, AOIRadius=30, weatherMetrics=None, usedLayerNames=None):
+        self.AOIRadius = AOIRadius
+        self.weatherMetrics = weatherMetrics if weatherMetrics is not None else InputSettings.dummyMetric
+        self.usedLayerNames = usedLayerNames if usedLayerNames is not None else 'all'
+
+    @staticmethod
+    def dummyMetric(weatherMatrix):
+        return 42

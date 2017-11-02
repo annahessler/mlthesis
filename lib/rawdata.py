@@ -13,14 +13,18 @@ class RawData(object):
         if burnNames == 'all':
             burnNames = listdir_nohidden('data/raw/')
         if dates == 'all':
-            burns = [Burn.load(n, 'all') for n in burnNames]
+            burns = {n:Burn.load(n, 'all') for n in burnNames}
         else:
             # assumes dates is a dict, with keys being burnNames and vals being dates
-            burns = [Burn.load(n, dates[n]) for n in burnNames]
+            burns = {n:Burn.load(n, dates[n]) for n in burnNames}
         return RawData(burns)
 
+    def augment(self):
+        '''TODO make it so we bootstrap our dataset, adding noise, rotation, and some scaling to all our fires.'''
+        return self
+
     def __repr__(self):
-        return str(self.burns)
+        return "Dataset({})".format(list(self.burns.values()))
 
 class Burn(object):
 
@@ -28,6 +32,9 @@ class Burn(object):
         self.name = name
         self.days = days
         self.layers = layers if layers is not None else self.loadLayers()
+
+        # what is the height and width of a layer of data
+        self.layerSize = list(self.layers.values())[0].shape[:2]
 
     def loadLayers(self):
         folder = 'data/raw/{}/'.format(self.name)
@@ -37,6 +44,9 @@ class Burn(object):
         ndvi = cv2.imread(folder+'NDVI_1.tif', cv2.IMREAD_UNCHANGED)
         aspect = cv2.imread(folder+'aspect.tif', cv2.IMREAD_UNCHANGED)
         r,g,b,nir = cv2.split(landsat)
+
+        # the noValue pixels should be rescaled to make viz easier
+        dem[dem==32768] = 0
         return {'dem':dem,
                 'slope':slope,
                 'landsat':landsat,
@@ -51,11 +61,11 @@ class Burn(object):
     def load(burnName, dates='all'):
         if dates == 'all':
             dates = Day.allGoodDays(burnName)
-        days = [Day(burnName, date) for date in dates]
+        days = {date:Day(burnName, date) for date in dates}
         return Burn(burnName, days)
 
     def __repr__(self):
-        return "Burn({}, {})".format(self.name, [d.date for d in self.days])
+        return "Burn({}, {})".format(self.name, [d.date for d in self.days.values()])
 
 class Day(object):
 
@@ -145,4 +155,4 @@ def listdir_nohidden(path):
 
 if __name__ == '__main__':
     raw = RawData.load()
-    print(raw)
+    print(raw.burns['riceRidge'].days['0731'].weather)

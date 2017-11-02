@@ -5,9 +5,16 @@ from lib import model
 from lib import datamodule
 from lib import dataset
 from lib import viz
+from lib import rawdata
+from lib import datasetchange
 
-data = datamodule.Data.defaultData('0731')
-dataset = dataset.Dataset(data)
+data = rawdata.RawData.load(burnNames='all', dates='all')
+data = data.augment()
+masterDataSet = datasetchange.Dataset(data, whichBurns='all', whichDates='all')
+masterDataSet.whichPixels = masterDataSet.findVulnerablePixels(radius=500)
+
+# data = datamodule.Data.defaultData('0731')
+# dataset = dataset.Dataset(data)
 
 usedLayers = ['perim', 'ndvi', 'slope', 'aspect']
 dataset.usedLayers = usedLayers
