@@ -78,9 +78,9 @@ class Day(object):
             if weatherData[i][col] < 90 and weatherData[i][col] > 270: #going south
                 s += (np.sin(weatherData[i][col]) * weatherData[i][col + 1])
             if weatherData[i][col] < 360 and weatherData[i][col] > 180: #going east
-                e += (np.sin(weatherData[i][col]) * weatherData[i][col + 1])
+                e += (np.cos(weatherData[i][col]) * weatherData[i][col + 1])
             if weatherData[i][col] > 0 and weatherData[i][col] < 180: #going west
-                w += (np.sin(weatherData[i][col]) * weatherData[i][col + 1])
+                w += (np.cos(weatherData[i][col]) * weatherData[i][col + 1])
 
         weather = [n, s, e, w]
         return weather
