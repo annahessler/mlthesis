@@ -3,6 +3,8 @@ from os import listdir
 import numpy as np
 import cv2
 
+PIXEL_SIZE = 30
+
 class RawData(object):
 
     def __init__(self, burns):
@@ -41,13 +43,11 @@ class Burn(object):
         dem = cv2.imread(folder+'dem.tif', cv2.IMREAD_UNCHANGED)
         slope = cv2.imread(folder+'slope.tif',cv2.IMREAD_UNCHANGED)
         landsat = cv2.imread(folder+'landsat.png', cv2.IMREAD_UNCHANGED)
-        ndvi = cv2.imread(folder+'NDVI_1.tif', cv2.IMREAD_UNCHANGED)
+        ndvi = cv2.imread(folder+'ndvi.tif', cv2.IMREAD_UNCHANGED)
         aspect = cv2.imread(folder+'aspect.tif', cv2.IMREAD_UNCHANGED)
         r,g,b,nir = cv2.split(landsat)
 
-        # the noValue pixels should be rescaled to make viz easier
-        dem[dem==32768] = 0
-        return {'dem':dem,
+        layers = {'dem':dem,
                 'slope':slope,
                 'landsat':landsat,
                 'ndvi':ndvi,
@@ -56,6 +56,14 @@ class Burn(object):
                 'g':g,
                 'b':b,
                 'nir':nir}
+
+        # ok, now we have to make sure that all of the NoData values are set to 0
+        #the NV pixels occur outside of our AOIRadius
+        # When exported from GIS they could take on a variety of values
+        # susceptible = ['dem', 'r','g','b','nir',]
+        for name, layer in layers.items():
+            pass
+        return layers
 
     @staticmethod
     def load(burnName, dates='all'):
@@ -80,6 +88,7 @@ class Day(object):
         fname = 'data/raw/{}/weather/{}.csv'.format(self.burnName, self.date)
         # the first row is the headers, and only cols 4-11 are actual data
         data = np.loadtxt(fname, skiprows=1, usecols=range(5,12), delimiter=',').T
+        # now data is 2D array
         return data
 
     @staticmethod

@@ -1,3 +1,6 @@
+from lib import preprocess
+from lib import metrics
+
 print('importing keras...')
 from keras.models import Sequential, Model
 from keras.layers import Dense, Activation, Dropout, Flatten, Concatenate, Input
@@ -5,18 +8,13 @@ from keras.optimizers import SGD, RMSprop
 from keras.layers import Conv2D, MaxPooling2D, AveragePooling2D
 print('done.')
 
-
-# class WeatherBranch(Sequential):
-
-#     def __init__(self, inputSize):
-#         super().__init__()
-#         self.add(Dense(32, activation='relu', input_dim=(inputSize)))
-
 class ImageBranch(Sequential):
 
-    def __init__(self, nchannels, kernelSize):
+    def __init__(self, nchannels, kernelDiam):
         super().__init__()
-        input_shape = (kernelSize, kernelSize, nchannels)
+        # there is also the starting perim which is implicitly gonna be included
+        nchannels += 1
+        input_shape = (kernelDiam, kernelDiam, nchannels)
 
         self.add(AveragePooling2D(pool_size=(2,2), strides=(2,2), input_shape=input_shape))
         self.add(Conv2D(32, kernel_size=(3,3), strides=(1,1),
@@ -36,12 +34,13 @@ class ImageBranch(Sequential):
 
 class FireModel(Model):
 
-    def __init__(self, InputSettings):
-        self.InputSettings = InputSettings
+    def __init__(self, inputSettings):
+        self.inputSettings = inputSettings
+        self.usedLayers, self.weatherMetric, self.AOIRadius = self.inputSettings
 
-        # print("creating network with shape", weatherDataSize, spatialChannels, aoiSize)
-        self.wb = Input((self.variableSet.weatherDataSize,),name='weatherInput')
-        self.ib = ImageBranch(spatialChannels, kernelSize)
+        kernelDiam = 2*self.AOIRadius+1
+        self.wb = Input((self.weatherMetric.numOutputs,),name='weatherInput')
+        self.ib = ImageBranch(len(self.usedLayers), kernelDiam)
 
         # print('weather branch info:', self.wb.shape)
         # print('image branch info:', self.ib.input_shape, self.ib.output_shape, self.ib.output)
@@ -57,25 +56,36 @@ class FireModel(Model):
         self.compile(loss = 'binary_crossentropy', optimizer = sgd, metrics = ['accuracy'])
 
 
-    def fit(self, trainingSamples, validateSamples):
-        inputs, outputs = trainingSamples.getData()
-        history = super().fit(inputs, outputs, batch_size = 1000, epochs = 2, validation_data=validateData.getData())
+    def fit(self, training, validate):
+        # get the actual samples from the collection of points
+        tinputs, toutputs = preprocess.getInputsAndOutputs(training, self.inputSettings)
+        vinputs, voutputs = preprocess.getInputsAndOutputs(validate, self.inputSettings)
+        print('training on ', training)
+        history = super().fit(tinputs, toutputs, batch_size = 1000, epochs = 2, validation_data=(vinputs, voutputs))
+
         from time import localtime, strftime
         timeString = strftime("%d%b%H:%M", localtime())
         self.save('models/{}.h5'.format(timeString))
+
         return history
 
     def predict(self, dataset):
-        inputs, outputs = dataset.getData()
+        samples = dataset.getSamples(self.inputSettings)
+        inputs, outputs = preprocess.mergeSamples(samples)
         return super().predict(inputs).flatten()
 
-class InputSettings(object):
+from collections import namedtuple
+InputSettings = namedtuple('InputSettings', ['usedLayerNames', 'weatherMetrics', 'AOIRadius'])
 
-    def __init__(self, AOIRadius=30, weatherMetrics=None, usedLayerNames=None):
-        self.AOIRadius = AOIRadius
-        self.weatherMetrics = weatherMetrics if weatherMetrics is not None else InputSettings.dummyMetric
-        self.usedLayerNames = usedLayerNames if usedLayerNames is not None else 'all'
-
-    @staticmethod
-    def dummyMetric(weatherMatrix):
-        return 42
+# class InputSettings(object):
+#     '''This things which define the inputs to a Model:
+#     -weatherMetrics: How many and which weather metrics we use
+#     -usedLayerNames: Which layers get fed in (dem, nir, etc.)
+#     -AOIRadius: How large of a window around each sample do we feed into the CNN'''
+#
+#     def __init__(self, usedLayerNames, weatherMetric, AOIRadius=30):
+#         self.usedLayerNames = usedLayerNames
+#         self.weatherMetrics = weatherMetric
+#         self.AOIRadius = AOIRadius
+#         assert type(self.usedLayerNames) == list
+#         assert len(usedLayerNames) > 0
