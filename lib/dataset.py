@@ -6,6 +6,7 @@ import cv2
 # from rawdata import
 from lib.rawdata import RawData, PIXEL_SIZE
 from lib import viz
+from keras.preprocessing.image import ImageDataGenerator
 # from model import InputSettings
 
 class Dataset(object):
@@ -149,6 +150,24 @@ class Sample(object):
         aoi = self.extract(padded, location)
 
         return [weatherMetrics, aoi]
+
+    def rotateInput(self, train, test):
+        datagen = ImageDataGenerator(
+                rotation_range=40,
+                width_shift_range=0.2,
+                height_shift_range=0.2,
+                rescale=1./255,
+                shear_range=0.2,
+                zoom_range=0.2,
+                horizontal_flip=True,
+                fill_mode='nearest')
+
+        i = 0
+        for batch in datagen.flow(train, batch_size=1, save_to_dir='/data/forModel', save_prefix='augmented', save_format='tif'):
+            i += 1
+            if i > 20:
+                break
+
 
     def extract(self, padded, location):
         '''Assume padded is bordered by radius self.inputSettings.AOIRadius'''
