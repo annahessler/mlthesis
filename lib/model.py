@@ -1,5 +1,6 @@
 from lib import preprocess
 from lib import metrics
+from lib import histories
 
 print('importing keras...')
 from keras.models import Sequential, Model
@@ -56,13 +57,13 @@ class FireModel(Model):
         self.compile(loss = 'binary_crossentropy', optimizer = sgd, metrics = ['accuracy'])
 
 
-    def fit(self, training, validate):
+    def fit(self, training, validate, test):
         # get the actual samples from the collection of points
         tinputs, toutputs = preprocess.getInputsAndOutputs(training, self.inputSettings)
         vinputs, voutputs = preprocess.getInputsAndOutputs(validate, self.inputSettings)
+        self.history = histories.Histories(test)
         print('training on ', training)
-        history = super().fit(tinputs, toutputs, batch_size = 1000, epochs = 2, validation_data=(vinputs, voutputs))
-
+        history = super().fit(tinputs, toutputs, batch_size = 1000, epochs = 1000, validation_data=(vinputs, voutputs), callbacks=[self.history])
         from time import localtime, strftime
         timeString = strftime("%d%b%H:%M", localtime())
         self.save('models/{}.h5'.format(timeString))

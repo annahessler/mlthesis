@@ -1,4 +1,5 @@
-
+import matplotlib as mpl
+mpl.use('Agg')
 import numpy as np
 
 from lib import rawdata
@@ -20,7 +21,7 @@ wm = metrics.WeatherMetric()
 inputSettings = model.InputSettings(usedLayers, wm, AOIRadius)
 
 mod = model.FireModel(inputSettings)
-mod.fit(train, validate)
+mod.fit(train, validate, test)
 predictions = mod.predict(test)
 np.savetxt("res.csv", predictions, delimiter=',')
 

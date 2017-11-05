@@ -5,3 +5,5 @@ lib/__pycache__/*
 output/*
 res.csv
 models/*
+data/raw/coldSprings/perims/._*
+data/raw/coldSprings/weather/._*
