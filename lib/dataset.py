@@ -20,37 +20,59 @@ class Dataset(object):
             points = Dataset.allPixels
         if hasattr(points, '__call__'):
             # points is a filter function
-            self.points = self.getPoints(points)
+            filterFunc = points
+            self.points = self.filterPoints(self.data, filterFunc)
 
         assert type(self.points) == type([])
         for p in self.points:
             assert type(p) == Point
 
-    def getUsedBurnNames(self):
-        used = []
-        for burnName, date, location in self.points:
-            if burnName not in used:
-                used.append(burnName)
-        return used
-
     def getUsedBurnNamesAndDates(self):
-        used = []
-        for burnName, date, location in self.points:
-            if (burnName, date) not in used:
-                used.append((burnName, date))
-        return used
+        results = []
+        burnNames = self.points.keys()
+        for name in burnNames:
+            dates = self.points[name].keys()
+            for date in dates:
+                results.append((name,date))
+        return results
 
-    def getPoints(self, filterFunction):
+    @staticmethod
+    def toList(pointDict):
+        '''Flatten the point dictionary to a list of Points'''
+        result = []
+        for burnName in pointDict:
+            dayDict = pointDict[burnName]
+            for date in dayDict:
+                points = dayDict[date]
+                result.extend(points)
+        return result
+
+    @staticmethod
+    def toDict(pointList):
+        burns = {}
+        for p in pointList:
+            burnName, date, location = p
+            if burnName not in burns:
+                burns[burnName] = {}
+            if date not in burns[burnName]:
+                burns[burnName][date] = []
+            if p not in burns[burnName][date]:
+                burns[burnName][date].append(p)
+        return burns
+
+    @staticmethod
+    def filterPoints(data, filterFunction):
         '''Return all the points which satisfy some filterFunction'''
-        points = []
-        burns = self.data.burns.values()
+        points = {}
+        burns = data.burns.values()
         for b in burns:
+            dictOfDays = {}
+            points[b.name] = dictOfDays
             days = b.days.values()
             for d in days:
                 # get every location that satisfies the condition
                 locations = filterFunction(b, d)
-                for l in locations:
-                    points.append(Point(b.name,d.date,l))
+                dictOfDays[d.date] = [Point(b.name,d.date,l) for l in locations]
         return points
 
     def evenOutPositiveAndNegative(self):
@@ -58,7 +80,7 @@ class Dataset(object):
         # yes will contain all 'did burn' points, no contains 'did not burn' points
         yes = []
         no =  []
-        for p in self.points:
+        for p in self.toList():
             burnName, date, loc = p
             burn = self.data.burns[burnName]
             day = burn.days[date]
@@ -76,20 +98,19 @@ class Dataset(object):
             no = no[:len(yes)]
 
         # recombine
-        return yes+no
-
-    def getSamples(self, inputSettings):
-        return [Sample(self.data, p, inputSettings) for p in self.points]
+        return self.toDict(yes+no)
 
     def split(self, ratios=[.5]):
-        random.shuffle(self.points)
+        ptList = self.toList(self.points)
+        random.shuffle(ptList)
         beginIndex = 0
         ratios.append(1)
         sets = []
         for r in ratios:
-            endIndex = int(round(r * len(self.points)))
+            endIndex = int(round(r * len(ptList)))
             # print(beginIndex, endIndex)
-            sets.append( Dataset(self.data, self.points[beginIndex:endIndex]) )
+            newPts = self.toDict(self.points[beginIndex:endIndex])
+            sets.append( Dataset(self.data, newPts))
             beginIndex = endIndex
         return sets
 
@@ -110,95 +131,10 @@ class Dataset(object):
 
     def __repr__(self):
         # shorten the string repr of self.points
-        return "Dataset({}, with {} points)".format(self.data, len(self.points))
+        return "Dataset({}, with {} points)".format(self.data, len(self.toList(self.points)))
 
 # create a class that represents a spatial and temporal location that a sample lives at
 Point = namedtuple('Point', ['burnName', 'date', 'location'])
-
-class Sample(object):
-    '''An actual sample that can be fed into the network.
-
-    Encapsulates both the input and output data, as well as the Point it was taken from'''
-
-    # if we calculate the weatherMetric for a Day, memo it
-    memoedWeatherMetrics = {}
-    memoedPadded = {}
-
-    def __init__(self, data, point, inputSettings):
-        self.data = data
-        self.point = point
-        self.inputSettings = inputSettings
-
-    def getInputs(self):
-        burnName, date, location = self.point
-        burn = self.data.burns[burnName]
-        day = burn.days[date]
-
-        inpset = self.inputSettings
-        if (burnName, date) in Sample.memoedWeatherMetrics:
-            weatherMetrics = Sample.memoedWeatherMetrics[(burnName, date)]
-        else:
-            weatherMetrics = inpset.weatherMetrics.calculate(day.weather)
-            Sample.memoedWeatherMetrics[(burnName, date)] = weatherMetrics
-
-        if (burnName, date) not in Sample.memoedPadded:
-            padded = self.stackAndPadLayers(burn.layers, day.startingPerim)
-            Sample.memoedPadded[(burnName, date)] = padded
-        else:
-            padded = Sample.memoedPadded[(burnName, date)]
-        aoi = self.extract(padded, location)
-
-        return [weatherMetrics, aoi]
-
-    def extract(self, padded, location):
-        '''Assume padded is bordered by radius self.inputSettings.AOIRadius'''
-        y,x = location
-        r = self.inputSettings.AOIRadius
-        lox = r+(x-r)
-        hix = r+(x+r+1)
-        loy = r+(y-r)
-        hiy = r+(y+r+1)
-        aoi = padded[loy:hiy,lox:hix]
-        # print(stacked.shape, padded.shape)s
-        return aoi
-
-    def stackAndPadLayers(self, layers, startingPerim):
-        usedLayerNames, metric, AOIRadius = self.inputSettings
-        if usedLayerNames == 'all':
-            names = list(layers.keys())
-            names.sort()
-            usedLayers = [layers[name] for name in names]
-        else:
-            usedLayers = [layers[name] for name in usedLayerNames]
-        usedLayers.insert(0, startingPerim)
-        stacked = np.dstack(usedLayers)
-
-        r = AOIRadius
-        # pad with zeros around border of image
-        padded = np.lib.pad(stacked, ((r,r),(r,r),(0,0)), 'constant')
-        return padded
-
-    def getOutput(self):
-        burnName, date, (y, x) = self.point
-        burn = self.data.burns[burnName]
-        day = burn.days[date]
-        return day.endingPerim[y, x]
-
-    def __repr__(self):
-        return "Sample({}, {}, {})".format(self.data, self.point, self.inputSettings)
-
-class InputSettings(object):
-
-    def __init__(self, usedLayerNames, AOIRadius=30, weatherMetrics=None, ):
-        self.AOIRadius = AOIRadius
-        self.weatherMetrics = weatherMetrics if weatherMetrics is not None else InputSettings.dummyMetric
-        self.usedLayerNames = usedLayerNames
-        assert type(self.usedLayerNames) == list
-        assert len(usedLayerNames) > 0
-
-    @staticmethod
-    def dummyMetric(weatherMatrix):
-        return 42
 
 if __name__ == '__main__':
     d = RawData.load()

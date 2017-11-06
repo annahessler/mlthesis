@@ -21,6 +21,11 @@ class RawData(object):
             burns = {n:Burn.load(n, dates[n]) for n in burnNames}
         return RawData(burns)
 
+    def getWeather(self, burnName, date):
+        burn = self.burns[burnName]
+        day = burn.days[date]
+        return day.weather
+
     def augment(self):
         '''TODO make it so we bootstrap our dataset, adding noise, rotation, and some scaling to all our fires.'''
         return self
@@ -91,26 +96,6 @@ class Day(object):
         # now data is 2D array
         return data
 
-    @staticmethod
-    def windMetrics(weatherData):
-        col = 4
-        n, s, e, w = 0
-
-        for i in np.shape(weatherData)[0]:
-            if weatherData[i][col] > 90 and weatherData[i][col] < 270: #going north
-                ''' sin(wind direction) * wind speed '''
-                n += (np.sin(weatherData[i][col]) * weatherData[i][col + 1])
-            if weatherData[i][col] < 90 and weatherData[i][col] > 270: #going south
-                s += (np.sin(weatherData[i][col]) * weatherData[i][col + 1])
-            if weatherData[i][col] < 360 and weatherData[i][col] > 180: #going east
-                e += (np.cos(weatherData[i][col]) * weatherData[i][col + 1])
-            if weatherData[i][col] > 0 and weatherData[i][col] < 180: #going west
-                w += (np.cos(weatherData[i][col]) * weatherData[i][col + 1])
-
-        weather = [n, s, e, w]
-        return weather
-
-
     def loadStartingPerim(self):
         fname = 'data/raw/{}/perims/{}.tif'.format(self.burnName, self.date)
         perim = cv2.imread(fname, cv2.IMREAD_UNCHANGED)
@@ -146,7 +131,6 @@ class Day(object):
 
         return guess1, guess2
 
-
     @staticmethod
     def allGoodDays(burnName):
         '''Given a fire, return a list of all dates that we can train on'''
@@ -154,7 +138,6 @@ class Day(object):
 
         weatherFiles = listdir_nohidden(directory+'weather/')
         weatherDates = [fname[:-len('.csv')] for fname in weatherFiles]
-
 
         perimFiles = listdir_nohidden(directory+'perims/')
         perimDates = [fname[:-len('.tif')] for fname in perimFiles if isValidImg(directory+'perims/'+fname)]
@@ -176,6 +159,7 @@ def isValidImg(imgName):
     return img is not None
 
 def listdir_nohidden(path):
+    '''List all the files in a path that are not hidden (begin with a .)'''
     result = []
     for f in listdir(path):
         if not f.startswith('.'):
