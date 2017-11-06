@@ -60,8 +60,8 @@ oidg = image.ourImageDataGenerator(
         fill_mode='nearest',
         data_format = 'channels_last'
     )
-augment = np.lib.pad(x, ((1,1), (1,1), (0,0)) 'constant')
-np.lib.pad(x, ((r,r),(r,r),(0,0)), 'constant')
+x = np.lib.pad(x, ((1,1), (1,1), (0,0)) 'constant')
+
 augmented = oidg.random_transform(x, 7)
 print(augmented.shape)
 np.savetxt('data/raw/demafterreturn.csv', augmented[:,:,0], delimiter=',')
