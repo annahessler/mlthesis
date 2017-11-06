@@ -27,15 +27,20 @@ datagen = ImageDataGenerator(
         horizontal_flip=True,
         fill_mode='nearest')
 
-def collectData(fireName, date):
+def collectData(fireName, date, next_day):
     dem = cv2.imread('data/raw/' + fireName + '/dem.tif', cv2.IMREAD_UNCHANGED)
-    print('dem is all good', dem)
-    print('directory is ', os.listdir)
+    # print('DEM SHAPE: ', dem.shape)
+    # print('dem is all good', dem)
+    # print('directory is ', os.listdir())
     # np.savetxt('data/raw/dembefore.csv', dem, delimiter=',')
-    aspect = cv2.imread('data/raw/'+ fireName + '/aspect.tif', cv2.IMREAD_UNCHANGED) 
-    perim = cv2.imread('data/raw/' + fireName + '/perims/' + date + '.tif', cv2.IMREAD_UNCHANGED)
-    perim_next = cv2.imread('data/raw' + fireName + '/perims/' + '0801')
+    aspect = cv2.imread('data/raw/'+ fireName + '/aspect.tif', cv2.IMREAD_UNCHANGED)
+    # print('ASPECT SHAPE: ', aspect.shape)
+    # print(fireName, date)
+    perim = cv2.imread('data/raw/'+fireName+'/perims/'+date+'.tif', 0)
+    # print('PERIM SHAPE: ', perim.shape)
+    perim_next = cv2.imread('data/raw' + fireName + '/perims/' + next_day + '.tif')
     weather = createWeatherMetrics(openWeatherData(date, fireName))
+    # print('SHAPES: ', dem.shape, aspect.shape, perim.shape)
     toAugment = np.dstack((dem, aspect, perim))
     print('weather shape', weather.shape)
     print('toaugment shape ', toAugment.shape)
@@ -46,31 +51,50 @@ def collectData(fireName, date):
     print('x shape is ', toAugment.shape)
     return toAugment
 
+def doMore(x, fire, date):
+    oidg = image.ourImageDataGenerator(
+            rotation_range=40,
+            width_shift_range=0.2,
+            height_shift_range=0.2,
+            shear_range=0.2,
+            zoom_range=0.2,
+            horizontal_flip=True,
+            fill_mode='nearest',
+            data_format = 'channels_last'
+        )
+
+    x1 = np.lib.pad(x, ((1,1),(1,1),(0,0)), 'constant')
+    augmented = oidg.random_transform(x1, 7)
+    print(augmented.shape)
+    np.savetxt('data/raw/demafterreturn.csv', augmented[:,:,0], delimiter=',')
+
+    before = x[:,:,0]
+    result = augmented[:,:,0]
+    print('before shape is ', before.shape)
+    print('result shape is ', result.shape)
+
+    cv2.imwrite('before'+ fire+ date+ '.png', before.reshape(before.shape[:2]))
+    cv2.imwrite('after'+ fire+ date+ '.png', result.reshape(result.shape[:2]))
+
+fires = ['riceRidge', 'coldSprings']
+rrdays = ['0731', '0801', '0802', '0803']
+csdays = ['0711', '0712', '0713', '0714', '0715']
+
+for i in fires:
+    if i == fires[0]:
+        for r, value in enumerate(rrdays[:-1], 0):
+            x = collectData(i, rrdays[r], rrdays[r+1])
+            doMore(x, i, rrdays[r])
+    if i == fires[1]:
+        for c, value in enumerate(csdays[:-1], 0):
+            x = collectData(i, csdays[c], csdays[c+1])
+            doMore(x, i, csdays[c])
 
 
 
-x = collectData('riceRidge', '0731')
-oidg = image.ourImageDataGenerator(
-        rotation_range=40,
-        width_shift_range=0.2,
-        height_shift_range=0.2,
-        shear_range=0.2,
-        zoom_range=0.2,
-        horizontal_flip=True,
-        fill_mode='nearest',
-        data_format = 'channels_last'
-    )
-augmented = oidg.random_transform(x, 7)
-print(augmented.shape)
-np.savetxt('data/raw/demafterreturn.csv', augmented[:,:,0], delimiter=',')
+# x = collectData('riceRidge', '0731')
 
-before = x[:,:,0]
-result = augmented[:,:,0]
-print('before shape is ', before.shape)
-print('result shape is ', result.shape)
 
-cv2.imwrite('before.png', before.reshape(before.shape[:2]))
-cv2.imwrite('after.png', result.reshape(result.shape[:2]))
 
 # the .flow() command below generates batches of randomly transformed images
 # and saves the results to the `preview/` directory
