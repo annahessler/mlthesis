@@ -29,18 +29,18 @@ datagen = ImageDataGenerator(
 
 def collectData(fireName, date, next_day):
     dem = cv2.imread('data/raw/' + fireName + '/dem.tif', cv2.IMREAD_UNCHANGED)
-    # print('DEM SHAPE: ', dem.shape)
-    # print('dem is all good', dem)
+    print('DEM SHAPE: ', dem.shape)
+    print('dem is all good', dem)
     # print('directory is ', os.listdir())
-    # np.savetxt('data/raw/dembefore.csv', dem, delimiter=',')
+    np.savetxt('data/raw/dembefore.csv', dem, delimiter=',')
     aspect = cv2.imread('data/raw/'+ fireName + '/aspect.tif', cv2.IMREAD_UNCHANGED)
-    # print('ASPECT SHAPE: ', aspect.shape)
-    # print(fireName, date)
+    print('ASPECT SHAPE: ', aspect.shape)
+    print(fireName, date)
     perim = cv2.imread('data/raw/'+fireName+'/perims/'+date+'.tif', 0)
-    # print('PERIM SHAPE: ', perim.shape)
+    print('PERIM SHAPE: ', perim)
     perim_next = cv2.imread('data/raw' + fireName + '/perims/' + next_day + '.tif')
     weather = createWeatherMetrics(openWeatherData(date, fireName))
-    # print('SHAPES: ', dem.shape, aspect.shape, perim.shape)
+    print('SHAPES: ', dem.shape, aspect.shape, perim.shape)
     toAugment = np.dstack((dem, aspect, perim))
     print('weather shape', weather.shape)
     print('toaugment shape ', toAugment.shape)
@@ -76,9 +76,14 @@ def doMore(x, fire, date):
     cv2.imwrite('before'+ fire+ date+ '.png', before.reshape(before.shape[:2]))
     cv2.imwrite('after'+ fire+ date+ '.png', result.reshape(result.shape[:2]))
 
-fires = ['riceRidge', 'coldSprings']
+fires = ['riceRidge', 'coldSprings', 'beaverCreek']
 rrdays = ['0731', '0801', '0802', '0803']
 csdays = ['0711', '0712', '0713', '0714', '0715']
+bcdays = ['0629', '0630']
+bcdays2 = ['0711', '0712', '0713', '0714', '0715', '0716']
+bcdays3 = ['0801', '0802']
+bcdays4 = ['0804', '0805']
+bcdays5 = ['0807', '0808', '0809', '0810']
 
 for i in fires:
     if i == fires[0]:
@@ -89,6 +94,22 @@ for i in fires:
         for c, value in enumerate(csdays[:-1], 0):
             x = collectData(i, csdays[c], csdays[c+1])
             doMore(x, i, csdays[c])
+    if i == fires[2]:
+        for b, value in enumerate(bcdays[:-1], 0):
+            x = collectData(i, bcdays[b], bcdays[b+1])
+            doMore(x, i, bcdays[b])
+        for b, value in enumerate(bcdays2[:-1], 0):
+            x = collectData(i, bcdays2[b], bcdays2[b+1])
+            doMore(x, i, bcdays2[b])
+        for b, value in enumerate(bcdays3[:-1], 0):
+            x = collectData(i, bcdays3[b], bcdays3[b+1])
+            doMore(x, i, bcdays3[b])
+        for b, value in enumerate(bcdays4[:-1], 0):
+            x = collectData(i, bcdays4[b], bcdays4[b+1])
+            doMore(x, i, bcdays4[b])
+        for b, value in enumerate(bcdays5[:-1], 0):
+            x = collectData(i, bcdays5[b], bcdays5[b+1])
+            doMore(x, i, bcdays5[b])
 
 
 
