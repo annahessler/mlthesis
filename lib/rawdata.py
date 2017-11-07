@@ -26,9 +26,10 @@ class RawData(object):
         day = burn.days[date]
         return day.weather
 
-    def augment(self):
-        '''TODO make it so we bootstrap our dataset, adding noise, rotation, and some scaling to all our fires.'''
-        return self
+    def getOutput(self, burnName, date, location):
+        burn = self.burns[burnName]
+        day = burn.days[date]
+        return day.endingPerim[location]
 
     def __repr__(self):
         return "Dataset({})".format(list(self.burns.values()))

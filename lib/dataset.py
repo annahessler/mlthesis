@@ -23,9 +23,7 @@ class Dataset(object):
             filterFunc = points
             self.points = self.filterPoints(self.data, filterFunc)
 
-        assert type(self.points) == type([])
-        for p in self.points:
-            assert type(p) == Point
+        assert type(self.points) == type({})
 
     def getUsedBurnNamesAndDates(self):
         results = []
@@ -35,6 +33,15 @@ class Dataset(object):
             for date in dates:
                 results.append((name,date))
         return results
+
+    def getAllLayers(self, layerName):
+        result = {}
+        allBurnNames = list(self.points.keys())
+        for burnNamename in allBurnNames:
+            burn = self.data.burns[burnName]
+            layer = burn.layers[layerName]
+            result[burnName] = layer
+        return result
 
     @staticmethod
     def toList(pointDict):
