@@ -5,3 +5,9 @@ lib/__pycache__/*
 output/*
 res.csv
 models/*
+._*
+*/*/*/*/._*
+*/*/*/._*
+lib/._*
+data/raw/*/weather/*
+data/raw/*/perims/*

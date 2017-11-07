@@ -18,11 +18,11 @@ def createWeatherMetrics(weatherData):
     avgHum = sum(hum)/len(hum)
     return np.array( [max(temp), avgWSpeed, avgWDir, totalPrecip, avgHum])
 
+
 datagen = ImageDataGenerator(
-        rotation_range=40,
+        rotation_range=300,
         width_shift_range=0.2,
         height_shift_range=0.2,
-        shear_range=0.2,
         zoom_range=0.2,
         horizontal_flip=True,
         fill_mode='nearest')
@@ -35,13 +35,13 @@ def collectData(fireName, date):
     aspect = cv2.imread('data/raw/'+ fireName + '/aspect.tif', cv2.IMREAD_UNCHANGED) 
     perim = cv2.imread('data/raw/' + fireName + '/perims/' + date + '.tif', cv2.IMREAD_UNCHANGED)
     perim_next = cv2.imread('data/raw' + fireName + '/perims/' + '0801')
-    weather = createWeatherMetrics(openWeatherData(date, fireName))
+    # weather = createWeatherMetrics(openWeatherData(date, fireName))
     toAugment = np.dstack((dem, aspect, perim))
-    print('weather shape', weather.shape)
+    # print('weather shape', weather.shape)
     print('toaugment shape ', toAugment.shape)
-    tiledWeather = np.tile(weather, (toAugment.shape))
-    print(tiledWeather.shape)
-    toAugment = np.dstack((toAugment, tiledWeather))
+    # tiledWeather = np.tile(weather, (toAugment.shape))
+    # print(tiledWeather.shape)
+    # toAugment = np.dstack((toAugment, tiledWeather))
     # toAugment = toAugment.reshape((1,) + toAugment.shape )
     print('x shape is ', toAugment.shape)
     return toAugment
@@ -60,11 +60,14 @@ oidg = image.ourImageDataGenerator(
         fill_mode='nearest',
         data_format = 'channels_last'
     )
-x = np.lib.pad(x, ((1,1), (1,1), (0,0)) 'constant')
+x = np.lib.pad(x, ((1,1), (1,1), (0,0)), 'constant')
 
-augmented = oidg.random_transform(x, 7)
+augmented, theta = oidg.random_transform(x, 7)
 print(augmented.shape)
+print('theta is ', theta)
 np.savetxt('data/raw/demafterreturn.csv', augmented[:,:,0], delimiter=',')
+rotated_weather = changeWindDirection(theta,'0731', 'riceRidge')
+
 
 before = x[:,:,0]
 result = augmented[:,:,0]

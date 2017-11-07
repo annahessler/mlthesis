@@ -510,7 +510,7 @@ class ourImageDataGenerator(object):
 
         np.savetxt('data/raw/demafterrandomtransform.csv', x[:,:,0], delimiter=',')
 
-        return x
+        return x, theta
 
 def apply_transform(x,
                     transform_matrix,
