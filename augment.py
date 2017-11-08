@@ -82,11 +82,11 @@ def collectData(fireName, days):
     print('PERIM TUPLE: ' + str(perim_tuple))
 
 
-    toAugment = np.dstack(perim_tuple)
+    toAugment = np.dstack(perim_tuple) #This needs to be tuple?????
     # print('weather shape', weather.shape)
     print('toaugment shape ', toAugment.shape)
     print('x shape is ', toAugment.shape)
-    return toAugment, perim_tuple
+    return toAugment, perim_tuple, days_arr
 
 def rotateWindDirection(theta, fire, date, int_index):
     weather = openWeatherData(date, fire)
@@ -96,7 +96,7 @@ def rotateWindDirection(theta, fire, date, int_index):
     np.savetxt('data/raw/' + fire+ 'Augmented' + int_index + '/weather/' + date + '.csv', weather, delimiter=',')
     return weather
 
-def doMore(x, fire, days, p_tuple):
+def doMore(x, fire, days, p_tuple, array_perim):
     oidg = image.ourImageDataGenerator(
             rotation_range=40,
             width_shift_range=0.2,
@@ -136,8 +136,8 @@ def doMore(x, fire, days, p_tuple):
     cv2.imwrite('aspect.tif', aspect)
     cv2.imwrite('slope.tif', slope)
     os.chdir('perims/')
-    for n, perim in enumerate(p_tuple, 0): #figure out how to do this with two perims
-        cv2.imwrite(days[n] +'.tif', p_tuple[n+3])
+    for n, perim in enumerate(array_perim, 0): #figure out how to do this with two perims
+        cv2.imwrite(days[n] +'.tif', perim)
     os.chdir('../../../..')
     print(os.listdir())
     print('done with 1')
@@ -147,19 +147,19 @@ rrdays = ['0731', '0801', '0802', '0803']
 csdays = ['0711', '0712', '0713', '0714']
 # bcdays = ['0629', '0630']
 # bcdays2 = ['0711', '0712', '0713', '0714', '0715', '0716']
-# bcdays3 = ['0801', '0802']
+# bcdays3 = ['0801', '0802'] TAKE OUT
 # bcdays4 = ['0804', '0805']
 # bcdays5 = ['0807', '0808', '0809', '0810']
 
 for fire in fires:
     if fire == fires[0]:
         # for r, value in enumerate(rrdays[:-1], 0):
-        x, y = collectData(fire, rrdays)
-        doMore(x, fire, rrdays, y)
+        x, y, arr = collectData(fire, rrdays)
+        doMore(x, fire, rrdays, y, arr)
     if fire == fires[1]:
         # for c, value in enumerate(csdays[:-1], 0):
-        x, y = collectData(fire, csdays)
-        doMore(x, fire, csdays, y)
+        x, y, arr = collectData(fire, csdays)
+        doMore(x, fire, csdays, y, arr)
     # if i == fires[2]:
     #     for b, value in enumerate(bcdays[:-1], 0):
     #         x = collectData(i, bcdays[b], bcdays[b+1])
