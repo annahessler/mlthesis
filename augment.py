@@ -28,9 +28,12 @@ def openWeatherData(dateString, fireName):
     fname = 'data/raw/' + fireName + '/weather/' + dateString + '.csv'
     # the first row is the headers, and only cols 4-11 are actual data
     # data = np.loadtxt(fname, usecols=[5,12], skiprows=1, delimiter='')
-    date_list = np.loadtxt(fname, usecols=range(0,2), dtype=str, skiprows=1, delimiter=',').T
-    no_augment = np.loadtxt(fname, usecols=range(2,5), skiprows=1, delimiter=',').T
-    augment = np.loadtxt(fname, usecols=range(5,12), skiprows=1, delimiter=',').T
+    date_list = np.loadtxt(fname, usecols=range(0,2), dtype='float32', skiprows=1, delimiter=',')
+    print('datelist is ', date_list)
+    no_augment = np.loadtxt(fname, usecols=range(2,5), skiprows=1, delimiter=',', dtype='float32')
+    print('no augment ', no_augment)
+    augment = np.loadtxt(fname, usecols=range(5,12), skiprows=1, delimiter=',', dtype='float32').T
+    print('augment ', augment)
     return date_list, no_augment, augment
 
 # def createWeatherMetrics(weatherData):
@@ -92,21 +95,24 @@ def rotateWindDirection(theta, fire, date, int_index):
     temp, dewpt, temp2, wdir, wspeed, precip, hum = weather
     wdir = (wdir + ((180/np.pi)+theta))%360
     weather = temp, dewpt, temp2, wdir, wspeed, precip, hum
-    all_weather = np.concatenate([date_list, no_augment, weather])
+    weather2 = np.transpose(weather)
+    print('new weather shape is ', weather2.shape, weather2)
+    all_weather = np.hstack([date_list, no_augment, weather2])
     print('all weather shape is ', all_weather.shape)
-    headings = np.array(['DATE', 'HOUR', 'LAT', 'LONG', 'MSL PRESSURE', 'TEMPERATURE', 'DEW POINT', 'TEMPERATURE', 'WIND DIRECTION', 'WIND SPEED', 'PRECIPITATION', 'RELATIVE HUMIDITY'])
-    # print('headings shape is ', headings.shape)
-    # headings = headings.reshape(headings.shape + (1,))
-    # print('new headings shape is ', headings.shape)
-    # result = np.hstack((headings, all_weather))
-
+    headings = np.zeros(12, dtype='float32')
+    print('headings shape is ', headings.shape)
+    headings = headings.reshape( (1,) + headings.shape)
+    print('new headings shape is ', headings.shape)
+    result = np.vstack((headings, all_weather))
+    print('result shape is ', result.shape)
     f = 'data/raw/' + fire+ 'Augmented' + int_index + '/weather/' + date + '.csv'
     # np.savetxt(f, headings, delimiter=',')
-    np.savetxt(f, all_weather, delimiter=',')
-    f = open(f)
-    for i in all_weather:
-        np.savetxt(f, i, delimiter=',')
-    # np.savetxt('data/raw/' + fire+ 'Augmented' + int_index + '/weather/' + date + '.csv', all_weather, delimiter=',')
+    # np.savetxt(f, all_weather, delimiter=',')
+    # f = open(f)
+    # for i in all_weather:
+    #     np.savetxt(f, i, delimiter=',')
+    print('result is ', result)
+    np.savetxt('data/raw/' + fire+ 'Augmented' + int_index + '/weather/' + date + '.csv', result, delimiter=',')
 
     return weather 
 
