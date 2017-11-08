@@ -7,7 +7,7 @@ import time
 from time import localtime, strftime
 
 
-  
+
 def openEndingPerim(dateString, fire):
     month, day = dateString[:2], dateString[2:]
     nextDay = str(int(day)+1).zfill(2)
@@ -47,23 +47,26 @@ datagen = ImageDataGenerator(
         horizontal_flip=True,
         fill_mode='nearest')
 
-def collectData(fireName, date, next_day):
-    # still need landsat to be read in 
+def collectData(fireName, days):
+    days_arr = []
+    # still need landsat to be read in
     dem = cv2.imread('data/raw/' + fireName + '/dem.tif', cv2.IMREAD_UNCHANGED)
     print('DEM SHAPE: ', dem.shape)
     # print('directory is ', os.listdir())
     # np.savetxt('data/raw/dembefore.csv', dem, delimiter=',')
     aspect = cv2.imread('data/raw/'+ fireName + '/aspect.tif', cv2.IMREAD_UNCHANGED)
     print('ASPECT SHAPE: ', aspect.shape)
-    print(fireName, date)
-    perim = cv2.imread('data/raw/'+fireName+'/perims/'+date+'.tif', 0)
-    print('PERIM SHAPE: ', perim.shape)
-    print('perim_next day ' + next_day)
-    perim_next = cv2.imread('data/raw/' + fireName + '/perims/' + next_day + '.tif')
-    print('perim_next shape ', perim_next.shape)
+    # print(fireName, date)
+    for day in days:
+        perim = cv2.imread('data/raw/'+fireName+'/perims/'+day+'.tif', 0)
+        days_arr.append(perim)
+    # print('PERIM SHAPE: ', perim.shape)
+    # print('perim_next day ' + next_day)
+    # perim_next = cv2.imread('data/raw/' + fireName + '/perims/' + next_day + '.tif')
+    # print('perim_next shape ', perim_next.shape)
     slope = cv2.imread('data/raw/'+ fireName + '/slope.tif', cv2.IMREAD_UNCHANGED)
     print('slope shape ', slope.shape)
-    print('SHAPES: ', dem.shape, aspect.shape, perim.shape, perim_next.shape, slope.shape)
+    # print('SHAPES: ', dem.shape, aspect.shape, perim.shape, perim_next.shape, slope.shape)
     # if(perim.shape != aspect.shape):
     #     xdiff = aspect.shape[0] - perim.shape[0]
     #     print('xdiff is ', xdiff)
@@ -71,12 +74,19 @@ def collectData(fireName, date, next_day):
     #     print('ydiff is ', ydiff)
     #     perim = np.lib.pad(perim, ((xdiff, 0), (0,0)), 'constant')
     #     print('new perime shape is ', perim.shape)
-    
-    toAugment = np.dstack((dem, aspect, perim, perim_next, slope))
+
+    perim_tuple = (dem, aspect, slope)
+
+    for p in days_arr:
+        perim_tuple = perim_tuple + (p,)
+    print('PERIM TUPLE: ' + str(perim_tuple))
+
+
+    toAugment = np.dstack(perim_tuple)
     # print('weather shape', weather.shape)
     print('toaugment shape ', toAugment.shape)
     print('x shape is ', toAugment.shape)
-    return toAugment
+    return toAugment, perim_tuple
 
 def rotateWindDirection(theta, fire, date, int_index):
     weather = openWeatherData(date, fire)
@@ -84,9 +94,9 @@ def rotateWindDirection(theta, fire, date, int_index):
     wdir = (wdir + ((180/np.pi)+theta))%360
     weather = temp, dewpt, temp2, wdir, wspeed, precip, hum
     np.savetxt('data/raw/' + fire+ 'Augmented' + int_index + '/weather/' + date + '.csv', weather, delimiter=',')
-    return weather 
+    return weather
 
-def doMore(x, fire, date):
+def doMore(x, fire, days, p_tuple):
     oidg = image.ourImageDataGenerator(
             rotation_range=40,
             width_shift_range=0.2,
@@ -107,25 +117,27 @@ def doMore(x, fire, date):
     to_save_weather = os.mkdir('data/raw/' + fire + 'Augmented' + int_index+ '/weather/' )
     to_save_perims = os.mkdir('data/raw/' + fire + 'Augmented'  + int_index + '/perims/')
 
-    weather = rotateWindDirection(theta, fire, date, int_index)
+    for date in days:
+        weather = rotateWindDirection(theta, fire, date, int_index)
     # np.savetxt('data/raw/demafterreturn.csv', augmented[:,:,0], delimiter=',')
 
     dem = augmented[:,:,0]
     aspect = augmented[:,:,1]
-    perim = augmented[:,:,2]
-    # perim_next = 
-    slope = augmented[:,:,4]
+    #perim = augmented[:,:,2]
+    # perim_next =
+    slope = augmented[:,:,2]
     # cv2.imwrite('before'+ fire+ date+ '.png', before.reshape(before.shape[:2]))
- 
-    
+
+
     print('current dir is ', os.listdir())
     os.chdir('data/raw/' + fire + 'Augmented' + int_index + '/')
-    # cv2.imwrite('dem.tif', result.reshape(dem.shape[:2])) 
-    cv2.imwrite('dem.tif', dem) 
+    # cv2.imwrite('dem.tif', result.reshape(dem.shape[:2]))
+    cv2.imwrite('dem.tif', dem)
     cv2.imwrite('aspect.tif', aspect)
     cv2.imwrite('slope.tif', slope)
     os.chdir('perims/')
-    cv2.imwrite(date +'.tif', perim)
+    for n, perim in enumerate(p_tuple, 0): #figure out how to do this with two perims
+        cv2.imwrite(days[n] +'.tif', p_tuple[n+3])
     os.chdir('../../../..')
     print(os.listdir())
     print('done with 1')
@@ -139,15 +151,15 @@ csdays = ['0711', '0712', '0713', '0714']
 # bcdays4 = ['0804', '0805']
 # bcdays5 = ['0807', '0808', '0809', '0810']
 
-for i in fires:
-    if i == fires[0]:
-        for r, value in enumerate(rrdays[:-1], 0):
-            x = collectData(i, rrdays[r], rrdays[r+1])
-            doMore(x, i, rrdays[r])
-    if i == fires[1]:
-        for c, value in enumerate(csdays[:-1], 0):
-            x = collectData(i, csdays[c], csdays[c+1])
-            doMore(x, i, csdays[c])
+for fire in fires:
+    if fire == fires[0]:
+        # for r, value in enumerate(rrdays[:-1], 0):
+        x, y = collectData(fire, rrdays)
+        doMore(x, fire, rrdays, y)
+    if fire == fires[1]:
+        # for c, value in enumerate(csdays[:-1], 0):
+        x, y = collectData(fire, csdays)
+        doMore(x, fire, csdays, y)
     # if i == fires[2]:
     #     for b, value in enumerate(bcdays[:-1], 0):
     #         x = collectData(i, bcdays[b], bcdays[b+1])
