@@ -1,5 +1,13 @@
 # preprocess.py
+from collections import namedtuple
 import numpy as np
+# import scipy.stats as stats
+import scipy.stats
+import lib.stats as stats
+try:
+    import matplotlib.pyplot as plt
+except:
+    pass
 
 class PreProcessor(object):
     '''What is responsible for extracting the used data from the dataset and then
@@ -61,8 +69,7 @@ def getSpatialData(dataset, whichLayers, AOIRadius):
     # now normalize them
     layers = normalizeLayers(layers)
     # now order them in the whichLayers order, stack them, and pad them
-
-    paddedLayers = getPadded(dataset, whichLayers, AOIRadius)
+    paddedLayers = stackAndPad(layers, whichLayers, dataset, AOIRadius)
     # now extract out the aois around each point
     result = {}
     for pt in dataset.toList(dataset.points):
@@ -75,24 +82,129 @@ def getSpatialData(dataset, whichLayers, AOIRadius):
 
 def normalizeLayers(layers):
     result = {}
-    for name, data in layers:
+    for name, data in layers.items():
+        # if name != 'ndvi':
+        #     continue
         if name == 'dem':
             result[name] = normalizeElevations(data)
         else:
+            # print('normalizing layer', name)
             result[name] = normalizeNonElevations(data)
     return result
 
 def normalizeElevations(dems):
     avgElevation = {}
+    validIndicesDict = {}
     ranges = {}
     for burnName, dem in dems.items():
-        avgElevation[burnName] = np.mean(dem)
-        ranges
+        validIndices = validPixelIndices(dem)
+        validIndicesDict[burnName] = validIndices
+        validPixels = dem[validIndices]
+        avgElevation[burnName] = np.mean(validPixels)
+        ranges[burnName] = validPixels.max()-validPixels.min()
 
-def validPixels(layer):
-    '''Find all of the pixels which are not NODATA.
+        # vis = dem.copy()
+        # vis[validIndices] = 42
+        # plt.imshow(dem)
+        # plt.figure("valid")
+        # plt.imshow(vis)
+        # plt.show()
+    maxRange = max(ranges.values())
+    results = {}
+    for burnName, dem in dems.items():
+        validIndices = validIndicesDict[burnName]
+        # print(validIndices)
+        validPixels = dem[validIndices]
+        # print('valid pixels size:', validPixels.size)
+        normed = normalize(validPixels)
+        blank = np.zeros_like(dem, dtype=np.float32)
+        thisRange = ranges[burnName]
+        scaleFactor = thisRange/maxRange
+        blank[validIndices] = scaleFactor * normed
+        # print('scaleFactor is ', scaleFactor)
+        # plt.imshow(blank)
+        # plt.show()
+        results[burnName] = blank
+    return results
 
-    Usually the NODATA pixels are some really large or small value and there are lots of them contiguous'''
+def normalizeNonElevations(nonDems):
+    splitIndices = [0]
+    validPixelsList = []
+    validIndicesList = []
+    names = list(nonDems.keys())
+    for name in names:
+        layer = nonDems[name]
+        validIndices = validPixelIndices(layer)
+        validPixels = layer[validIndices]
+
+        # print('valid indices:', validIndices)
+        # print('len of valid pixels', validPixels.shape, len(validPixels))
+
+        # vis = np.zeros_like(layer)
+        # vis[validIndices] = 42
+        # plt.figure('before '+name)
+        # plt.imshow(layer)
+        # plt.figure('valid '+name)
+        # plt.imshow(vis)
+        # plt.show()
+
+        validPixelsList += validPixels.tolist()
+        splitIndices.append(splitIndices[-1] + len(validPixels))
+        validIndicesList.append(validIndices)
+
+    # now layers.shape is (nburns, height, width)
+    arr = np.array(validPixelsList)
+    # print('array is', arr, arr.min(), arr.max())
+    normed = normalize(arr)
+    # print(normed)
+    # print('split indices', splitIndices)
+    splitIndices = splitIndices[1:]
+    # print('split indices', splitIndices)
+    splitBackUp = np.split(normed, splitIndices)
+    # print('split back up:', splitBackUp.shape)
+    results = {}
+    for name, validIndices, normedPixels in zip(names,validIndicesList,splitBackUp):
+        # print(name, validIndices, normedPixels)
+        src = nonDems[name]
+        img = np.zeros_like(src, dtype=np.float32)
+        img[validIndices] = normedPixels
+        results[name] = img
+        # if normedPixels.size > 0:
+        #     print('min and max of ', name, normedPixels.min(), normedPixels.max())
+        # plt.figure('normed'+name)
+        # plt.imshow(img)
+    # plt.show()
+    return results
+
+def validPixelIndices(layer):
+    '''return the locations of all of the pixels which are not NODATA.
+
+    if there are any realllllly big or small pixels, use those. Otherwise, they are big, but not that big.
+
+    Then, the NODATA pixels are some really large or small value and there are lots of them contiguous.
+    First rely on the fact that they will be really common. If there is one value that covers >20% of the img,
+    use those pixels.
+
+    Sometimes though there aren't many NODATA pixels. Then we rely on the fact that the small number of them have really large
+    or small values, far away from the mean'''
+    HUGE = 1e10
+    reasonable = np.where(np.absolute(layer) < HUGE)
+    if len(reasonable[0]) < layer.size:
+        return reasonable
+    # get the modes and counts for the entire image
+    m, count = stats.mode(layer.flatten(), axis=0)
+    # get the most common entry
+    # if that pixel is really common (>20% of the img)
+    CUTOFF_PERCENT = .2
+    if count > CUTOFF_PERCENT * layer.size:
+        # print('using mode method for valid pixels')
+        return np.where(layer!=m)
+    # print('using deviance method for valid pixels')
+    trimMean = scipy.stats.trim_mean(layer, .1, axis=None)
+    dev = np.std(layer)
+    # print('means and std:', np.mean(layer), trimMean, dev)
+    lowDeviance = abs(layer-trimMean) < 3*dev
+    return np.where(lowDeviance)
 
 def normalizeLayers2(layerDict):
     ids = list(layerDict.keys())
@@ -132,17 +244,16 @@ def getOutputs(dataset):
         result[(burnName, date, location)] = out
     return result
 
-def getPadded(dataset, whichLayers, AOIRadius):
+def stackAndPad(layerDict, whichLayers, dataset, AOIRadius):
     result = {}
     for burnName, date in dataset.getUsedBurnNamesAndDates():
-        burn = dataset.data.burns[burnName]
-        day = burn.days[date]
-
         # guarantee that the perim mask is just 0s and 1s
+        day = dataset.data.burns[burnName].days[date]
         sp = day.startingPerim
         sp[sp!=0]=1
 
-        layers = [sp] + [burn.layers[l] for l in whichLayers]
+        layers = [layerDict[layerName][burnName] for layerName in whichLayers]
+        layers = [sp] + layers
         stacked = np.dstack(layers)
         r = AOIRadius
         # pad with zeros around border of image
@@ -170,12 +281,13 @@ def normalize(arr, axis=None):
 
     if axis=0, then each column is normalized independently
     if axis=1, then each row is normalized independently'''
-    print('subtracting min')
+    # print('subtracting min')
     res = arr - arr.min(axis=axis)
-    print('dividing where')
+    # print('dividing where', res)
+    res = res.astype(np.float32)
     # where dividing by zero, just use zero
     res = np.divide(res, res.max(axis=axis), out=np.zeros_like(res), where=res!=0)
-    print('done')
+    # print('done')
     return res
 
 def totalPrecipitation(weatherMatrix):

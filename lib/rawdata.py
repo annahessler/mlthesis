@@ -13,7 +13,7 @@ class RawData(object):
     @staticmethod
     def load(burnNames='all', dates='all'):
         if burnNames == 'all':
-            burnNames = listdir_nohidden('data/raw/')
+            burnNames = listdir_nohidden('data/')
         if dates == 'all':
             burns = {n:Burn.load(n, 'all') for n in burnNames}
         else:
@@ -45,7 +45,7 @@ class Burn(object):
         self.layerSize = list(self.layers.values())[0].shape[:2]
 
     def loadLayers(self):
-        folder = 'data/raw/{}/'.format(self.name)
+        folder = 'data/{}/'.format(self.name)
         dem = cv2.imread(folder+'dem.tif', cv2.IMREAD_UNCHANGED)
         slope = cv2.imread(folder+'slope.tif',cv2.IMREAD_UNCHANGED)
         landsat = cv2.imread(folder+'landsat.png', cv2.IMREAD_UNCHANGED)
@@ -55,7 +55,6 @@ class Burn(object):
 
         layers = {'dem':dem,
                 'slope':slope,
-                'landsat':landsat,
                 'ndvi':ndvi,
                 'aspect':aspect,
                 'r':r,
@@ -91,14 +90,14 @@ class Day(object):
         self.endingPerim = endingPerim     if endingPerim   is not None else self.loadEndingPerim()
 
     def loadWeather(self):
-        fname = 'data/raw/{}/weather/{}.csv'.format(self.burnName, self.date)
+        fname = 'data/{}/weather/{}.csv'.format(self.burnName, self.date)
         # the first row is the headers, and only cols 4-11 are actual data
         data = np.loadtxt(fname, skiprows=1, usecols=range(5,12), delimiter=',').T
         # now data is 2D array
         return data
 
     def loadStartingPerim(self):
-        fname = 'data/raw/{}/perims/{}.tif'.format(self.burnName, self.date)
+        fname = 'data/{}/perims/{}.tif'.format(self.burnName, self.date)
         perim = cv2.imread(fname, cv2.IMREAD_UNCHANGED)
         if perim is None:
             raise RuntimeError('Could not find a perimeter for the fire {} for the day {}'.format(self.burnName, self.date))
@@ -107,11 +106,11 @@ class Day(object):
 
     def loadEndingPerim(self):
         guess1, guess2 = Day.nextDay(self.date)
-        fname = 'data/raw/{}/perims/{}.tif'.format(self.burnName, guess1)
+        fname = 'data/{}/perims/{}.tif'.format(self.burnName, guess1)
         perim = cv2.imread(fname, cv2.IMREAD_UNCHANGED)
         if perim is None:
             # overflowed the month, that file didnt exist
-            fname = 'data/raw/{}/perims/{}.tif'.format(self.burnName, guess2)
+            fname = 'data/{}/perims/{}.tif'.format(self.burnName, guess2)
             perim = cv2.imread(fname, cv2.IMREAD_UNCHANGED)
             if perim is None:
                 raise RuntimeError('Could not open a perimeter for the fire {} for the day {} or {}'.format(self.burnName, guess1, guess2))
@@ -135,7 +134,7 @@ class Day(object):
     @staticmethod
     def allGoodDays(burnName):
         '''Given a fire, return a list of all dates that we can train on'''
-        directory = 'data/raw/{}/'.format(burnName)
+        directory = 'data/{}/'.format(burnName)
 
         weatherFiles = listdir_nohidden(directory+'weather/')
         weatherDates = [fname[:-len('.csv')] for fname in weatherFiles]

@@ -13,7 +13,7 @@ datagen = ImageDataGenerator(
 
 # print(os.listdir())
 print('this is augment')
-img = load_img('data/raw/riceRidge/perims/0731.tif') 
+img = load_img('data/riceRidge/perims/0731.tif') 
 print(img) 
 x = img_to_array(img)
 x = img.reshape(img.shape + (1,1))

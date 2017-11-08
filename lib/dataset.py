@@ -37,7 +37,7 @@ class Dataset(object):
     def getAllLayers(self, layerName):
         result = {}
         allBurnNames = list(self.points.keys())
-        for burnNamename in allBurnNames:
+        for burnName in allBurnNames:
             burn = self.data.burns[burnName]
             layer = burn.layers[layerName]
             result[burnName] = layer
@@ -87,7 +87,7 @@ class Dataset(object):
         # yes will contain all 'did burn' points, no contains 'did not burn' points
         yes = []
         no =  []
-        for p in self.toList():
+        for p in self.toList(self.points):
             burnName, date, loc = p
             burn = self.data.burns[burnName]
             day = burn.days[date]
@@ -116,7 +116,7 @@ class Dataset(object):
         for r in ratios:
             endIndex = int(round(r * len(ptList)))
             # print(beginIndex, endIndex)
-            newPts = self.toDict(self.points[beginIndex:endIndex])
+            newPts = self.toDict(ptList[beginIndex:endIndex])
             sets.append( Dataset(self.data, newPts))
             beginIndex = endIndex
         return sets

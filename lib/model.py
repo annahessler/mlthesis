@@ -34,13 +34,12 @@ class ImageBranch(Sequential):
 
 class FireModel(Model):
 
-    def __init__(self, inputSettings):
-        self.inputSettings = inputSettings
-        self.usedLayers, self.weatherMetric, self.AOIRadius = self.inputSettings
+    def __init__(self, preProcessor):
+        self.preProcessor = preProcessor
 
-        kernelDiam = 2*self.AOIRadius+1
-        self.wb = Input((self.weatherMetric.numOutputs,),name='weatherInput')
-        self.ib = ImageBranch(len(self.usedLayers), kernelDiam)
+        kernelDiam = 2*self.preProcessor.AOIRadius+1
+        self.wb = Input((self.preProcessor.numWeatherInputs,),name='weatherInput')
+        self.ib = ImageBranch(len(self.preProcessor.whichLayers), kernelDiam)
 
         # print('weather branch info:', self.wb.shape)
         # print('image branch info:', self.ib.input_shape, self.ib.output_shape, self.ib.output)
@@ -58,8 +57,8 @@ class FireModel(Model):
 
     def fit(self, training, validate):
         # get the actual samples from the collection of points
-        tinputs, toutputs = preprocess.getInputsAndOutputs(training, self.inputSettings)
-        vinputs, voutputs = preprocess.getInputsAndOutputs(validate, self.inputSettings)
+        (tinputs, toutputs), ptList = self.preProcessor.process(training)
+        (vinputs, voutputs), ptList = self.preProcessor.process(validate)
         print('training on ', training)
         history = super().fit(tinputs, toutputs, batch_size = 1000, epochs = 2, validation_data=(vinputs, voutputs))
 
@@ -70,8 +69,7 @@ class FireModel(Model):
         return history
 
     def predict(self, dataset):
-        samples = dataset.getSamples(self.inputSettings)
-        inputs, outputs = preprocess.mergeSamples(samples)
+        (inputs, outputs), ptList = self.preProcessor.process(dataset)
         return super().predict(inputs).flatten()
 
 from collections import namedtuple
