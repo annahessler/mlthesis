@@ -27,16 +27,19 @@ def openEndingPerim(dateString, fire):
 def openWeatherData(dateString, fireName):
     fname = 'data/raw/' + fireName + '/weather/' + dateString + '.csv'
     # the first row is the headers, and only cols 4-11 are actual data
-    data = np.loadtxt(fname, skiprows=1, usecols=range(5,12), delimiter=',').T
-    return data
+    # data = np.loadtxt(fname, usecols=[5,12], skiprows=1, delimiter='')
+    date_list = np.loadtxt(fname, usecols=range(0,2), dtype=str, skiprows=1, delimiter=',').T
+    no_augment = np.loadtxt(fname, usecols=range(2,5), skiprows=1, delimiter=',').T
+    augment = np.loadtxt(fname, usecols=range(5,12), skiprows=1, delimiter=',').T
+    return date_list, no_augment, augment
 
-def createWeatherMetrics(weatherData):
-    temp, dewpt, temp2, wdir, wspeed, precip, hum = weatherData
-    avgWSpeed = sum(wspeed)/len(wspeed)
-    totalPrecip = sum(precip)
-    avgWDir= sum(wdir)/len(wdir)
-    avgHum = sum(hum)/len(hum)
-    return np.array( [max(temp), avgWSpeed, avgWDir, totalPrecip, avgHum])
+# def createWeatherMetrics(weatherData):
+#     temp, dewpt, temp2, wdir, wspeed, precip, hum = weatherData
+#     avgWSpeed = sum(wspeed)/len(wspeed)
+#     totalPrecip = sum(precip)
+#     avgWDir= sum(wdir)/len(wdir)
+#     avgHum = sum(hum)/len(hum)
+#     return np.array( [max(temp), avgWSpeed, avgWDir, totalPrecip, avgHum])
 
 
 datagen = ImageDataGenerator(
@@ -79,11 +82,32 @@ def collectData(fireName, date, next_day):
     return toAugment
 
 def rotateWindDirection(theta, fire, date, int_index):
-    weather = openWeatherData(date, fire)
+    date_list, no_augment, weather = openWeatherData(date, fire)
+    print('date_list shape is ', date_list.shape)
+    print('date_list is ', date_list)
+    print('no_augment shape is ', no_augment.shape)
+    print('no_augment is ', no_augment)
+    print('weather shape is ', weather.shape)
+    print('weather is ', weather)
     temp, dewpt, temp2, wdir, wspeed, precip, hum = weather
     wdir = (wdir + ((180/np.pi)+theta))%360
     weather = temp, dewpt, temp2, wdir, wspeed, precip, hum
-    np.savetxt('data/raw/' + fire+ 'Augmented' + int_index + '/weather/' + date + '.csv', weather, delimiter=',')
+    all_weather = np.concatenate([date_list, no_augment, weather])
+    print('all weather shape is ', all_weather.shape)
+    headings = np.array(['DATE', 'HOUR', 'LAT', 'LONG', 'MSL PRESSURE', 'TEMPERATURE', 'DEW POINT', 'TEMPERATURE', 'WIND DIRECTION', 'WIND SPEED', 'PRECIPITATION', 'RELATIVE HUMIDITY'])
+    # print('headings shape is ', headings.shape)
+    # headings = headings.reshape(headings.shape + (1,))
+    # print('new headings shape is ', headings.shape)
+    # result = np.hstack((headings, all_weather))
+
+    f = 'data/raw/' + fire+ 'Augmented' + int_index + '/weather/' + date + '.csv'
+    # np.savetxt(f, headings, delimiter=',')
+    np.savetxt(f, all_weather, delimiter=',')
+    f = open(f)
+    for i in all_weather:
+        np.savetxt(f, i, delimiter=',')
+    # np.savetxt('data/raw/' + fire+ 'Augmented' + int_index + '/weather/' + date + '.csv', all_weather, delimiter=',')
+
     return weather 
 
 def doMore(x, fire, date):
