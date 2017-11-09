@@ -55,12 +55,12 @@ class FireModel(Model):
         self.compile(loss = 'binary_crossentropy', optimizer = sgd, metrics = ['accuracy'])
 
 
-    def fit(self, training, validate):
+    def fit(self, training, validate, epochs=1):
         # get the actual samples from the collection of points
         (tinputs, toutputs), ptList = self.preProcessor.process(training)
         (vinputs, voutputs), ptList = self.preProcessor.process(validate)
         print('training on ', training)
-        history = super().fit(tinputs, toutputs, batch_size = 1000, epochs = 2, validation_data=(vinputs, voutputs))
+        history = super().fit(tinputs, toutputs, batch_size = 1000, epochs=epochs, validation_data=(vinputs, voutputs))
 
         from time import localtime, strftime
         timeString = strftime("%d%b%H:%M", localtime())
@@ -70,7 +70,9 @@ class FireModel(Model):
 
     def predict(self, dataset):
         (inputs, outputs), ptList = self.preProcessor.process(dataset)
-        return super().predict(inputs).flatten()
+        results = super().predict(inputs).flatten()
+        resultDict = {pt:pred for (pt, pred) in zip(ptList, results)}
+        return resultDict
 
 from collections import namedtuple
 InputSettings = namedtuple('InputSettings', ['usedLayerNames', 'weatherMetrics', 'AOIRadius'])

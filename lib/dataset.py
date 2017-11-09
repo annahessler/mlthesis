@@ -1,10 +1,12 @@
 from collections import namedtuple
 import random
+import json
+from time import localtime, strftime
 
 import numpy as np
 import cv2
 # from rawdata import
-from lib.rawdata import RawData, PIXEL_SIZE
+from lib import rawdata
 from lib import viz
 # from model import InputSettings
 
@@ -42,6 +44,34 @@ class Dataset(object):
             layer = burn.layers[layerName]
             result[burnName] = layer
         return result
+
+    def save(self, fname=None):
+        if fname is None:
+            timeString = strftime("%d%b%H:%M", localtime())
+            fname = timeString + '.jsn'
+        if not fname.startswith("output/datasets/"):
+            fname = "output/datasets/" + fname + '.json'
+
+        class MyEncoder(json.JSONEncoder):
+            def default(self, obj):
+                if isinstance(obj, np.integer):
+                    return int(obj)
+                elif isinstance(obj, np.floating):
+                    return float(obj)
+                elif isinstance(obj, np.ndarray):
+                    return obj.tolist()
+                else:
+                    return super(MyEncoder, self).default(obj)
+
+        with open(fname, 'w') as fp:
+            json.dump(self.points, fp, cls=MyEncoder, sort_keys=True, indent=4)
+
+    @staticmethod
+    def open(fname):
+        with open(fname, 'r') as fp:
+            data = rawdata.RawData.load(burnNames='all', dates='all')
+            pts = json.load(fp)
+            return Dataset(data, pts)
 
     @staticmethod
     def toList(pointDict):
@@ -130,7 +160,7 @@ class Dataset(object):
         '''Return the indices of the pixels that close to the current fire perimeter'''
         startingPerim = day.startingPerim
         kernel = np.ones((3,3))
-        its = int(round((2*(radius/PIXEL_SIZE)**2)**.5))
+        its = int(round((2*(radius/rawdata.PIXEL_SIZE)**2)**.5))
         dilated = cv2.dilate(startingPerim, kernel, iterations=its)
         border = dilated - startingPerim
         ys, xs = np.where(border)
@@ -144,7 +174,7 @@ class Dataset(object):
 Point = namedtuple('Point', ['burnName', 'date', 'location'])
 
 if __name__ == '__main__':
-    d = RawData.load()
+    d = rawdata.RawData.load()
     img = d.burns['riceRidge'].layers['b']
     masterDataSet = Dataset(d, points=Dataset.vulnerablePixels)
     print(masterDataSet)

@@ -11,9 +11,8 @@ the following python3 libraries should be installed
 - matplotlib (optional, for visualization)
 
 # Data sources
--Historical weather data: NOAA READY Archive for the HRRR (High Resolution Rapid Refresh) weather model.
-3km, 1 hr resolution
--Historical fire perimeters: GeoMAC Database, a conglomeration of daily fire perimeters from many different land management agencies. Perimeters are typically organized into burns, so you can follow the progress of a fire as it grows day to day.
+- Historical weather data: [NOAA READY Archive](https://www.ready.noaa.gov/READYamet.php) for the HRRR (High Resolution Rapid Refresh) weather model. 3km, 1 hr resolution
+- Historical fire perimeters: [GeoMAC Database](https://www.geomac.gov/), a conglomeration of daily fire perimeters from many different land management agencies. Perimeters are typically organized into burns, so you can follow the progress of a fire as it grows day to day.
 - Historical satellite imagery:
   - landsat
   - ndvi
