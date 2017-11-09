@@ -105,6 +105,7 @@ def doMore(toaugment, fire, days, f_tuple, perim_array):
         )
 
     toaugment = np.lib.pad(toaugment, ((1,1),(1,1),(0,0)), 'constant', constant_values=np.nan )
+    print('padded is ', toaugment)
     augmented, theta = oidg.random_transform(toaugment, 7)
 
     int_index = makeFolders(fire)
