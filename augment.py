@@ -5,6 +5,8 @@ import numpy as np
 from lib import image
 import time
 from time import localtime, strftime
+from scipy.misc import imsave
+from decimal import *
 
 
 
@@ -27,31 +29,38 @@ def openEndingPerim(dateString, fire):
 def openWeatherData(dateString, fireName):
     fname = 'data/raw/' + fireName + '/weather/' + dateString + '.csv'
     # the first row is the headers, and only cols 4-11 are actual data
-    data = np.loadtxt(fname, skiprows=1, usecols=range(5,12), delimiter=',').T
-    return data
+    # data = np.loadtxt(fname, usecols=[5,12], skiprows=1, delimiter='')
+    date_list = np.loadtxt(fname, usecols=range(0,2), dtype='float32', skiprows=1, delimiter=',')
+    print('datelist is ', date_list)
+    no_augment = np.loadtxt(fname, usecols=range(2,5), skiprows=1, delimiter=',', dtype='float32')
+    print('no augment ', no_augment)
+    augment = np.loadtxt(fname, usecols=range(5,12), skiprows=1, delimiter=',', dtype='float32').T
+    print('augment ', augment)
+    return date_list, no_augment, augment
 
-def createWeatherMetrics(weatherData):
-    temp, dewpt, temp2, wdir, wspeed, precip, hum = weatherData
-    avgWSpeed = sum(wspeed)/len(wspeed)
-    totalPrecip = sum(precip)
-    avgWDir= sum(wdir)/len(wdir)
-    avgHum = sum(hum)/len(hum)
-    return np.array( [max(temp), avgWSpeed, avgWDir, totalPrecip, avgHum])
+# def createWeatherMetrics(weatherData):
+#     temp, dewpt, temp2, wdir, wspeed, precip, hum = weatherData
+#     avgWSpeed = sum(wspeed)/len(wspeed)
+#     totalPrecip = sum(precip)
+#     avgWDir= sum(wdir)/len(wdir)
+#     avgHum = sum(hum)/len(hum)
+#     return np.array( [max(temp), avgWSpeed, avgWDir, totalPrecip, avgHum])
 
 
-datagen = ImageDataGenerator(
-        rotation_range=300,
-        width_shift_range=0.2,
-        height_shift_range=0.2,
-        zoom_range=0.2,
-        horizontal_flip=True,
-        fill_mode='nearest')
+# datagen = ImageDataGenerator(
+#         rotation_range=300,
+#         width_shift_range=0.2,
+#         height_shift_range=0.2,
+#         zoom_range=0.2,
+#         horizontal_flip=True,
+#         fill_mode='nearest')
 
 def collectData(fireName, days):
     days_arr = []
     # still need landsat to be read in
     dem = cv2.imread('data/raw/' + fireName + '/dem.tif', cv2.IMREAD_UNCHANGED)
     print('DEM SHAPE: ', dem.shape)
+    # dem = np.array(dem, dtype='float16') 
     # print('directory is ', os.listdir())
     # np.savetxt('data/raw/dembefore.csv', dem, delimiter=',')
     aspect = cv2.imread('data/raw/'+ fireName + '/aspect.tif', cv2.IMREAD_UNCHANGED)
@@ -66,7 +75,7 @@ def collectData(fireName, days):
     # print('perim_next shape ', perim_next.shape)
     slope = cv2.imread('data/raw/'+ fireName + '/slope.tif', cv2.IMREAD_UNCHANGED)
     print('slope shape ', slope.shape)
-    # print('SHAPES: ', dem.shape, aspect.shape, perim.shape, perim_next.shape, slope.shape)
+    print('SHAPES: ', dem.shape, aspect.shape, perim.shape, slope.shape)# before slope.shape->, perim_next.shape
     # if(perim.shape != aspect.shape):
     #     xdiff = aspect.shape[0] - perim.shape[0]
     #     print('xdiff is ', xdiff)
@@ -89,22 +98,44 @@ def collectData(fireName, days):
     return toAugment, perim_tuple, days_arr
 
 def rotateWindDirection(theta, fire, date, int_index):
-    weather = openWeatherData(date, fire)
+    date_list, no_augment, weather = openWeatherData(date, fire)
+    print('date_list shape is ', date_list.shape)
+    print('date_list is ', date_list)
+    print('no_augment shape is ', no_augment.shape)
+    print('no_augment is ', no_augment)
+    print('weather shape is ', weather.shape)
+    print('weather is ', weather)
     temp, dewpt, temp2, wdir, wspeed, precip, hum = weather
     wdir = (wdir + ((180/np.pi)+theta))%360
     weather = temp, dewpt, temp2, wdir, wspeed, precip, hum
-    np.savetxt('data/raw/' + fire+ 'Augmented' + int_index + '/weather/' + date + '.csv', weather, delimiter=',')
-    return weather
+    weather2 = np.transpose(weather)
+    print('new weather shape is ', weather2.shape, weather2)
+    all_weather = np.hstack([date_list, no_augment, weather2])
+    print('all weather shape is ', all_weather.shape)
+    headings = np.zeros(12, dtype='float32')
+    print('headings shape is ', headings.shape)
+    headings = headings.reshape( (1,) + headings.shape)
+    print('new headings shape is ', headings.shape)
+    result = np.vstack((headings, all_weather))
+    print('result shape is ', result.shape)
+    f = 'data/raw/' + fire+ 'Augmented' + int_index + '/weather/' + date + '.csv'
+    # np.savetxt(f, headings, delimiter=',')
+    # np.savetxt(f, all_weather, delimiter=',')
+    # f = open(f)
+    # for i in all_weather:
+    #     np.savetxt(f, i, delimiter=',')
+    print('result is ', result)
+    np.savetxt('data/raw/' + fire+ 'Augmented' + int_index + '/weather/' + date + '.csv', result, delimiter=',')
+
+    return weather 
+
 
 def doMore(x, fire, days, p_tuple, array_perim):
+    infinity = Decimal('Infinity')
     oidg = image.ourImageDataGenerator(
             rotation_range=40,
-            width_shift_range=0.2,
-            height_shift_range=0.2,
-            shear_range=0.2,
-            zoom_range=0.2,
-            horizontal_flip=True,
-            fill_mode='nearest',
+            fill_mode='constant',
+            cval=infinity, 
             data_format = 'channels_last'
         )
 
@@ -112,37 +143,29 @@ def doMore(x, fire, days, p_tuple, array_perim):
     augmented, theta = oidg.random_transform(x1, 7)
     print(augmented.shape)
 
-    int_index = strftime("%d%b%H:%M:%S", localtime()) + str(np.random.randint(low=1, high=99)) + str(time.time())
-    to_save_dir = os.mkdir('data/raw/' + fire + 'Augmented' + int_index + '/')
-    to_save_weather = os.mkdir('data/raw/' + fire + 'Augmented' + int_index+ '/weather/' )
-    to_save_perims = os.mkdir('data/raw/' + fire + 'Augmented'  + int_index + '/perims/')
+    int_index = strftime("%d%b%H%M%S", localtime()) + str(np.random.randint(low=1, high=99)) + str(time.time())
+    os.mkdir('data/raw/' + fire + 'Augmented' + int_index + '/')
+    os.mkdir('data/raw/' + fire + 'Augmented' + int_index+ '/weather/' )
+    os.mkdir('data/raw/' + fire + 'Augmented'  + int_index + '/perims/')
 
     for date in days:
         weather = rotateWindDirection(theta, fire, date, int_index)
     # np.savetxt('data/raw/demafterreturn.csv', augmented[:,:,0], delimiter=',')
-
     dem = augmented[:,:,0]
     aspect = augmented[:,:,1]
     #perim = augmented[:,:,2]
     # perim_next =
     slope = augmented[:,:,2]
     # cv2.imwrite('before'+ fire+ date+ '.png', before.reshape(before.shape[:2]))
-
-
     print('current dir is ', os.listdir())
-    os.chdir('data/raw/' + fire + 'Augmented' + int_index + '/')
-    # cv2.imwrite('dem.tif', result.reshape(dem.shape[:2]))
-    cv2.imwrite('dem.tif', dem)
-    cv2.imwrite('aspect.tif', aspect)
-    cv2.imwrite('slope.tif', slope)
-    os.chdir('perims/')
     for n, perim in enumerate(array_perim, 0): #figure out how to do this with two perims
-        cv2.imwrite(days[n] +'.tif', perim)
-    os.chdir('../../../..')
-    print(os.listdir())
+        imsave('data/raw/' + fire + 'Augmented'  + int_index + '/perims/' + days[n] +'.tif', perim)
+    dem2 = dem.astype(np.float32)
+    folder = 'data/raw/' + fire + 'Augmented' + int_index
+    imsave(folder + '/dem.tif', dem2)
     print('done with 1')
 
-fires = ['riceRidge', 'coldSprings'] # , 'beaverCreek'
+fires = ['riceRidge', 'coldSprings'] # ,  'coldSprings''riceRidge','coldSprings'
 rrdays = ['0731', '0801', '0802', '0803']
 csdays = ['0711', '0712', '0713', '0714']
 # bcdays = ['0629', '0630']
@@ -161,21 +184,7 @@ for fire in fires:
         x, y, arr = collectData(fire, csdays)
         doMore(x, fire, csdays, y, arr)
     # if i == fires[2]:
-    #     for b, value in enumerate(bcdays[:-1], 0):
-    #         x = collectData(i, bcdays[b], bcdays[b+1])
-    #         doMore(x, i, bcdays[b])
-    #     for b, value in enumerate(bcdays2[:-1], 0):
-    #         x = collectData(i, bcdays2[b], bcdays2[b+1])
-    #         doMore(x, i, bcdays2[b])
-    #     for b, value in enumerate(bcdays3[:-1], 0):
-    #         x = collectData(i, bcdays3[b], bcdays3[b+1])
-    #         doMore(x, i, bcdays3[b])
-    #     for b, value in enumerate(bcdays4[:-1], 0):
-    #         x = collectData(i, bcdays4[b], bcdays4[b+1])
-    #         doMore(x, i, bcdays4[b])
-    #     for b, value in enumerate(bcdays5[:-1], 0):
-    #         x = collectData(i, bcdays5[b], bcdays5[b+1])
-    #         doMore(x, i, bcdays5[b])
+
 
 
 # the .flow() command below generates batches of randomly transformed images
