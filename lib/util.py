@@ -1,14 +1,33 @@
 import numpy as np
 import cv2
+from scipy.misc import imsave
 
 def openImg(fname):
-    img = cv2.imread(fname, cv2.IMREAD_UNCHANGED)
+    if "/perims/" in fname:
+        img = cv2.imread(fname, 0)
+    else:
+        img = cv2.imread(fname, cv2.IMREAD_UNCHANGED)
     # print('img type is ', img.type)
     img = img.astype(np.float32)
     channels = cv2.split(img)
     for c in channels:
         c[invalidPixelIndices(c)] = np.nan
     return cv2.merge(channels)
+
+def saveImg(fname, img):
+    to_save = np.array(img.astype('float32'))
+    print('datatype of saveimg is ', to_save.dtype)
+    max_float = np.finfo(np.float32).max
+    print("to save shape is", to_save.shape)
+    print('max is ', max_float)
+    to_save[np.where(np.isnan(to_save))] = max_float
+    # for listed in to_save: 
+    #     for e in listed: 
+    #         if np.isnan(e):
+    #             print('e is ', e)
+    #             listed[e] = max_float
+    print('after conversions', to_save)
+    imsave(fname, to_save)
 
 def validPixelIndices(layer):
     validPixelMask = 1-invalidPixelMask(layer)

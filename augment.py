@@ -2,12 +2,11 @@ from keras.preprocessing.image import ImageDataGenerator, array_to_img, img_to_a
 import os
 import cv2
 import numpy as np
-from lib import image
+from lib import image, util
 import time
 from time import localtime, strftime
 from scipy.misc import imsave
 from decimal import *
-import util
 
 
 
@@ -29,38 +28,20 @@ def openEndingPerim(dateString, fire):
 
 def openWeatherData(dateString, fireName):
     fname = 'data/raw/' + fireName + '/weather/' + dateString + '.csv'
-    # the first row is the headers, and only cols 4-11 are actual data
+    # the first row is the headers, and only cols 5-12 are actual data
     # data = np.loadtxt(fname, usecols=[5,12], skiprows=1, delimiter='')
     date_list = np.loadtxt(fname, usecols=range(0,2), dtype='float32', skiprows=1, delimiter=',')
-    print('datelist is ', date_list)
     no_augment = np.loadtxt(fname, usecols=range(2,5), skiprows=1, delimiter=',', dtype='float32')
-    print('no augment ', no_augment)
     augment = np.loadtxt(fname, usecols=range(5,12), skiprows=1, delimiter=',', dtype='float32').T
-    print('augment ', augment)
     return date_list, no_augment, augment
-
-# def createWeatherMetrics(weatherData):
-#     temp, dewpt, temp2, wdir, wspeed, precip, hum = weatherData
-#     avgWSpeed = sum(wspeed)/len(wspeed)
-#     totalPrecip = sum(precip)
-#     avgWDir= sum(wdir)/len(wdir)
-#     avgHum = sum(hum)/len(hum)
-#     return np.array( [max(temp), avgWSpeed, avgWDir, totalPrecip, avgHum])
-
-
-# datagen = ImageDataGenerator(
-#         rotation_range=300,
-#         width_shift_range=0.2,
-#         height_shift_range=0.2,
-#         zoom_range=0.2,
-#         horizontal_flip=True,
-#         fill_mode='nearest')
 
 def collectData(fireName, days):
     days_arr = []
     dem = util.openImg('data/raw/' + fireName + '/dem.tif')
     aspect = util.openImg('data/raw/'+ fireName + '/aspect.tif')  
-    landsat = util.openImg('data/raw/'+ fireName + '/landsat.png')  
+    landsat = util.openImg('data/raw/'+ fireName + '/landsat.png')
+    print('before landsat shape is ', landsat.shape)
+    print(landsat)  
     ndvi = util.openImg('data/raw/'+ fireName + '/ndvi.tif')
     slope = util.openImg('data/raw/'+ fireName + '/slope.tif')
     for day in days:
@@ -72,9 +53,7 @@ def collectData(fireName, days):
 
     for p in days_arr:
         fire_tuple = fire_tuple + (p,)
-    print('FIRE TUPLE: ' + str(fire_tuple))
-
-
+    # print('FIRE TUPLE: ' + str(fire_tuple))
     toAugment = np.dstack(fire_tuple) #This needs to be tuple?????
     print('toaugment shape ', toAugment.shape)
     return toAugment, fire_tuple, days_arr
@@ -100,12 +79,11 @@ def doMore(toaugment, fire, days, f_tuple, perim_array):
     oidg = image.ourImageDataGenerator(
             rotation_range=40,
             fill_mode='constant',
-            cval=infinity, 
+            cval=np.nan, 
             data_format = 'channels_last'
         )
 
     toaugment = np.lib.pad(toaugment, ((1,1),(1,1),(0,0)), 'constant', constant_values=np.nan )
-    print('padded is ', toaugment)
     augmented, theta = oidg.random_transform(toaugment, 7)
 
     int_index = makeFolders(fire)
@@ -115,20 +93,34 @@ def doMore(toaugment, fire, days, f_tuple, perim_array):
     # np.savetxt('data/raw/demafterreturn.csv', augmented[:,:,0], delimiter=',')
     saveFiles(augmented, int_index, perim_array, days)
 
-    print('done with 1')
+    print('done with 1+++++++++++++++++++++++++++++++++++++++++++++++++++')
 
 def saveFiles(augmented, int_index, perim_array, days):
+    # print('COLLECT DATA SHAPES: ', dem.shape, aspect.shape, landsat.shape, ndvi.shape, slope.shape)
     dem = augmented[:,:,0]
     aspect = augmented[:,:,1]
     #perim = augmented[:,:,2]
     # perim_next =
-    landsat = augmented[:,:,2]
+    # others = augmented[:,:,2:]
+    landsat = augmented[:,:,2:6]
+    # others2 = others[:,:,4:]
+    ndvi = augmented[:,:,7]
+    slope = augmented[:,:,8]
+    othersperims = augmented[:,:,8:]
+    days = days
+    print('days is ', days)
+    print('other layers are' , othersperims.shape, othersperims)
+    print('landsat shape is ', landsat.shape)
+    print(landsat)
     # cv2.imwrite('before'+ fire+ date+ '.png', before.reshape(before.shape[:2]))
     print('current dir is ', os.listdir())
     folder = 'data/raw/' + fire + 'Augmented' + int_index
-    for n, perim in enumerate(perim_array, 0): #figure out how to do this with two perims
-        imsave(folder + '/perims/' + days[n] +'.tif', perim)
-    imsave(folder + '/dem.tif', dem)
+    for n, perim in enumerate(cv2.split(othersperims)): #figure out how to do this with two perims
+        util.saveImg(folder + '/perims/' + days[n] +'.tif', perim )
+        # imsave(folder + '/perims/' + days[n] +'.tif', perim)
+    util.saveImg(folder + '/dem.tif', dem)
+    util.saveImg(folder + '/aspect.tif', aspect)
+    util.saveImg(folder + '/landsat.png', landsat)
 
 def makeFolders(fire):
     int_index = strftime("%d%b%H%M%S", localtime()) + str(np.random.randint(low=1, high=99)) + str(time.time())
@@ -151,10 +143,10 @@ for fire in fires:
         # for r, value in enumerate(rrdays[:-1], 0):
         toaugment, fire_tuple, day_arr = collectData(fire, rrdays)
         doMore(toaugment, fire, rrdays, fire_tuple, day_arr)
-    # if fire == fires[1]:
-    #     # for c, value in enumerate(csdays[:-1], 0):
-    #     toaugment, fire_tuple, day_arr = collectData(fire, csdays)
-    #     doMore(toaugment, fire, csdays, fire_tuple, day_arr)
+    if fire == fires[1]:
+        # for c, value in enumerate(csdays[:-1], 0):
+        toaugment, fire_tuple, day_arr = collectData(fire, csdays)
+        doMore(toaugment, fire, csdays, fire_tuple, day_arr)
     # if i == fires[2]:
 
 

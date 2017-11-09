@@ -428,7 +428,6 @@ class ourImageDataGenerator(object):
             A randomly transformed version of the input (same shape).
         """
         # x is a single image, so it doesn't have image number at index 0
-        print('dem2 is ', x[:,:,0])
         np.savetxt('data/raw/deminfrontofcall.csv', x[:,:,0], delimiter=',')
         img_row_axis = self.row_axis - 1
         img_col_axis = self.col_axis - 1
@@ -490,7 +489,6 @@ class ourImageDataGenerator(object):
             transform_matrix = zoom_matrix if transform_matrix is None else np.dot(transform_matrix, zoom_matrix)
 
         if transform_matrix is not None:
-            print('transform matrix shape ', transform_matrix.shape)
             h, w = x.shape[img_row_axis], x.shape[img_col_axis]
             transform_matrix = transform_matrix_offset_center(transform_matrix, h, w)
             x = apply_transform(x, transform_matrix, img_channel_axis,
@@ -507,8 +505,14 @@ class ourImageDataGenerator(object):
         if self.vertical_flip:
             if np.random.random() < 0.5:
                 x = flip_axis(x, img_row_axis)
-
-        np.savetxt('data/raw/demafterrandomtransform.csv', x[:,:,0], delimiter=',')
+        others = x[:,:,2:]
+        landsat = others[:,:,:4]
+        # np.savetxt('data/raw/demafterrandomtransform.csv', x[:,:,3], delimiter=',')
+        # plt.imshow(x[:,:,3])
+        # plt.figure()
+        # plt.imshow(x[:,:,4])
+        # plt.show()
+        # print('image.py landsat is ', landsat)
 
         return x, theta
 
@@ -530,10 +534,9 @@ def apply_transform(x,
     # Returns
         The transformed version of the input.
     """
-    print('x is',x, x.shape)
     np.savetxt('data/raw/dembeforeapplytransform.csv', x[:,:,0], delimiter=',')
     x = np.rollaxis(x, channel_axis, 0)
-    print('x is',x, x.shape)
+    print('x is', x.shape)
     final_affine_matrix = transform_matrix[:2, :2]
     final_offset = transform_matrix[:2, 2]
     channel_images = [ndi.interpolation.affine_transform(
