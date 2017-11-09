@@ -5,6 +5,8 @@ import numpy as np
 from lib import image
 import time
 from time import localtime, strftime
+from scipy.misc import imsave
+from decimal import *
 
 
   
@@ -45,13 +47,13 @@ def openWeatherData(dateString, fireName):
 #     return np.array( [max(temp), avgWSpeed, avgWDir, totalPrecip, avgHum])
 
 
-datagen = ImageDataGenerator(
-        rotation_range=300,
-        width_shift_range=0.2,
-        height_shift_range=0.2,
-        zoom_range=0.2,
-        horizontal_flip=True,
-        fill_mode='nearest')
+# datagen = ImageDataGenerator(
+#         rotation_range=300,
+#         width_shift_range=0.2,
+#         height_shift_range=0.2,
+#         zoom_range=0.2,
+#         horizontal_flip=True,
+#         fill_mode='nearest')
 
 def collectData(fireName, date, next_day):
     # still need landsat to be read in 
@@ -118,14 +120,11 @@ def rotateWindDirection(theta, fire, date, int_index):
     return weather 
 
 def doMore(x, fire, date):
+    infinity = Decimal('Infinity')
     oidg = image.ourImageDataGenerator(
             rotation_range=40,
-            width_shift_range=0.2,
-            height_shift_range=0.2,
-            shear_range=0.2,
-            zoom_range=0.2,
-            horizontal_flip=True,
-            fill_mode='nearest',
+            fill_mode='constant',
+            cval=infinity, 
             data_format = 'channels_last'
         )
 
@@ -152,24 +151,23 @@ def doMore(x, fire, date):
     # os.chdir('data/raw/' + fire + 'Augmented' + int_index + '/')
     # cv2.imwrite('dem.tif', result.reshape(dem.shape[:2])) 
     print('dem before conversions is ', dem)
-    np.savetxt('data/raw/' + fire + 'Augmented' + int_index + '/dem.tif', dem)
     print('dem converted is ', dem.astype(np.float32))
     print("dem dtype is ", dem.astype(np.float32).dtype)
-    dem2 = dem.astype(np.float16)
-    np.savetxt('data/raw/' + fire + 'Augmented' + int_index + '/dem2.tif', dem2)
+    dem2 = dem.astype(np.float32)
     print(dem2.shape, dem2.dtype)
     folder = 'data/raw/' + fire + 'Augmented' + int_index
-    cv2.imwrite('data/raw/' + fire + 'Augmented' + int_index + '/dem.tif', dem2) 
-    cv2.imwrite('data/raw/' + fire + 'Augmented' + int_index + '/aspect.tif', aspect)
-    # cv2.imwrite('data/raw/' + fire + 'Augmented' + int_index + '/slope.tif', slope)
-    cv2.imwrite('data/raw/' + fire + 'Augmented' + int_index + '/perims/' + date +'.tif', perim)
+    imsave(folder + '/dem.tif', dem2)
+    # cv2.imwrite('data/raw/' + fire + 'Augmented' + int_index + '/dem.tif', dem2) 
+    # cv2.imwrite('data/raw/' + fire + 'Augmented' + int_index + '/aspect.tif', aspect)
+    # # cv2.imwrite('data/raw/' + fire + 'Augmented' + int_index + '/slope.tif', slope)
+    # cv2.imwrite('data/raw/' + fire + 'Augmented' + int_index + '/perims/' + date +'.tif', perim)
     # os.chdir('../../../..')
     # print(os.listdir())
     print('done with 1')
 
-fires = ['riceRidge'] # ,  'coldSprings''riceRidge','coldSprings'
+fires = ['riceRidge', 'coldSprings'] # ,  'coldSprings''riceRidge','coldSprings'
 rrdays = ['0731', '0801', '0802', '0803']
-# csdays = ['0711', '0712', '0713', '0714']
+csdays = ['0711', '0712', '0713', '0714']
 # bcdays = ['0629', '0630']
 # bcdays2 = ['0711', '0712', '0713', '0714', '0715', '0716']
 # bcdays3 = ['0801', '0802']
@@ -181,10 +179,10 @@ for i in fires:
         for r, value in enumerate(rrdays[:-1], 0):
             x = collectData(i, rrdays[r], rrdays[r+1])
             doMore(x, i, rrdays[r])
-    # if i == fires[1]:
-    #     for c, value in enumerate(csdays[:-1], 0):
-    #         x = collectData(i, csdays[c], csdays[c+1])
-    #         doMore(x, i, csdays[c])
+    if i == fires[1]:
+        for c, value in enumerate(csdays[:-1], 0):
+            x = collectData(i, csdays[c], csdays[c+1])
+            doMore(x, i, csdays[c])
     # if i == fires[0]:
     #     for b, value in enumerate(bcdays[:-1], 0):
     #         x = collectData(i, bcdays[b], bcdays[b+1])
