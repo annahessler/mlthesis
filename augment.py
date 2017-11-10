@@ -99,18 +99,14 @@ def saveFiles(augmented, int_index, perim_array, days):
     # print('COLLECT DATA SHAPES: ', dem.shape, aspect.shape, landsat.shape, ndvi.shape, slope.shape)
     dem = augmented[:,:,0]
     aspect = augmented[:,:,1]
-    #perim = augmented[:,:,2]
-    # perim_next =
-    # others = augmented[:,:,2:]
     landsat = augmented[:,:,2:6]
-    # others2 = others[:,:,4:]
-    ndvi = augmented[:,:,7]
-    slope = augmented[:,:,8]
+    ndvi = augmented[:,:,6]
+    slope = augmented[:,:,7]
     othersperims = augmented[:,:,8:]
-    days = days
     print('days is ', days)
     print('other layers are' , othersperims.shape, othersperims)
     print('landsat shape is ', landsat.shape)
+    # np.savetxt('landsatcheck.csv', landsat[:,:,0], delimiter=',')
     print(landsat)
     # cv2.imwrite('before'+ fire+ date+ '.png', before.reshape(before.shape[:2]))
     print('current dir is ', os.listdir())
@@ -158,4 +154,4 @@ for fire in fires:
 #                           save_to_dir='data/raw/riceRidgeAugmented', save_prefix='test', save_format='tif'):
 #     i += 1
 #     if i > 25:
-#         break  # otherwise the generator would loop indefinitely
+#         break  # otherwise the generator would loop indefinitel

@@ -1,10 +1,14 @@
 import numpy as np
 import cv2
 from scipy.misc import imsave
+from scipy.ndimage import imread
 
 def openImg(fname):
     if "/perims/" in fname:
         img = cv2.imread(fname, 0)
+        print('perim image is ', fname, img)
+    if "landsat.png" in fname:
+        img = imread(fname, mode='F') 
     else:
         img = cv2.imread(fname, cv2.IMREAD_UNCHANGED)
     # print('img type is ', img.type)
