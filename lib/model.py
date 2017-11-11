@@ -1,5 +1,4 @@
-from lib import preprocess
-from lib import metrics
+from time import localtime, strftime
 
 print('importing keras...')
 from keras.models import Sequential, Model
@@ -7,6 +6,9 @@ from keras.layers import Dense, Activation, Dropout, Flatten, Concatenate, Input
 from keras.optimizers import SGD, RMSprop
 from keras.layers import Conv2D, MaxPooling2D, AveragePooling2D
 print('done.')
+
+from lib import preprocess
+from lib import metrics
 
 class ImageBranch(Sequential):
 
@@ -34,7 +36,7 @@ class ImageBranch(Sequential):
 
 class FireModel(Model):
 
-    def __init__(self, preProcessor):
+    def __init__(self, preProcessor, weightsFileName=None):
         self.preProcessor = preProcessor
 
         kernelDiam = 2*self.preProcessor.AOIRadius+1
@@ -54,6 +56,9 @@ class FireModel(Model):
         #rms = RMSprop(lr=0.001, rho=0.9, epsilon=1e-08, decay=0.0)
         self.compile(loss = 'binary_crossentropy', optimizer = sgd, metrics = ['accuracy'])
 
+        if weightsFileName is not None:
+            self.load_weights(weightsFileName)
+
 
     def fit(self, training, validate, epochs=1):
         # get the actual samples from the collection of points
@@ -62,11 +67,14 @@ class FireModel(Model):
         print('training on ', training)
         history = super().fit(tinputs, toutputs, batch_size = 1000, epochs=epochs, validation_data=(vinputs, voutputs))
 
-        from time import localtime, strftime
-        timeString = strftime("%d%b%H:%M", localtime())
-        self.save('models/{}.h5'.format(timeString))
-
+        self.saveWeights()
         return history
+
+    def saveWeights(self, fname=None):
+        if fname is None:
+            timeString = strftime("%d%b%H:%M", localtime())
+            fname = 'models/{}.h5'.format(timeString)
+        self.save_weights(fname)
 
     def predict(self, dataset):
         (inputs, outputs), ptList = self.preProcessor.process(dataset)

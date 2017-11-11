@@ -3,6 +3,8 @@ from os import listdir
 import numpy as np
 import cv2
 
+from lib import util
+
 PIXEL_SIZE = 30
 
 class RawData(object):
@@ -31,6 +33,9 @@ class RawData(object):
         day = burn.days[date]
         return day.endingPerim[location]
 
+    def getDay(self, burnName, date):
+        return self.burns[burnName].days[date]
+
     def __repr__(self):
         return "Dataset({})".format(list(self.burns.values()))
 
@@ -46,11 +51,11 @@ class Burn(object):
 
     def loadLayers(self):
         folder = 'data/{}/'.format(self.name)
-        dem = cv2.imread(folder+'dem.tif', cv2.IMREAD_UNCHANGED)
-        slope = cv2.imread(folder+'slope.tif',cv2.IMREAD_UNCHANGED)
-        landsat = cv2.imread(folder+'landsat.png', cv2.IMREAD_UNCHANGED)
-        ndvi = cv2.imread(folder+'ndvi.tif', cv2.IMREAD_UNCHANGED)
-        aspect = cv2.imread(folder+'aspect.tif', cv2.IMREAD_UNCHANGED)
+        dem = util.openImg(folder+'dem.tif')
+        slope = util.openImg(folder+'slope.tif')
+        landsat = util.openImg(folder+'landsat.png')
+        ndvi = util.openImg(folder+'ndvi.tif')
+        aspect = util.openImg(folder+'aspect.tif')
         r,g,b,nir = cv2.split(landsat)
 
         layers = {'dem':dem,
