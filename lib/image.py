@@ -440,7 +440,7 @@ class ourImageDataGenerator(object):
         # to generate final transform that needs to be applied
         if self.rotation_range:
             # theta = np.pi / 180 * np.random.uniform(-self.rotation_range, self.rotation_range)
-            theta = 0.01
+            theta = np.pi*2
         else:
             theta = 0
 
