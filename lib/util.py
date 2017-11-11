@@ -2,6 +2,7 @@ import numpy as np
 import cv2
 from scipy.misc import imsave
 from scipy.ndimage import imread
+from libtiff import TIFF
 
 def openImg(fname):
     if "/perims/" in fname:
@@ -41,8 +42,11 @@ def saveImg(fname, img):
         print('landsat to_save shape is ', to_save.shape)
         # np.savetxt('landsatrightafter32bitconversion.csv', to_save[:,:,0], delimiter=',')
     # imsave(fname, to_save.astype(np.uint8))
-    cv2.imwrite(fname, to_save.astype(np.uint16))
-    
+    tiff = TIFF.open(fname, mode='w')
+    tiff.write_image(to_save)
+    tiff.close()
+    # cv2.imwrite(fname, to_save.astype(np.uint16))
+
 def validPixelIndices(layer):
     validPixelMask = 1-invalidPixelMask(layer)
     return np.where(validPixelMask)

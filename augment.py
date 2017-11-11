@@ -42,6 +42,7 @@ def collectData(fireName, days):
     landsat4 = util.openImg('data/raw/'+ fireName + '/band_4.tif')
     landsat3 = util.openImg('data/raw/'+ fireName + '/band_3.tif')
     landsat2 = util.openImg('data/raw/'+ fireName + '/band_2.tif')
+    np.savetxt('band2lookatthis.csv', landsat2, delimiter=',')
     landsat5 = util.openImg('data/raw/'+ fireName + '/band_5.tif')
     print('before landsat4 shape is ', landsat4.shape)
     print('before landsat3 shape is ', landsat3.shape)
@@ -83,15 +84,16 @@ def rotateWindDirection(theta, fire, date, int_index):
 def doMore(toaugment, fire, days, f_tuple, perim_array):
     infinity = Decimal('Infinity')
     oidg = image.ourImageDataGenerator(
-            rotation_range=40,
-            fill_mode='constant',
-            cval=np.nan, 
+            rotation_range=1, 
+            # fill_mode='constant',
+            # cval=np.nan, 
             data_format = 'channels_last'
         )
 
     toaugment = np.lib.pad(toaugment, ((1,1),(1,1),(0,0)), 'constant', constant_values=np.nan )
     augmented, theta = oidg.random_transform(toaugment, 7)
-
+    np.savetxt('landsat2directlyafterrandomtransformcall.csv', augmented[:,:,4], delimiter=',')
+    print(np.array_equal(augmented[:,:,4], toaugment[:,:,4]))
     int_index = makeFolders(fire)
 
     for day in days:
@@ -126,7 +128,7 @@ def saveFiles(augmented, int_index, perim_array, days):
         # imsave(folder + '/perims/' + days[n] +'.tif', perim)
     util.saveImg(folder + '/dem.tif', dem)
     util.saveImg(folder + '/aspect.tif', aspect)
-    np.savetxt('landsatrightbeforesavetif.csv', landsat[:,:,0], delimiter=',')
+    np.savetxt('landsatrightbeforesavetif.csv', landsat[:,:,2], delimiter=',')
     util.saveImg(folder + '/landsat4.tif', landsat[:,:,0])
     util.saveImg(folder + '/landsat3.tif', landsat[:,:,1])
     util.saveImg(folder + '/landsat2.tif', landsat[:,:,2])

@@ -428,7 +428,7 @@ class ourImageDataGenerator(object):
             A randomly transformed version of the input (same shape).
         """
         # x is a single image, so it doesn't have image number at index 0
-        np.savetxt('data/raw/deminfrontofcall.csv', x[:,:,0], delimiter=',')
+        np.savetxt('data/raw/landsat2infrontofaugmentcall.csv', x[:,:,4], delimiter=',')
         img_row_axis = self.row_axis - 1
         img_col_axis = self.col_axis - 1
         img_channel_axis = self.channel_axis - 1
@@ -439,7 +439,8 @@ class ourImageDataGenerator(object):
         # use composition of homographies
         # to generate final transform that needs to be applied
         if self.rotation_range:
-            theta = np.pi / 180 * np.random.uniform(-self.rotation_range, self.rotation_range)
+            # theta = np.pi / 180 * np.random.uniform(-self.rotation_range, self.rotation_range)
+            theta = 0.01
         else:
             theta = 0
 
@@ -513,6 +514,8 @@ class ourImageDataGenerator(object):
         # plt.imshow(x[:,:,4])
         # plt.show()
         # print('image.py landsat is ', landsat)
+
+        np.savetxt('data/raw/landsat2afteraugmentcall.csv', x[:,:,4], delimiter=',')
 
         return x, theta
 
