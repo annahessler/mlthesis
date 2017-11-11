@@ -1,14 +1,24 @@
 import numpy as np
 import cv2
 from scipy.misc import imsave
+from scipy.ndimage import imread
 
 def openImg(fname):
     if "/perims/" in fname:
         img = cv2.imread(fname, 0)
+        img = img.astype(np.float32)
+    # elif "landsat.png" in fname:
+    #     img = cv2.imread(fname, cv2.IMREAD_COLOR)
+    #     # img = imread(fname, flatten=False, mode='F')
+    #     print('imported landsat shape is ', img.shape)
+    #     img = img.astype(np.float32)
+    #     print('landat right after import is', img.shape)
+    #     np.savetxt('importedlandsetrightafter.csv', img[:,:,0], delimiter=',')
     else:
         img = cv2.imread(fname, cv2.IMREAD_UNCHANGED)
+        img = img.astype(np.float32)
     # print('img type is ', img.type)
-    img = img.astype(np.float32)
+    # img = img.astype(np.float32)
     channels = cv2.split(img)
     for c in channels:
         c[invalidPixelIndices(c)] = np.nan
@@ -27,8 +37,12 @@ def saveImg(fname, img):
     #             print('e is ', e)
     #             listed[e] = max_float
     print('after conversions', to_save)
-    imsave(fname, to_save)
-
+    if 'landsat' in fname:
+        print('landsat to_save shape is ', to_save.shape)
+        # np.savetxt('landsatrightafter32bitconversion.csv', to_save[:,:,0], delimiter=',')
+    # imsave(fname, to_save.astype(np.uint8))
+    cv2.imwrite(fname, to_save.astype(np.uint16))
+    
 def validPixelIndices(layer):
     validPixelMask = 1-invalidPixelMask(layer)
     return np.where(validPixelMask)
