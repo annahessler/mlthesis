@@ -1,5 +1,4 @@
-from lib import preprocess
-from lib import metrics
+from time import localtime, strftime
 
 print('importing keras...')
 from keras.models import Sequential, Model
@@ -7,6 +6,9 @@ from keras.layers import Dense, Activation, Dropout, Flatten, Concatenate, Input
 from keras.optimizers import SGD, RMSprop
 from keras.layers import Conv2D, MaxPooling2D, AveragePooling2D
 print('done.')
+
+from lib import preprocess
+from lib import metrics
 
 class ImageBranch(Sequential):
 
@@ -27,20 +29,20 @@ class ImageBranch(Sequential):
         self.add(Flatten())
         self.add(Dense(128, activation='relu'))
         self.add(Dropout(0.5))
+        print("HELLO DAVE")
 
         self.compile(optimizer='rmsprop',
             loss='binary_crossentropy',
             metrics=['accuracy'])
 
 class FireModel(Model):
+    print("sdfkljdfslkdjflksdj")
+    def __init__(self, preProcessor, weightsFileName=None):
+        self.preProcessor = preProcessor
 
-    def __init__(self, inputSettings):
-        self.inputSettings = inputSettings
-        self.usedLayers, self.weatherMetric, self.AOIRadius = self.inputSettings
-
-        kernelDiam = 2*self.AOIRadius+1
-        self.wb = Input((self.weatherMetric.numOutputs,),name='weatherInput')
-        self.ib = ImageBranch(len(self.usedLayers), kernelDiam)
+        kernelDiam = 2*self.preProcessor.AOIRadius+1
+        self.wb = Input((self.preProcessor.numWeatherInputs,),name='weatherInput')
+        self.ib = ImageBranch(len(self.preProcessor.whichLayers), kernelDiam)
 
         # print('weather branch info:', self.wb.shape)
         # print('image branch info:', self.ib.input_shape, self.ib.output_shape, self.ib.output)
@@ -55,24 +57,31 @@ class FireModel(Model):
         #rms = RMSprop(lr=0.001, rho=0.9, epsilon=1e-08, decay=0.0)
         self.compile(loss = 'binary_crossentropy', optimizer = sgd, metrics = ['accuracy'])
 
+        if weightsFileName is not None:
+            self.load_weights(weightsFileName)
 
-    def fit(self, training, validate):
+
+    def fit(self, training, validate, epochs=1):
         # get the actual samples from the collection of points
-        tinputs, toutputs = preprocess.getInputsAndOutputs(training, self.inputSettings)
-        vinputs, voutputs = preprocess.getInputsAndOutputs(validate, self.inputSettings)
+        (tinputs, toutputs), ptList = self.preProcessor.process(training)
+        (vinputs, voutputs), ptList = self.preProcessor.process(validate)
         print('training on ', training)
-        history = super().fit(tinputs, toutputs, batch_size = 1000, epochs = 2, validation_data=(vinputs, voutputs))
+        history = super().fit(tinputs, toutputs, batch_size = 1000, epochs=epochs, validation_data=(vinputs, voutputs))
 
-        from time import localtime, strftime
-        timeString = strftime("%d%b%H:%M", localtime())
-        self.save('models/{}.h5'.format(timeString))
-
+        self.saveWeights()
         return history
 
+    def saveWeights(self, fname=None):
+        if fname is None:
+            timeString = strftime("%d%b%H:%M", localtime())
+            fname = 'models/{}.h5'.format(timeString)
+        self.save_weights(fname)
+
     def predict(self, dataset):
-        samples = dataset.getSamples(self.inputSettings)
-        inputs, outputs = preprocess.mergeSamples(samples)
-        return super().predict(inputs).flatten()
+        (inputs, outputs), ptList = self.preProcessor.process(dataset)
+        results = super().predict(inputs).flatten()
+        resultDict = {pt:pred for (pt, pred) in zip(ptList, results)}
+        return resultDict
 
 from collections import namedtuple
 InputSettings = namedtuple('InputSettings', ['usedLayerNames', 'weatherMetrics', 'AOIRadius'])

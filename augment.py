@@ -38,7 +38,7 @@ def openWeatherData(dateString, fireName):
 def collectData(fireName, days):
     days_arr = []
     dem = util.openImg('data/raw/' + fireName + '/dem.tif')
-    aspect = util.openImg('data/raw/'+ fireName + '/aspect.tif')  
+    aspect = util.openImg('data/raw/'+ fireName + '/aspect.tif')
     landsat4 = util.openImg('data/raw/'+ fireName + '/band_4.tif')
     landsat3 = util.openImg('data/raw/'+ fireName + '/band_3.tif')
     landsat2 = util.openImg('data/raw/'+ fireName + '/band_2.tif')
@@ -78,15 +78,15 @@ def rotateWindDirection(theta, fire, date, int_index):
     f = 'data/raw/' + fire+ 'Augmented' + int_index + '/weather/' + date + '.csv'
     np.savetxt(f, result, delimiter=',')
 
-    return weather 
+    return weather
 
 # doMore(toaugment, fire, csdays, fire_tuple, day_arr)
 def doMore(toaugment, fire, days, f_tuple, perim_array):
     infinity = Decimal('Infinity')
     oidg = image.ourImageDataGenerator(
-            rotation_range=1, 
+            rotation_range=1,
             # fill_mode='constant',
-            # cval=np.nan, 
+            # cval=np.nan,
             data_format = 'channels_last'
         )
 

@@ -1,13 +1,11 @@
 .DS_Store
-data/forModel/train.csv
-data/forModel/test.csv
 lib/__pycache__/*
 output/*
 res.csv
 models/*
-._*
-*/*/*/*/._*
-*/*/*/._*
-lib/._*
+*/._*
 data/raw/*/weather/*
 data/raw/*/perims/*
+*.pyc
+data/*
+

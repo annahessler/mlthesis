@@ -1,10 +1,13 @@
+import math
 from collections import namedtuple
 import random
+import json
+from time import localtime, strftime
 
 import numpy as np
 import cv2
 # from rawdata import
-from lib.rawdata import RawData, PIXEL_SIZE
+from lib import rawdata
 from lib import viz
 from keras.preprocessing.image import ImageDataGenerator
 # from model import InputSettings
@@ -14,6 +17,7 @@ class Dataset(object):
     VULNERABLE_RADIUS = 500
 
     def __init__(self, data, points='all'):
+        print('creating new dataset')
         self.data = data
 
         self.points = points
@@ -21,37 +25,100 @@ class Dataset(object):
             points = Dataset.allPixels
         if hasattr(points, '__call__'):
             # points is a filter function
-            self.points = self.getPoints(points)
+            filterFunc = points
+            self.points = self.filterPoints(self.data, filterFunc)
+        if type(points) == list:
+            self.points = self.toDict(points)
 
-        assert type(self.points) == type([])
-        for p in self.points:
-            assert type(p) == Point
-
-    def getUsedBurnNames(self):
-        used = []
-        for burnName, date, location in self.points:
-            if burnName not in used:
-                used.append(burnName)
-        return used
+        assert type(self.points) == type({})
 
     def getUsedBurnNamesAndDates(self):
-        used = []
-        for burnName, date, location in self.points:
-            if (burnName, date) not in used:
-                used.append((burnName, date))
-        return used
+        results = []
+        burnNames = self.points.keys()
+        for name in burnNames:
+            dates = self.points[name].keys()
+            for date in dates:
+                results.append((name,date))
+        return results
 
-    def getPoints(self, filterFunction):
+    def getAllLayers(self, layerName):
+        result = {}
+        allBurnNames = list(self.points.keys())
+        for burnName in allBurnNames:
+            burn = self.data.burns[burnName]
+            layer = burn.layers[layerName]
+            result[burnName] = layer
+        return result
+
+    def __len__(self):
+        total = 0
+        for burnName, dayDict in self.points.items():
+            for ptList in dayDict.values():
+                total += len(ptList)
+        return total
+
+    def save(self, fname=None):
+        timeString = strftime("%d%b%H:%M", localtime())
+        if fname is None:
+            fname = timeString
+        else:
+            fname = fname + timeString
+        if not fname.startswith("output/datasets/"):
+            fname = "output/datasets/" + fname
+        if not fname.endswith('.json'):
+            fname = fname + '.'
+
+        class MyEncoder(json.JSONEncoder):
+            def default(self, obj):
+                if isinstance(obj, np.integer):
+                    return int(obj)
+                elif isinstance(obj, np.floating):
+                    return float(obj)
+                elif isinstance(obj, np.ndarray):
+                    return obj.tolist()
+                else:
+                    return super(MyEncoder, self).default(obj)
+
+        with open(fname, 'w') as fp:
+            json.dump(self.points, fp, cls=MyEncoder, sort_keys=True, indent=4)
+
+    @staticmethod
+    def toList(pointDict):
+        '''Flatten the point dictionary to a list of Points'''
+        result = []
+        for burnName in pointDict:
+            dayDict = pointDict[burnName]
+            for date in dayDict:
+                points = dayDict[date]
+                result.extend(points)
+        return result
+
+    @staticmethod
+    def toDict(pointList):
+        burns = {}
+        for p in pointList:
+            burnName, date, location = p
+            if burnName not in burns:
+                burns[burnName] = {}
+            if date not in burns[burnName]:
+                burns[burnName][date] = []
+            if p not in burns[burnName][date]:
+                burns[burnName][date].append(p)
+        return burns
+
+    @staticmethod
+    def filterPoints(data, filterFunction):
         '''Return all the points which satisfy some filterFunction'''
-        points = []
-        burns = self.data.burns.values()
+        points = {}
+        burns = data.burns.values()
         for b in burns:
+            dictOfDays = {}
+            points[b.name] = dictOfDays
             days = b.days.values()
             for d in days:
                 # get every location that satisfies the condition
                 locations = filterFunction(b, d)
-                for l in locations:
-                    points.append(Point(b.name,d.date,l))
+                dictOfDays[d.date] = [Point(b.name,d.date,l) for l in locations]
         return points
 
     def evenOutPositiveAndNegative(self):
@@ -59,7 +126,7 @@ class Dataset(object):
         # yes will contain all 'did burn' points, no contains 'did not burn' points
         yes = []
         no =  []
-        for p in self.points:
+        for p in self.toList(self.points):
             burnName, date, loc = p
             burn = self.data.burns[burnName]
             day = burn.days[date]
@@ -77,22 +144,93 @@ class Dataset(object):
             no = no[:len(yes)]
 
         # recombine
-        return yes+no
+        return self.toDict(yes+no)
 
-    def getSamples(self, inputSettings):
-        return [Sample(self.data, p, inputSettings) for p in self.points]
+    def sample(self, goalNumber='max', sampleEvenly=True):
+        assert goalNumber == 'max' or (type(goalNumber)==int and goalNumber%2==0)
+        # map from (burnName, date) -> [pts that burned], [pts that didn't burn]
+        day2res = self.makeDay2burnedNotBurnedMap()
+        # print('day2res', day2res)
+        # find the limiting size for each day
+        limits = {day:min(len(yes), len(no)) for day, (yes, no) in day2res.items()}
+        print(limits)
+        if sampleEvenly:
+            # we must get the same number of samples from each day
+            # don't allow a large fire to have a bigger impact on training
+            if goalNumber == 'max':
+                # get as many samples as possible while maintaining even sampling
+                samplesPerDay = min(limits.values())
+                print("samplesPerDay", samplesPerDay)
+            else:
+                # aim for a specific number of samples and sample evenly
+                maxSamples = (2 * min(limits.values())) * len(limits)
+                if goalNumber > maxSamples:
+                    raise ValueError("Not able to get {} samples while maintaining even sampling from the available {}.".format(goalNumber, maxSamples))
+                ndays = len(limits)
+                samplesPerDay = goalNumber/(2*ndays)
+                samplesPerDay = int(math.ceil(samplesPerDay))
+        else:
+            # we don't care about sampling evenly. Larger Days will get more samples
+            if goalNumber == 'max':
+                # get as many samples as possible, whatever it takes
+                samplesPerDay = 'max'
+            else:
+                # aim for a specific number of samples and don't enforce even sampling
+                maxSamples = sum(limits.values()) * 2
+                if goalNumber > maxSamples:
+                    raise ValueError("Not able to get {} samples from the available {}.".format(goalNumber, maxSamples))
+        # order the days from most limiting to least limiting
+        days = sorted(limits, key=limits.get)
+        didBurnSamples = []
+        didNotBurnSamples = []
+        for i, day in enumerate(days):
+            didBurn, didNotBurn = day2res[day]
+            random.shuffle(didBurn)
+            random.shuffle(didNotBurn)
+            if sampleEvenly:
+                print('now samplesPerDay', samplesPerDay)
+                didBurnSamples.extend(didBurn[:samplesPerDay])
+                didNotBurnSamples.extend(didNotBurn[:samplesPerDay])
+            else:
+                if samplesPerDay == 'max':
+                    nsamples = min(len(didBurn), len(didNotBurn))
+                    didBurnSamples.extend(didBurn[:nsamples])
+                    didNotBurnSamples.extend(didNotBurn[:nsamples])
+                else:
+                    samplesToGo = goalNumber/2 - len(didBurnSamples)
+                    daysToGo = len(days)-i
+                    goalSamplesPerDay = int(math.ceil(samplesToGo/daysToGo))
+                    nsamples = min(goalSamplesPerDay, len(didBurn), len(didNotBurn))
+                    didBurnSamples.extend(didBurn[:nsamples])
+                    didNotBurnSamples.extend(didNotBurn[:nsamples])
 
-    def split(self, ratios=[.5]):
-        random.shuffle(self.points)
-        beginIndex = 0
-        ratios.append(1)
-        sets = []
-        for r in ratios:
-            endIndex = int(round(r * len(self.points)))
-            # print(beginIndex, endIndex)
-            sets.append( Dataset(self.data, self.points[beginIndex:endIndex]) )
-            beginIndex = endIndex
-        return sets
+        # now shuffle, trim and split the samples
+        print('length of did and no burn samples', len(didBurnSamples), len(didNotBurnSamples))
+        random.shuffle(didBurnSamples)
+        random.shuffle(didNotBurnSamples)
+        if goalNumber != 'max':
+            didBurnSamples = didBurnSamples[:goalNumber//2]
+            didNotBurnSamples = didNotBurnSamples[:goalNumber//2]
+        samples = didBurnSamples + didNotBurnSamples
+        random.shuffle(samples)
+        print(len(samples), sum(limits.values()))
+        return samples
+
+    def makeDay2burnedNotBurnedMap(self):
+        result = {}
+        for burnName, dayDict in self.points.items():
+            for date, ptList in dayDict.items():
+                day = self.data.getDay(burnName, date)
+                didBurn, didNotBurn = [], []
+                for pt in ptList:
+                    _,_,location = pt
+                    if day.endingPerim[location] == 1:
+                        didBurn.append(pt)
+                    else:
+                        didNotBurn.append(pt)
+                result[(burnName, date)] = (didBurn, didNotBurn)
+        return result
+
 
     @staticmethod
     def allPixels(burn, day):
@@ -103,7 +241,7 @@ class Dataset(object):
         '''Return the indices of the pixels that close to the current fire perimeter'''
         startingPerim = day.startingPerim
         kernel = np.ones((3,3))
-        its = int(round((2*(radius/PIXEL_SIZE)**2)**.5))
+        its = int(round((2*(radius/rawdata.PIXEL_SIZE)**2)**.5))
         dilated = cv2.dilate(startingPerim, kernel, iterations=its)
         border = dilated - startingPerim
         ys, xs = np.where(border)
@@ -111,116 +249,28 @@ class Dataset(object):
 
     def __repr__(self):
         # shorten the string repr of self.points
-        return "Dataset({}, with {} points)".format(self.data, len(self.points))
+        return "Dataset({}, with {} points)".format(self.data, len(self.toList(self.points)))
 
 # create a class that represents a spatial and temporal location that a sample lives at
 Point = namedtuple('Point', ['burnName', 'date', 'location'])
 
-class Sample(object):
-    '''An actual sample that can be fed into the network.
-
-    Encapsulates both the input and output data, as well as the Point it was taken from'''
-
-    # if we calculate the weatherMetric for a Day, memo it
-    memoedWeatherMetrics = {}
-    memoedPadded = {}
-
-    def __init__(self, data, point, inputSettings):
-        self.data = data
-        self.point = point
-        self.inputSettings = inputSettings
-
-    def getInputs(self):
-        burnName, date, location = self.point
-        burn = self.data.burns[burnName]
-        day = burn.days[date]
-
-        inpset = self.inputSettings
-        if (burnName, date) in Sample.memoedWeatherMetrics:
-            weatherMetrics = Sample.memoedWeatherMetrics[(burnName, date)]
-        else:
-            weatherMetrics = inpset.weatherMetrics.calculate(day.weather)
-            Sample.memoedWeatherMetrics[(burnName, date)] = weatherMetrics
-
-        if (burnName, date) not in Sample.memoedPadded:
-            padded = self.stackAndPadLayers(burn.layers, day.startingPerim)
-            Sample.memoedPadded[(burnName, date)] = padded
-        else:
-            padded = Sample.memoedPadded[(burnName, date)]
-        aoi = self.extract(padded, location)
-
-        return [weatherMetrics, aoi]
-
-    def rotateInput(self, train, test):
-        datagen = ImageDataGenerator(
-                rotation_range=40,
-                width_shift_range=0.2,
-                height_shift_range=0.2,
-                rescale=1./255,
-                shear_range=0.2,
-                zoom_range=0.2,
-                horizontal_flip=True,
-                fill_mode='nearest')
-
-        i = 0
-        for batch in datagen.flow(train, batch_size=1, save_to_dir='/data/forModel', save_prefix='augmented', save_format='tif'):
-            i += 1
-            if i > 20:
-                break
-
-
-    def extract(self, padded, location):
-        '''Assume padded is bordered by radius self.inputSettings.AOIRadius'''
-        y,x = location
-        r = self.inputSettings.AOIRadius
-        lox = r+(x-r)
-        hix = r+(x+r+1)
-        loy = r+(y-r)
-        hiy = r+(y+r+1)
-        aoi = padded[loy:hiy,lox:hix]
-        # print(stacked.shape, padded.shape)s
-        return aoi
-
-    def stackAndPadLayers(self, layers, startingPerim):
-        usedLayerNames, metric, AOIRadius = self.inputSettings
-        if usedLayerNames == 'all':
-            names = list(layers.keys())
-            names.sort()
-            usedLayers = [layers[name] for name in names]
-        else:
-            usedLayers = [layers[name] for name in usedLayerNames]
-        usedLayers.insert(0, startingPerim)
-        stacked = np.dstack(usedLayers)
-
-        r = AOIRadius
-        # pad with zeros around border of image
-        padded = np.lib.pad(stacked, ((r,r),(r,r),(0,0)), 'constant')
-        return padded
-
-    def getOutput(self):
-        burnName, date, (y, x) = self.point
-        burn = self.data.burns[burnName]
-        day = burn.days[date]
-        return day.endingPerim[y, x]
-
-    def __repr__(self):
-        return "Sample({}, {}, {})".format(self.data, self.point, self.inputSettings)
-
-class InputSettings(object):
-
-    def __init__(self, usedLayerNames, AOIRadius=30, weatherMetrics=None, ):
-        self.AOIRadius = AOIRadius
-        self.weatherMetrics = weatherMetrics if weatherMetrics is not None else InputSettings.dummyMetric
-        self.usedLayerNames = usedLayerNames
-        assert type(self.usedLayerNames) == list
-        assert len(usedLayerNames) > 0
-
-    @staticmethod
-    def dummyMetric(weatherMatrix):
-        return 42
+def openDataset(fname):
+    with open(fname, 'r') as fp:
+        data = rawdata.RawData.load(burnNames='all', dates='all')
+        pts = json.load(fp)
+        newBurnDict = {}
+        for burnName, dayDict in pts.items():
+            newDayDict = {}
+            for date, ptList in dayDict.items():
+                newPtList = [Point(name, date, tuple(loc)) for name, date, loc in ptList]
+                newDayDict[date] = newPtList
+            newBurnDict[burnName] = newDayDict
+        # pts = [Point(name, date, tuple(loc)) for name, date, loc in pts]
+        # print(pts)
+        return Dataset(data, newBurnDict)
 
 if __name__ == '__main__':
-    d = RawData.load()
+    d = rawdata.RawData.load()
     img = d.burns['riceRidge'].layers['b']
     masterDataSet = Dataset(d, points=Dataset.vulnerablePixels)
     print(masterDataSet)
