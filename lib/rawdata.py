@@ -106,7 +106,6 @@ class Day(object):
 
     def loadStartingPerim(self):
         fname = 'data/{}/perims/{}.tif'.format(self.burnName, self.date)
-        print("THIS IS FNAME: " + fname)
         perim = cv2.imread(fname, cv2.IMREAD_UNCHANGED)
         if perim is None:
             raise RuntimeError('Could not find a perimeter for the fire {} for the day {}'.format(self.burnName, self.date))

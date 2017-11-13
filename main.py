@@ -54,17 +54,24 @@ def getModel(weightsFile=None):
     return mod
 
 def example():
-    test = dataset.openDataset("output/datasets/test13Nov12/23.json")
-    mod = getModel("models/13Nov13/19.h5")
+    from tkinter import Tk
+    from tkinter.filedialog import askopenfilename
+    root = Tk()
+    root.withdraw()
+    modfname = askopenfilename(initialdir = "models/",title="choose a model")
+    datasetfname = askopenfilename(initialdir = "output/datasets",title="choose a dataset")
+    root.destroy()
+    
+    test = dataset.openDataset(datasetfname)
+    mod = getModel(modfname)
     # mod.fit(train, val)
     predictions = mod.predict(test)
-
     # test, predictions = openAndTrain()
     res = viz.visualizePredictions(test, predictions)
     viz.showPredictions(res)
 
 
-openAndTrain()
+example()
 # train, val, test = openDatasets()
 
 # train.save('train')
