@@ -1,7 +1,7 @@
 .DS_Store
-data/forModel/train.csv
-data/forModel/test.csv
-lib/__pycache__/*
+*.csv
+*.tif
+*//__pycache__/*
 output/*
 res.csv
 models/*
@@ -9,5 +9,5 @@ models/*
 */*/*/*/._*
 */*/*/._*
 lib/._*
-data/raw/*/weather/*
-data/raw/*/perims/*
+data/raw/*/*
+data/raw/*
