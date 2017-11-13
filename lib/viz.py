@@ -1,9 +1,11 @@
+from time import localtime, strftime
 import numpy as np
 import cv2
 try:
     import matplotlib.pyplot as plt
 except:
     pass
+from keras.utils import plot_model
 
 def reassemblePredictions(predictions, indices, shape):
     assert type(shape) == type((1,))
@@ -19,3 +21,8 @@ def reassemblePredictions(predictions, indices, shape):
 #         plt.figure(i)
 #         plt.imshow(img)
 #     plt.show()
+
+def saveModel(model):
+    timeString = strftime("%d%b%H:%M", localtime())
+    fname = 'output/modelViz/{}.png'.format(timeString)
+    plot_model(model, to_file=fname, show_shapes=True)

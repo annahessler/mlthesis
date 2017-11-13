@@ -4,6 +4,7 @@ import numpy as np
 import lib.model
 from lib.datamodule import Data
 from lib.dataset import Dataset
+from lib import viz
 
 
 
@@ -19,7 +20,7 @@ weather, aois, out = trainData.getData()
 nsamples, height, width, nchannels = aois.shape
 
 mod = lib.model.FireModel(weather.shape[1], nchannels, (height, width))
-mod.fit(trainData)
-res = mod.predict(testData)
-
-print(res)
+viz.saveModel(mod)
+# mod.fit(trainData)
+# res = mod.predict(testData)
+# print(res)
