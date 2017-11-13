@@ -9,6 +9,7 @@ import cv2
 # from rawdata import
 from lib import rawdata
 from lib import viz
+from keras.preprocessing.image import ImageDataGenerator
 # from model import InputSettings
 
 class Dataset(object):

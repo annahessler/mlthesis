@@ -1,5 +1,8 @@
 import numpy as np
 import cv2
+from scipy.misc import imsave
+from scipy.ndimage import imread
+from libtiff import TIFF
 from time import localtime, strftime
 import csv
 
@@ -8,18 +11,52 @@ try:
 except:
     pass
 
-
 def openImg(fname):
-    img = cv2.imread(fname, cv2.IMREAD_UNCHANGED)
+    if "/perims/" in fname:
+        img = cv2.imread(fname, 0)    # elif "landsat.png" in fname:
+    #     img = cv2.imread(fname, cv2.IMREAD_COLOR)
+    #     # img = imread(fname, flatten=False, mode='F')
+    #     print('imported landsat shape is ', img.shape)
+    #     img = img.astype(np.float32)
+    #     print('landat right after import is', img.shape)
+    #     np.savetxt('importedlandsetrightafter.csv', img[:,:,0], delimiter=',')
+    # elif "ecklund/band_3" in fname:
+    #     img = cv2.imread('data/raw/ecklund/band_3.tif', 0)
+    else:
+        img = cv2.imread(fname, cv2.IMREAD_UNCHANGED)
+        print('img shap is ', img.shape)
     try:
         img = img.astype(np.float32)
     except AttributeError:
         raise ValueError("Could not open the file {} as an image".format(fname))
+    # print('img type is ', img.type)
+    # img = img.astype(np.float32)
     channels = cv2.split(img)
     for c in channels:
         c[invalidPixelIndices(c)] = np.nan
     return cv2.merge(channels)
 
+def saveImg(fname, img):
+    to_save = np.array(img.astype('float32'))
+    print('datatype of saveimg is ', to_save.dtype)
+    max_float = np.finfo(np.float32).max
+    print("to save shape is", to_save.shape)
+    print('max is ', max_float)
+    to_save[np.where(np.isnan(to_save))] = max_float
+    # for listed in to_save:
+    #     for e in listed:
+    #         if np.isnan(e):
+    #             print('e is ', e)
+    #             listed[e] = max_float
+    print('after conversions', to_save)
+    if 'landsat' in fname:
+        print('landsat to_save shape is ', to_save.shape)
+        # np.savetxt('landsatrightafter32bitconversion.csv', to_save[:,:,0], delimiter=',')
+    # imsave(fname, to_save.astype(np.uint8))
+    tiff = TIFF.open(fname, mode='w')
+    tiff.write_image(to_save)
+    tiff.close()
+    # cv2.imwrite(fname, to_save.astype(np.uint16))
 
 def validPixelIndices(layer):
     validPixelMask = 1-invalidPixelMask(layer)

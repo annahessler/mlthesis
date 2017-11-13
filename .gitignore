@@ -1,7 +1,10 @@
 .DS_Store
 lib/__pycache__/*
-output/*
-res.csv
 models/*
-*.pyc
+**/*.pyc
 data/*
+**/*.csv
+*.tif
+output/*
+**/._*
+data/**
