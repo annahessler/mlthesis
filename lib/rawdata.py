@@ -52,7 +52,7 @@ class Burn(object):
     def loadLayers(self):
         folder = 'data/{}/'.format(self.name)
         dem = util.openImg(folder+'dem.tif')
-        slope = util.openImg(folder+'slope.tif')
+        # slope = util.openImg(folder+'slope.tif')
         band_2 = util.openImg(folder+'band_2.tif')
         band_3 = util.openImg(folder+'band_3.tif')
         band_4 = util.openImg(folder+'band_4.tif')
@@ -62,7 +62,7 @@ class Burn(object):
         # r,g,b,nir = cv2.split(landsat)
 
         layers = {'dem':dem,
-                'slope':slope,
+                # 'slope':slope,
                 'ndvi':ndvi,
                 'aspect':aspect,
                 'band_4':band_4,

@@ -428,7 +428,7 @@ class ourImageDataGenerator(object):
             A randomly transformed version of the input (same shape).
         """
         # x is a single image, so it doesn't have image number at index 0
-        np.savetxt('data/raw/landsat2infrontofaugmentcall.csv', x[:,:,4], delimiter=',')
+        # np.savetxt('data/landsat2infrontofaugmentcall.csv', x[:,:,4], delimiter=',')
         img_row_axis = self.row_axis - 1
         img_col_axis = self.col_axis - 1
         img_channel_axis = self.channel_axis - 1
@@ -507,14 +507,14 @@ class ourImageDataGenerator(object):
                 x = flip_axis(x, img_row_axis)
         others = x[:,:,2:]
         landsat = others[:,:,:4]
-        # np.savetxt('data/raw/demafterrandomtransform.csv', x[:,:,3], delimiter=',')
+        # np.savetxt('data/demafterrandomtransform.csv', x[:,:,3], delimiter=',')
         # plt.imshow(x[:,:,3])
         # plt.figure()
         # plt.imshow(x[:,:,4])
         # plt.show()
         # print('image.py landsat is ', landsat)
 
-        np.savetxt('data/raw/landsat2afteraugmentcall.csv', x[:,:,4], delimiter=',')
+        # np.savetxt('data/landsat2afteraugmentcall.csv', x[:,:,4], delimiter=',')
 
         return x, theta
 
@@ -536,7 +536,7 @@ def apply_transform(x,
     # Returns
         The transformed version of the input.
     """
-    np.savetxt('data/raw/dembeforeapplytransform.csv', x[:,:,0], delimiter=',')
+    # np.savetxt('data/dembeforeapplytransform.csv', x[:,:,0], delimiter=',')
     x = np.rollaxis(x, channel_axis, 0)
     print('x is', x.shape)
     final_affine_matrix = transform_matrix[:2, :2]
@@ -550,7 +550,7 @@ def apply_transform(x,
         cval=cval) for x_channel in x]
     x = np.stack(channel_images, axis=0)
     x = np.rollaxis(x, 0, channel_axis + 1)
-    np.savetxt('data/raw/demafterapplytransform.csv', x[:,:,0], delimiter=',')
+    # np.savetxt('data/demafterapplytransform.csv', x[:,:,0], delimiter=',')
     return x
 
 class ImageDataGenerator(object):

@@ -2,7 +2,7 @@ import numpy as np
 import cv2
 from scipy.misc import imsave
 from scipy.ndimage import imread
-from libtiff import TIFF
+# from libtiff import TIFF
 from time import localtime, strftime
 import csv
 

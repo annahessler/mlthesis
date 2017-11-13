@@ -46,7 +46,7 @@ def reloadPredictions():
 def getModel(weightsFile=None):
     from lib import model
     numWeatherInputs = 8
-    usedLayers = ['dem','ndvi', 'aspect', 'slope', 'band_2', 'band_3', 'band_4', 'band_5']
+    usedLayers = ['dem','ndvi', 'aspect', 'band_2', 'band_3', 'band_4', 'band_5'] #, 'slope'
     AOIRadius = 30
     pp = preprocess.PreProcessor(numWeatherInputs, usedLayers, AOIRadius)
 
@@ -54,8 +54,8 @@ def getModel(weightsFile=None):
     return mod
 
 def example():
-    test = dataset.openDataset("output/datasets/test10Nov09:58.json")
-    mod = getModel("models/10Nov09:38.h5")
+    test = dataset.openDataset("output/datasets/test13Nov12/23.json")
+    mod = getModel("models/13Nov13/19.h5")
     # mod.fit(train, val)
     predictions = mod.predict(test)
 

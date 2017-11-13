@@ -127,12 +127,13 @@ def saveFiles(augmented, int_index, perim_array, days):
         util.saveImg(folder + '/perims/' + days[n] +'.tif', perim )
         # imsave(folder + '/perims/' + days[n] +'.tif', perim)
     util.saveImg(folder + '/dem.tif', dem)
+    util.saveImg(folder + '/ndvi.tif', ndvi)
     util.saveImg(folder + '/aspect.tif', aspect)
     np.savetxt('landsatrightbeforesavetif.csv', landsat[:,:,2], delimiter=',')
-    util.saveImg(folder + '/landsat4.tif', landsat[:,:,0])
-    util.saveImg(folder + '/landsat3.tif', landsat[:,:,1])
-    util.saveImg(folder + '/landsat2.tif', landsat[:,:,2])
-    util.saveImg(folder + '/landsat5.tif', landsat[:,:,3])
+    util.saveImg(folder + '/band_4.tif', landsat[:,:,0])
+    util.saveImg(folder + '/band_3.tif', landsat[:,:,1])
+    util.saveImg(folder + '/band_2.tif', landsat[:,:,2])
+    util.saveImg(folder + '/band_5.tif', landsat[:,:,3])
     # landsat_test_write = util.openImg(folder + '/landsat.tif')
     # np.savetxt('landsataftersavereqrite1.csv', landsat_test_write[:,:,0], delimiter=',')
     # np.savetxt('landsataftersavereqrite2.csv', landsat_test_write[:,:,1], delimiter=',')
@@ -146,7 +147,7 @@ def makeFolders(fire):
     fperims = os.mkdir('data/' + fire + 'Augmented'  + int_index + '/perims/')
     return int_index
 
-fires = ['riceRidge', 'coldSprings', 'beaverCreek', 'haydenPass', 'junkins', 'peekaboo', 'pineTree', 'redDirt', 'gutzler', 'ecklund']
+fires = ['riceRidge', 'coldSprings', 'beaverCreek', 'haydenPass', 'junkins', 'peekaboo', 'pineTree', 'redDirt', 'gutzler', 'ecklund', 'redDirt2']
 rrdays = ['0731', '0801', '0802', '0803']
 csdays = ['0711', '0712', '0713', '0714']
 bcdays = ['0629', '0630']
@@ -161,6 +162,7 @@ jdays3 = ['1023', '1024']
 peekdays = ['0710', '0711']
 ptdays = ['0911', '0912']
 rddays = ['0719', '0720']
+rd2days = ['0719', '0720']
 gdays = ['0703', '0704', '0705', '0706']
 eckdays = ['0628','0629', '0630']
 
@@ -216,3 +218,7 @@ for fire in fires:
     # for c, value in enumerate(csdays[:-1], 0):
         toaugment, fire_tuple, day_arr = collectData(fire, eckdays)
         doMore(toaugment, fire, eckdays, fire_tuple, day_arr)
+    if fire == fires[10]:
+    # for c, value in enumerate(csdays[:-1], 0):
+        toaugment, fire_tuple, day_arr = collectData(fire, rd2days)
+        doMore(toaugment, fire, rd2days, fire_tuple, day_arr)
