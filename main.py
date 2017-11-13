@@ -9,9 +9,10 @@ from lib.dataset import Dataset
 
 data = Data.defaultData('0731')
 dataset = Dataset(data)
-usedLayers = ['ndvi', 'slope', 'aspect']
+usedLayers = ['perim', 'ndvi', 'slope', 'aspect']
 dataset.usedLayers = usedLayers
-dataset.usedWeather = ['maxTemp','avgHum']
+# dataset.usedWeather = ['maxTemp','avgHum']
+dataset.usedWeather = []
 trainData, testData = dataset.split()
 
 weather, aois, out = trainData.getData()

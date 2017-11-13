@@ -55,7 +55,7 @@ class FireModel(Model):
 
     def fit(self, trainData):
         weather,spatialData, outputs = trainData.getData()
-        super().fit([weather, spatialData], outputs, batch_size = 2000, epochs = 50, verbose = 1)
+        super().fit([weather, spatialData], outputs, batch_size = 1000, epochs = 50, verbose = 1)
 
     def predict(self, dataset):
         weather,spatialData, outputs = dataset.getData()
