@@ -14,20 +14,20 @@ def openEndingPerim(dateString, fire):
     month, day = dateString[:2], dateString[2:]
     nextDay = str(int(day)+1).zfill(2)
     guess = month+nextDay
-    perimFileName = 'data/raw/'+ fire + '/perims/' + guess + '.tif'
+    perimFileName = 'data/'+ fire + '/perims/' + guess + '.tif'
     perim = cv2.imread(perimFileName, cv2.IMREAD_UNCHANGED)
     if perim is None:
         # overflowed the month, that file didnt exist
         nextMonth = str(int(month)+1).zfill(2)
         guess = nextMonth+'01'
-        perimFileName = 'data/raw/' + fire + '/perims/' + guess + '.tif'
+        perimFileName = 'data/' + fire + '/perims/' + guess + '.tif'
         perim = cv2.imread(perimFileName, cv2.IMREAD_UNCHANGED)
         if perim is None:
             raise RuntimeError('Could not find a perimeter for the day after ' + dateString)
         return perim
 
 def openWeatherData(dateString, fireName):
-    fname = 'data/raw/' + fireName + '/weather/' + dateString + '.csv'
+    fname = 'data/' + fireName + '/weather/' + dateString + '.csv'
     # the first row is the headers, and only cols 5-12 are actual data
     # data = np.loadtxt(fname, usecols=[5,12], skiprows=1, delimiter='')
     date_list = np.loadtxt(fname, usecols=range(0,2), dtype='float32', skiprows=1, delimiter=',')
@@ -37,22 +37,22 @@ def openWeatherData(dateString, fireName):
 
 def collectData(fireName, days):
     days_arr = []
-    dem = util.openImg('data/raw/' + fireName + '/dem.tif')
-    aspect = util.openImg('data/raw/'+ fireName + '/aspect.tif')  
-    landsat4 = util.openImg('data/raw/'+ fireName + '/band_4.tif')
+    dem = util.openImg('data/' + fireName + '/dem.tif')
+    aspect = util.openImg('data/'+ fireName + '/aspect.tif')  
+    landsat4 = util.openImg('data/'+ fireName + '/band_4.tif')
     print('landsat4.tif shae', landsat4.shape)
-    landsat3 = util.openImg('data/raw/'+ fireName + '/band_3.tif')
+    landsat3 = util.openImg('data/'+ fireName + '/band_3.tif')
     print('landsat3.tif shae', landsat3.shape)
-    landsat2 = util.openImg('data/raw/'+ fireName + '/band_2.tif')
+    landsat2 = util.openImg('data/'+ fireName + '/band_2.tif')
     np.savetxt('band2lookatthis.csv', landsat2, delimiter=',')
-    landsat5 = util.openImg('data/raw/'+ fireName + '/band_5.tif')
+    landsat5 = util.openImg('data/'+ fireName + '/band_5.tif')
     print('before landsat4 shape is ', landsat4.shape)
 
-    ndvi = util.openImg('data/raw/'+ fireName + '/ndvi.tif')
-    slope = util.openImg('data/raw/'+ fireName + '/slope.tif')
+    ndvi = util.openImg('data/'+ fireName + '/ndvi.tif')
+    slope = util.openImg('data/'+ fireName + '/slope.tif')
     for day in days:
         print('day is ', day)
-        days_arr.append(util.openImg('data/raw/'+fireName+'/perims/'+day+'.tif'))
+        days_arr.append(util.openImg('data/'+fireName+'/perims/'+day+'.tif'))
     print('COLLECT DATA SHAPES: ', dem.shape, aspect.shape, landsat4.shape, landsat3.shape, landsat2.shape, landsat5.shape, ndvi.shape, slope.shape)
 
     fire_tuple = (dem, aspect, slope, landsat4, landsat3, landsat2, landsat5, ndvi)
@@ -75,7 +75,7 @@ def rotateWindDirection(theta, fire, date, int_index):
     headings = np.zeros(12, dtype='float32')
     headings = headings.reshape( (1,) + headings.shape)
     result = np.vstack((headings, all_weather))
-    f = 'data/raw/' + fire+ 'Augmented' + int_index + '/weather/' + date + '.csv'
+    f = 'data/' + fire+ 'Augmented' + int_index + '/weather/' + date + '.csv'
     np.savetxt(f, result, delimiter=',')
 
     return weather 
@@ -98,7 +98,7 @@ def doMore(toaugment, fire, days, f_tuple, perim_array):
 
     for day in days:
         weather = rotateWindDirection(theta, fire, day, int_index)
-    # np.savetxt('data/raw/demafterreturn.csv', augmented[:,:,0], delimiter=',')
+    # np.savetxt('data/demafterreturn.csv', augmented[:,:,0], delimiter=',')
     saveFiles(augmented, int_index, perim_array, days)
 
     print('done with 1+++++++++++++++++++++++++++++++++++++++++++++++++++')
@@ -122,7 +122,7 @@ def saveFiles(augmented, int_index, perim_array, days):
     print(landsat)
     # cv2.imwrite('before'+ fire+ date+ '.png', before.reshape(before.shape[:2]))
     print('current dir is ', os.listdir())
-    folder = 'data/raw/' + fire + 'Augmented' + int_index
+    folder = 'data/' + fire + 'Augmented' + int_index
     for n, perim in enumerate(cv2.split(othersperims)): #figure out how to do this with two perims
         util.saveImg(folder + '/perims/' + days[n] +'.tif', perim )
         # imsave(folder + '/perims/' + days[n] +'.tif', perim)
@@ -141,9 +141,9 @@ def saveFiles(augmented, int_index, perim_array, days):
 
 def makeFolders(fire):
     int_index = strftime("%d%b%H%M%S", localtime()) + str(np.random.randint(low=1, high=99)) + str(time.time())
-    folder = os.mkdir('data/raw/' + fire + 'Augmented' + int_index + '/')
-    fweather = os.mkdir('data/raw/' + fire + 'Augmented' + int_index+ '/weather/' )
-    fperims = os.mkdir('data/raw/' + fire + 'Augmented'  + int_index + '/perims/')
+    folder = os.mkdir('data/' + fire + 'Augmented' + int_index + '/')
+    fweather = os.mkdir('data/' + fire + 'Augmented' + int_index+ '/weather/' )
+    fperims = os.mkdir('data/' + fire + 'Augmented'  + int_index + '/perims/')
     return int_index
 
 fires = ['riceRidge', 'coldSprings', 'beaverCreek', 'haydenPass', 'junkins', 'peekaboo', 'pineTree', 'redDirt', 'gutzler', 'ecklund'] 
@@ -216,13 +216,3 @@ for fire in fires:
     # for c, value in enumerate(csdays[:-1], 0):
         toaugment, fire_tuple, day_arr = collectData(fire, eckdays)
         doMore(toaugment, fire, eckdays, fire_tuple, day_arr)
-
-
-# the .flow() command below generates batches of randomly transformed images
-# and saves the results to the `preview/` directory
-# i = 0
-# for batch in datagen.flow(augmented, batch_size=10,
-#                           save_to_dir='data/raw/riceRidgeAugmented', save_prefix='test', save_format='tif'):
-#     i += 1
-#     if i > 25:
-#         break  # otherwise the generator would loop indefinitely
