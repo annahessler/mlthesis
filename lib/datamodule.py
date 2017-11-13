@@ -127,4 +127,3 @@ class Data(object):
         avgWDir= sum(wdir)/len(wdir)
         avgHum = sum(hum)/len(hum)
         return np.array( [max(temp), avgWSpeed, avgWDir, totalPrecip, avgHum])
-
