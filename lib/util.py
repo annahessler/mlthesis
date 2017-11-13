@@ -1,10 +1,13 @@
 import numpy as np
 import cv2
+from time import localtime, strftime
+import csv
 
 try:
     import matplotlib.pyplot as plt
 except:
     pass
+
 
 def openImg(fname):
     img = cv2.imread(fname, cv2.IMREAD_UNCHANGED)
@@ -16,6 +19,7 @@ def openImg(fname):
     for c in channels:
         c[invalidPixelIndices(c)] = np.nan
     return cv2.merge(channels)
+
 
 def validPixelIndices(layer):
     validPixelMask = 1-invalidPixelMask(layer)

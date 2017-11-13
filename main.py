@@ -25,13 +25,14 @@ def openAndTrain():
     # data = rawdata.RawData.load(burnNames='all', dates='all')
     # masterDataSet = dataset.Dataset(data, dataset.Dataset.vulnerablePixels)
     # masterDataSet.points = masterDataSet.evenOutPositiveAndNegative()
-    train, validate, test = openDataset()
+    train, validate, test = openDatasets()
     train.save('train')
     test.save('test')
     validate.save('validate')
     # print(train, validate, test)
     mod = getModel()
     mod.fit(train, validate)
+    mod.saveWeights()
     predictions = mod.predict(test)
     util.savePredictions(predictions)
     return test, predictions
@@ -45,7 +46,7 @@ def reloadPredictions():
 def getModel(weightsFile=None):
     from lib import model
     numWeatherInputs = 8
-    usedLayers = ['dem','ndvi']
+    usedLayers = ['dem','ndvi', 'aspect', 'slope', 'band_2', 'band_3', 'band_4', 'band_5']
     AOIRadius = 30
     pp = preprocess.PreProcessor(numWeatherInputs, usedLayers, AOIRadius)
 
@@ -63,7 +64,9 @@ def example():
     viz.showPredictions(res)
 
 
+openAndTrain()
 # train, val, test = openDatasets()
+
 # train.save('train')
 # test.save('test')
 # val.save('validate')

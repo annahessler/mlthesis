@@ -53,19 +53,22 @@ class Burn(object):
         folder = 'data/{}/'.format(self.name)
         dem = util.openImg(folder+'dem.tif')
         slope = util.openImg(folder+'slope.tif')
-        landsat = util.openImg(folder+'landsat.png')
+        band_2 = util.openImg(folder+'band_2.tif')
+        band_3 = util.openImg(folder+'band_3.tif')
+        band_4 = util.openImg(folder+'band_4.tif')
+        band_5 = util.openImg(folder+'band_5.tif')
         ndvi = util.openImg(folder+'ndvi.tif')
         aspect = util.openImg(folder+'aspect.tif')
-        r,g,b,nir = cv2.split(landsat)
+        # r,g,b,nir = cv2.split(landsat)
 
         layers = {'dem':dem,
                 'slope':slope,
                 'ndvi':ndvi,
                 'aspect':aspect,
-                'r':r,
-                'g':g,
-                'b':b,
-                'nir':nir}
+                'band_4':band_4,
+                'band_3':band_3,
+                'band_2':band_2,
+                'band_5':band_5}
 
         # ok, now we have to make sure that all of the NoData values are set to 0
         #the NV pixels occur outside of our AOIRadius
@@ -103,6 +106,7 @@ class Day(object):
 
     def loadStartingPerim(self):
         fname = 'data/{}/perims/{}.tif'.format(self.burnName, self.date)
+        print("THIS IS FNAME: " + fname)
         perim = cv2.imread(fname, cv2.IMREAD_UNCHANGED)
         if perim is None:
             raise RuntimeError('Could not find a perimeter for the fire {} for the day {}'.format(self.burnName, self.date))
@@ -166,8 +170,9 @@ def isValidImg(imgName):
 def listdir_nohidden(path):
     '''List all the files in a path that are not hidden (begin with a .)'''
     result = []
+
     for f in listdir(path):
-        if not f.startswith('.'):
+        if not f.startswith('.') and not f.startswith("_"):
             result.append(f)
     return result
 

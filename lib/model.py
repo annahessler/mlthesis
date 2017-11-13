@@ -11,6 +11,7 @@ from lib import preprocess
 from lib import metrics
 
 class ImageBranch(Sequential):
+    print("model.py")
 
     def __init__(self, nchannels, kernelDiam):
         super().__init__()
