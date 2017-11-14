@@ -16,6 +16,8 @@ class RawData(object):
     def load(burnNames='all', dates='all'):
         if burnNames == 'all':
             burnNames = listdir_nohidden('data/')
+        if burnNames == 'untrain':
+            burnNames = listdir_nohidden('/data/_untrained/')
         if dates == 'all':
             burns = {n:Burn.load(n, 'all') for n in burnNames}
         else:

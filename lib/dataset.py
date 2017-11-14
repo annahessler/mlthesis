@@ -241,7 +241,7 @@ class Dataset(object):
         '''Return the indices of the pixels that close to the current fire perimeter'''
         startingPerim = day.startingPerim
         kernel = np.ones((3,3))
-        its = int(round((2*(radius/rawdata.PIXEL_SIZE)**2)**.5))
+        its = int(round((2*(radius)**2)**.5))
         dilated = cv2.dilate(startingPerim, kernel, iterations=its)
         border = dilated - startingPerim
         ys, xs = np.where(border)

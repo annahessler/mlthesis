@@ -84,7 +84,7 @@ def rotateWindDirection(theta, fire, date, int_index):
 def doMore(toaugment, fire, days, f_tuple, perim_array):
     infinity = Decimal('Infinity')
     oidg = image.ourImageDataGenerator(
-            rotation_range=40,
+            rotation_range=330, #40, 80, 120, 160, 200, 240, 300, 360, 280, 330
             # fill_mode='constant',
             # cval=np.nan,
             data_format = 'channels_last'
@@ -150,15 +150,15 @@ def makeFolders(fire):
 fires = ['riceRidge', 'coldSprings', 'beaverCreek', 'haydenPass', 'junkins', 'peekaboo', 'pineTree', 'redDirt', 'gutzler', 'ecklund', 'redDirt2']
 rrdays = ['0731', '0801', '0802', '0803']
 csdays = ['0711', '0712', '0713', '0714']
-bcdays = ['0629', '0630']
-bcdays2 = ['0711', '0712', '0713', '0714', '0715', '0716']
-bcdays3 = ['0801', '0802'] #TAKE OUT
-bcdays4 = ['0804', '0805']
-bcdays5 = ['0807', '0808', '0809', '0810']
+bcdays = ['0629', '0630', '0711', '0712', '0713', '0714', '0715', '0716', '0801', '0802', '0804', '0805', '0807', '0808', '0809', '0810']
+# bcdays2 = ['0711', '0712', '0713', '0714', '0715', '0716']
+# bcdays3 = ['0801', '0802'] #TAKE OUT
+# bcdays4 = ['0804', '0805']
+# bcdays5 = ['0807', '0808', '0809', '0810']
 hpdays = ['0712', '0713', '0714', '0715', '0716', '0717', '0718', '0719']
-jdays = ['1028','1029', '1030']
-jdays2 = ['1020', '1021']
-jdays3 = ['1023', '1024']
+jdays = ['1028','1029', '1030', '1020', '1021', '1023', '1024']
+# jdays2 = ['1020', '1021']
+# jdays3 = ['1023', '1024']
 peekdays = ['0710', '0711']
 ptdays = ['0911', '0912']
 rddays = ['0719', '0720']
@@ -195,13 +195,13 @@ for fire in fires:
         # for c, value in enumerate(csdays[:-1], 0):
         toaugment, fire_tuple, day_arr = collectData(fire, jdays)
         doMore(toaugment, fire, jdays, fire_tuple, day_arr)
-        toaugment, fire_tuple, day_arr = collectData(fire, jdays2)
-        doMore(toaugment, fire, jdays2, fire_tuple, day_arr)
-        toaugment, fire_tuple, day_arr = collectData(fire, jdays3)
-        doMore(toaugment, fire, jdays3, fire_tuple, day_arr)
-    if fire == fires[5]:
-        toaugment, fire_tuple, day_arr = collectData(fire, peekdays)
-        doMore(toaugment, fire, peekdays, fire_tuple, day_arr)
+        # toaugment, fire_tuple, day_arr = collectData(fire, jdays2)
+        # doMore(toaugment, fire, jdays2, fire_tuple, day_arr)
+        # toaugment, fire_tuple, day_arr = collectData(fire, jdays3)
+        # doMore(toaugment, fire, jdays3, fire_tuple, day_arr)
+    # if fire == fires[5]:
+    #     toaugment, fire_tuple, day_arr = collectData(fire, peekdays)
+    #     doMore(toaugment, fire, peekdays, fire_tuple, day_arr)
     if fire == fires[6]:
     # for c, value in enumerate(csdays[:-1], 0):
         toaugment, fire_tuple, day_arr = collectData(fire, ptdays)
@@ -210,10 +210,10 @@ for fire in fires:
     # for c, value in enumerate(csdays[:-1], 0):
         toaugment, fire_tuple, day_arr = collectData(fire, rddays)
         doMore(toaugment, fire, rddays, fire_tuple, day_arr)
-    if fire == fires[8]:
-    # for c, value in enumerate(csdays[:-1], 0):
-        toaugment, fire_tuple, day_arr = collectData(fire, gdays)
-        doMore(toaugment, fire, gdays, fire_tuple, day_arr)
+    # if fire == fires[8]:
+    # # for c, value in enumerate(csdays[:-1], 0):
+    #     toaugment, fire_tuple, day_arr = collectData(fire, gdays)
+    #     doMore(toaugment, fire, gdays, fire_tuple, day_arr)
     if fire == fires[9]:
     # for c, value in enumerate(csdays[:-1], 0):
         toaugment, fire_tuple, day_arr = collectData(fire, eckdays)
