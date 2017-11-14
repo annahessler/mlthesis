@@ -54,14 +54,23 @@ def getModel(weightsFile=None):
     return mod
 
 def example():
-    from tkinter import Tk
-    from tkinter.filedialog import askopenfilename
-    root = Tk()
-    root.withdraw()
-    modfname = askopenfilename(initialdir = "models/",title="choose a model")
-    datasetfname = askopenfilename(initialdir = "output/datasets",title="choose a dataset")
-    root.destroy()
-    
+    try:
+        import sys
+        modfname = sys.argv[1]
+        datasetfname = sys.argv[2]
+    except:
+        print('about to import tkinter')
+        from tkinter import Tk
+        from tkinter.filedialog import askopenfilename
+        print('done!')
+        root = Tk()
+        print('Tked')
+        root.withdraw()
+        print('withdrawn')
+        modfname = askopenfilename(initialdir = "models/",title="choose a model")
+        datasetfname = askopenfilename(initialdir = "output/datasets",title="choose a dataset")
+        root.destroy()
+
     test = dataset.openDataset(datasetfname)
     mod = getModel(modfname)
     # mod.fit(train, val)

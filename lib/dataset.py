@@ -15,7 +15,6 @@ from keras.preprocessing.image import ImageDataGenerator
 class Dataset(object):
     '''A set of Point objects'''
     VULNERABLE_RADIUS = 500
-    print('Dataset')
 
     def __init__(self, data, points='all'):
         print('creating new dataset')
