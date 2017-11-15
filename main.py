@@ -30,7 +30,7 @@ def openDatasets():
     return train, validate, test
 
 def openAndPredict(weightsFile):
-    from lib importmodel
+    from lib import model
 
     test = predictFires()
     test.save('testOtherFire')
@@ -67,9 +67,10 @@ def reloadPredictions():
 
 def getModel(weightsFile=None):
     from lib import model
+    print('in getModel')
     numWeatherInputs = 8
     usedLayers = ['dem','ndvi', 'aspect', 'band_2', 'band_3', 'band_4', 'band_5'] #, 'slope'
-    AOIRadius = 50
+    AOIRadius = 30
     pp = preprocess.PreProcessor(numWeatherInputs, usedLayers, AOIRadius)
 
     mod = model.FireModel(pp, weightsFile)
@@ -80,6 +81,7 @@ def example():
         import sys
         modfname = sys.argv[1]
         datasetfname = sys.argv[2]
+        print("working")
     except:
         print('about to import tkinter')
         from tkinter import Tk
@@ -101,9 +103,9 @@ def example():
     res = viz.visualizePredictions(test, predictions)
     viz.showPredictions(res)
 
-openAndTrain()
+#openAndTrain()
 # openAndPredict('') #enter weightsFile
-#example()
+example()
 # train, val, test = openDatasets()
 
 # train.save('train')

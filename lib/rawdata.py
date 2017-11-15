@@ -14,15 +14,24 @@ class RawData(object):
 
     @staticmethod
     def load(burnNames='all', dates='all'):
+        print("in rawdata load")
         if burnNames == 'all':
+            print('1')
             burnNames = listdir_nohidden('data/')
+            print('1')
         if burnNames == 'untrain':
+            print('2')
             burnNames = listdir_nohidden('/data/_untrained/')
+            print('2')
         if dates == 'all':
+            print('3')
             burns = {n:Burn.load(n, 'all') for n in burnNames}
+            print('3')
         else:
             # assumes dates is a dict, with keys being burnNames and vals being dates
+            print('4')
             burns = {n:Burn.load(n, dates[n]) for n in burnNames}
+            print('4')
         return RawData(burns)
 
     def getWeather(self, burnName, date):
@@ -82,6 +91,7 @@ class Burn(object):
 
     @staticmethod
     def load(burnName, dates='all'):
+        print("in load")
         if dates == 'all':
             dates = Day.allGoodDays(burnName)
         days = {date:Day(burnName, date) for date in dates}

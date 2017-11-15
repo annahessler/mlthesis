@@ -255,13 +255,18 @@ class Dataset(object):
 Point = namedtuple('Point', ['burnName', 'date', 'location'])
 
 def openDataset(fname):
+    print('in openDataset')
     with open(fname, 'r') as fp:
+        print('in openDataset with')
         data = rawdata.RawData.load(burnNames='all', dates='all')
+        print('still in with')
         pts = json.load(fp)
         newBurnDict = {}
         for burnName, dayDict in pts.items():
+            print('in dataset for loop')
             newDayDict = {}
             for date, ptList in dayDict.items():
+                print("in inner dataset for loop")
                 newPtList = [Point(name, date, tuple(loc)) for name, date, loc in ptList]
                 newDayDict[date] = newPtList
             newBurnDict[burnName] = newDayDict

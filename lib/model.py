@@ -67,7 +67,7 @@ class FireModel(Model):
         (tinputs, toutputs), ptList = self.preProcessor.process(training)
         (vinputs, voutputs), ptList = self.preProcessor.process(validate)
         print('training on ', training)
-        history = super().fit(tinputs, toutputs, batch_size = 1000, epochs=50, validation_data=(vinputs, voutputs))
+        history = super().fit(tinputs, toutputs, batch_size = 1000, epochs=5, validation_data=(vinputs, voutputs))
 
         self.saveWeights()
         return history
@@ -79,9 +79,11 @@ class FireModel(Model):
         self.save_weights(fname)
 
     def predict(self, dataset):
+        print('start predict')
         (inputs, outputs), ptList = self.preProcessor.process(dataset)
         results = super().predict(inputs).flatten()
         resultDict = {pt:pred for (pt, pred) in zip(ptList, results)}
+        print("end predict")
         return resultDict
 
 from collections import namedtuple
