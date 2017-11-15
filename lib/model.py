@@ -123,6 +123,7 @@ class FireModel(Model):
 
         concat = Concatenate(name='mergedBranches')([self.wb,self.ib.output])
         out = Dense(1, kernel_initializer = 'normal', activation = 'sigmoid',name='output')(concat)
+        # out = Dropout(0.2)(out)
         # print("concat and out info:", concat.shape, out.shape)
         super().__init__([self.wb, self.ib.input], out)
 
@@ -139,7 +140,7 @@ class FireModel(Model):
         (tinputs, toutputs), ptList = self.preProcessor.process(training)
         (vinputs, voutputs), ptList = self.preProcessor.process(validate)
         print('training on ', training)
-        history = super().fit(tinputs, toutputs, batch_size = 1000, epochs=80, validation_data=(vinputs, voutputs))
+        history = super().fit(tinputs, toutputs, batch_size = 1000, epochs=5, validation_data=(vinputs, voutputs))
 
         self.saveWeights()
         return history
@@ -151,9 +152,11 @@ class FireModel(Model):
         self.save_weights(fname)
 
     def predict(self, dataset):
+        print('start predict')
         (inputs, outputs), ptList = self.preProcessor.process(dataset)
         results = super().predict(inputs).flatten()
         resultDict = {pt:pred for (pt, pred) in zip(ptList, results)}
+        print("end predict")
         return resultDict
 
 class OurModel(BaseModel):

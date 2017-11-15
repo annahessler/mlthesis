@@ -8,6 +8,16 @@ from lib import viz
 from lib import preprocess
 from lib import util
 
+
+def predictFires():
+    #create a new Data and make burn names those three instead of all. Pass all 3 fires
+    new_data = rawdata.RawData.load(burnNames='untrain', dates='all')
+    newDataSet = dataset.Dataset(new_data, dataset.Dataset.vulnerablePixels)
+    pointLst = newDataSet.toList(newDataSet.points)
+    pointLst = random.sample(pointLst, 1000)
+    test = dataset.Dataset(new_data, pointLst)
+    return test
+
 def openDatasets():
     data = rawdata.RawData.load(burnNames='all', dates='all')
     masterDataSet = dataset.Dataset(data, dataset.Dataset.vulnerablePixels)
@@ -18,6 +28,18 @@ def openDatasets():
     validate = dataset.Dataset(data, validatePts)
     test = dataset.Dataset(data, testPts)
     return train, validate, test
+
+def openAndPredict(weightsFile):
+    from lib import model
+
+    test = predictFires()
+    test.save('testOtherFire')
+    mod = getModel(weightsFile)
+    predictions = mod.predict(test)
+    util.savePredictions(predictions)
+    res = viz.visualizePredictions(test, predictions)
+    viz.showPredictions(res)
+    return test, predictions
 
 def openAndTrain():
     from lib import model
@@ -45,6 +67,7 @@ def reloadPredictions():
 
 def getModel(weightsFile=None):
     from lib import model
+    print('in getModel')
     numWeatherInputs = 8
     usedLayers = ['dem','ndvi', 'aspect', 'band_2', 'band_3', 'band_4', 'band_5'] #, 'slope'
     AOIRadius = 30
@@ -58,6 +81,7 @@ def example():
         import sys
         modfname = sys.argv[1]
         datasetfname = sys.argv[2]
+        print("working")
     except:
         print('about to import tkinter')
         from tkinter import Tk
@@ -79,7 +103,8 @@ def example():
     res = viz.visualizePredictions(test, predictions)
     viz.showPredictions(res)
 
-
+#openAndTrain()
+# openAndPredict('') #enter weightsFile
 example()
 # train, val, test = openDatasets()
 

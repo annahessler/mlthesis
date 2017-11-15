@@ -241,7 +241,7 @@ class Dataset(object):
         '''Return the indices of the pixels that close to the current fire perimeter'''
         startingPerim = day.startingPerim
         kernel = np.ones((3,3))
-        its = int(round((2*(radius/rawdata.PIXEL_SIZE)**2)**.5))
+        its = int(round((2*(radius)**2)**.5))
         dilated = cv2.dilate(startingPerim, kernel, iterations=its)
         border = dilated - startingPerim
         ys, xs = np.where(border)
@@ -255,13 +255,18 @@ class Dataset(object):
 Point = namedtuple('Point', ['burnName', 'date', 'location'])
 
 def openDataset(fname):
+    print('in openDataset')
     with open(fname, 'r') as fp:
+        print('in openDataset with')
         data = rawdata.RawData.load(burnNames='all', dates='all')
+        print('still in with')
         pts = json.load(fp)
         newBurnDict = {}
         for burnName, dayDict in pts.items():
+            print('in dataset for loop')
             newDayDict = {}
             for date, ptList in dayDict.items():
+                print("in inner dataset for loop")
                 newPtList = [Point(name, date, tuple(loc)) for name, date, loc in ptList]
                 newDayDict[date] = newPtList
             newBurnDict[burnName] = newDayDict
