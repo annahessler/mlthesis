@@ -6,9 +6,10 @@ try:
 except:
     pass
 
-
-from lib import util
-
+try:
+    from lib import util
+except:
+    import util
 class PreProcessor(object):
     '''What is responsible for extracting the used data from the dataset and then
     normalizing or doing any other steps before feeding it into the network.'''
