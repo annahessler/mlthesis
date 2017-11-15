@@ -81,8 +81,9 @@ class BaseModel(object):
         if not os.path.isdir(name):
             os.mkdir(name)
 
+        className = str(self.__class__.__name__)
         with open(name+'class.txt', 'w') as f:
-            f.write(str(self.__class__.__name__))
+            f.write(className)
         self.kerasModel.save(name+'model.h5')
 
 def load(modelFolder):
@@ -94,19 +95,17 @@ def load(modelFolder):
         modelFolder += '/'
 
     modelFile = modelFolder + 'model.h5'
-    print('im here')
     model = keras.models.load_model(modelFile)
-    print('now here')
 
     objFile = modelFolder + 'class.txt'
-    print(objFile)
-    with open(objFile, 'w') as f:
-        print(f)
-        classString = f.read()
-    print('classString is ', classString)
-    print(globals())
+    # print(objFile)
+    with open(objFile, 'r') as f:
+        classString = f.read().strip()
+    # print('classString is ', classString)
+    # print(globals())
     class_ = globals()[classString]
     obj = class_(kerasModel=model)
+    # print('done! returning', obj)
     return obj
 
 
@@ -188,21 +187,12 @@ class OurModel(BaseModel):
         kerasModel.compile(loss = 'binary_crossentropy', optimizer = sgd, metrics = ['accuracy'])
         return kerasModel
 
+class OurModel2(BaseModel):
+    pass
 
 if __name__ == '__main__':
     m = OurModel()
     m.save()
 
-    n = load('models/14Nov15_45')
+    n = load('models/15Nov09_41')
     print(n)
-
-
-
-
-
-
-
-
-
-
-

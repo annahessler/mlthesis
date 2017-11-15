@@ -143,14 +143,6 @@ def showPredictions(predictionsRenders):
         plt.show()
 
 
-    # anim = animation.FuncAnimation(fig, animfunc[,..other args])
-
-    #pause
-    # anim.event_source.stop()
-    #
-    # #unpause
-    # anim.event_source.start()
-
 def show(*imgs, imm=True):
     try:
         for i, img in enumerate(imgs):
