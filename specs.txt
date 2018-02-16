@@ -1,0 +1,13 @@
+specs:
+
+A model should be a stable state machine: Train it for however long you want, and then the result is an atomic thing (a directory) that can be ported around, duplicated, etc. You can come back whenever to that directory whenever you want and keep training it.
+
+GUI:
+Viewing Predictions:
+-choose a trained model
+-choose a burn
+-be able to scroll through dates of burn
+-overlay actual results as well
+
+Training models:
+-Select a model
