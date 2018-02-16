@@ -4,7 +4,9 @@ import csv
 import numpy as np
 import cv2
 try:
-    import matplotlib.pyplot as plt
+    import matplotlib
+    matplotlib.use("TkAgg")
+    from matplotlib import pyplot as plt
     import matplotlib.animation as animation
     print('Successfully imported pyplot')
 except:

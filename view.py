@@ -1,7 +1,9 @@
 import sys
 import cv2
 from scipy.misc import imread
-import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use("TkAgg")
+from matplotlib import pyplot as plt
 
 
 class Formatter(object):

@@ -254,9 +254,12 @@ class Dataset(object):
 # create a class that represents a spatial and temporal location that a sample lives at
 Point = namedtuple('Point', ['burnName', 'date', 'location'])
 
-def openDataset(fname):
+def load(fname=None):
+    if fname is None:
+        # give us the default dataset of everything
+        return Dataset(rawdata.load())
     with open(fname, 'r') as fp:
-        data = rawdata.RawData.load(burnNames='all', dates='all')
+        data = rawdata.RawData.load()
         pts = json.load(fp)
         newBurnDict = {}
         for burnName, dayDict in pts.items():
@@ -268,6 +271,8 @@ def openDataset(fname):
         # pts = [Point(name, date, tuple(loc)) for name, date, loc in pts]
         # print(pts)
         return Dataset(data, newBurnDict)
+
+
 
 if __name__ == '__main__':
     d = rawdata.RawData.load()

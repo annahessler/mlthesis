@@ -8,8 +8,6 @@ from time import localtime, strftime
 from scipy.misc import imsave
 from decimal import *
 
-
-
 def openEndingPerim(dateString, fire):
     month, day = dateString[:2], dateString[2:]
     nextDay = str(int(day)+1).zfill(2)

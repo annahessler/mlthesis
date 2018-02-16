@@ -39,7 +39,7 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
         self.mainwindow.show()
 
     def getFires(self):
-        burnFolder = '/home/n_crews/Documents/thesis/mlthesis/data/'
+        burnFolder = 'data/'
         burns = os.listdir(burnFolder)
         model = QtGui.QStandardItemModel()
         for name in burns:
@@ -86,7 +86,8 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
         # todo: load keras model
         # self.sigPredict.emit(modelFileName, burnName)
 
-    def donePredicting()
+    def donePredicting():
+        pass
 
     def showImage(self, img):
         h,w = img.shape[:2]
@@ -124,7 +125,7 @@ class CheckableDirModel(QtGui.QDirModel):
         return QtGui.QDirModel.setData(self, index, value, role)
 
 def async(func, args, callback):
-
+    pass
 
 if __name__ == '__main__':
     app = QtGui.QApplication([])

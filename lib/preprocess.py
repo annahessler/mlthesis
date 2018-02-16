@@ -2,7 +2,9 @@
 from collections import namedtuple
 import numpy as np
 try:
-    import matplotlib.pyplot as plt
+    import matplotlib
+    matplotlib.use("TkAgg")
+    from matplotlib import pyplot as plt
 except:
     pass
 

@@ -1,10 +1,7 @@
+**/*.pyc
+**/*.DS_Store
+
 lib/__pycache__/*
 models/*
-**/*.pyc
 data/*
-**/*.csv
-*.tif
 output/*
-**/._*
-data/**
-**/*.DS_Store

@@ -1,5 +1,4 @@
 
-from os import listdir
 import numpy as np
 import cv2
 
@@ -7,21 +6,59 @@ from lib import util
 
 PIXEL_SIZE = 30
 
+def availableBurns():
+    return util.listdir_nohidden('data/')
+
+def availableDates(burnName):
+    '''Given a fire, return a list of all dates that we can train on'''
+    directory = 'data/{}/'.format(burnName)
+
+    weatherFiles = util.listdir_nohidden(directory+'weather/')
+    weatherDates = [fname[:-len('.csv')] for fname in weatherFiles]
+
+    perimFiles = util.listdir_nohidden(directory+'perims/')
+    perimDates = [fname[:-len('.tif')] for fname in perimFiles if isValidImg(directory+'perims/'+fname)]
+
+    # we can only use days which have perimeter data on the following day
+    daysWithFollowingPerims = []
+    for d in perimDates:
+        nextDay1, nextDay2 = possibleNextDates(d)
+        if nextDay1 in perimDates or nextDay2 in perimDates:
+            daysWithFollowingPerims.append(d)
+
+    # now we have to verify that we have weather for these days as well
+    daysWithWeatherAndPerims = [d for d in daysWithFollowingPerims if d in weatherDates]
+    daysWithWeatherAndPerims.sort()
+    return daysWithWeatherAndPerims
+
+def possibleNextDates(dateString):
+    month, day = dateString[:2], dateString[2:]
+
+    nextDay = str(int(day)+1).zfill(2)
+    guess1 = month+nextDay
+
+    nextMonth = str(int(month)+1).zfill(2)
+    guess2 = nextMonth+'01'
+    return guess1, guess2
+
+def isValidImg(imgName):
+    img = cv2.imread(imgName, cv2.IMREAD_UNCHANGED)
+    return img is not None
+
+def load(burnNames='all', dates='all'):
+    if burnNames == 'all':
+        burnNames = util.listdir_nohidden('data/')
+    if dates == 'all':
+        burns = {n:Burn.load(n, 'all') for n in burnNames}
+    else:
+        # assumes dates is a dict, with keys being burnNames and vals being dates
+        burns = {n:Burn.load(n, dates[n]) for n in burnNames}
+    return RawData(burns)
+
 class RawData(object):
 
     def __init__(self, burns):
         self.burns = burns
-
-    @staticmethod
-    def load(burnNames='all', dates='all'):
-        if burnNames == 'all':
-            burnNames = listdir_nohidden('data/')
-        if dates == 'all':
-            burns = {n:Burn.load(n, 'all') for n in burnNames}
-        else:
-            # assumes dates is a dict, with keys being burnNames and vals being dates
-            burns = {n:Burn.load(n, dates[n]) for n in burnNames}
-        return RawData(burns)
 
     def getWeather(self, burnName, date):
         burn = self.burns[burnName]
@@ -81,7 +118,7 @@ class Burn(object):
     @staticmethod
     def load(burnName, dates='all'):
         if dates == 'all':
-            dates = Day.allGoodDays(burnName)
+            dates = availableDates(burnName)
         days = {date:Day(burnName, date) for date in dates}
         return Burn(burnName, days)
 
@@ -113,7 +150,7 @@ class Day(object):
         return perim
 
     def loadEndingPerim(self):
-        guess1, guess2 = Day.nextDay(self.date)
+        guess1, guess2 = possibleNextDates(self.date)
         fname = 'data/{}/perims/{}.tif'.format(self.burnName, guess1)
         perim = cv2.imread(fname, cv2.IMREAD_UNCHANGED)
         if perim is None:
@@ -127,54 +164,7 @@ class Day(object):
     def __repr__(self):
         return "Day({},{})".format(self.burnName, self.date)
 
-    @staticmethod
-    def nextDay(dateString):
-        month, day = dateString[:2], dateString[2:]
-
-        nextDay = str(int(day)+1).zfill(2)
-        guess1 = month+nextDay
-
-        nextMonth = str(int(month)+1).zfill(2)
-        guess2 = nextMonth+'01'
-
-        return guess1, guess2
-
-    @staticmethod
-    def allGoodDays(burnName):
-        '''Given a fire, return a list of all dates that we can train on'''
-        directory = 'data/{}/'.format(burnName)
-
-        weatherFiles = listdir_nohidden(directory+'weather/')
-        weatherDates = [fname[:-len('.csv')] for fname in weatherFiles]
-
-        perimFiles = listdir_nohidden(directory+'perims/')
-        perimDates = [fname[:-len('.tif')] for fname in perimFiles if isValidImg(directory+'perims/'+fname)]
-
-        # we can only use days which have perimeter data on the following day
-        daysWithFollowingPerims = []
-        for d in perimDates:
-            nextDay1, nextDay2 = Day.nextDay(d)
-            if nextDay1 in perimDates or nextDay2 in perimDates:
-                daysWithFollowingPerims.append(d)
-
-        # now we have to verify that we have weather for these days as well
-        daysWithWeatherAndPerims = [d for d in daysWithFollowingPerims if d in weatherDates]
-        daysWithWeatherAndPerims.sort()
-        return daysWithWeatherAndPerims
-
-def isValidImg(imgName):
-    img = cv2.imread(imgName, cv2.IMREAD_UNCHANGED)
-    return img is not None
-
-def listdir_nohidden(path):
-    '''List all the files in a path that are not hidden (begin with a .)'''
-    result = []
-
-    for f in listdir(path):
-        if not f.startswith('.') and not f.startswith("_"):
-            result.append(f)
-    return result
 
 if __name__ == '__main__':
-    raw = RawData.load()
+    raw = load()
     print(raw.burns['riceRidge'].days['0731'].weather)
