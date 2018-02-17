@@ -11,6 +11,7 @@ class TestRawdata(unittest.TestCase):
 
     def test_load(self):
         self.raw = rawdata.load()
+        print("loaded the RawData:" + str(self.raw))
 
     def test_findAvailable(self):
         print("found these burns and dates:")
@@ -20,7 +21,6 @@ class TestRawdata(unittest.TestCase):
                 print('\t' + d)
 
 class TestDataset(unittest.TestCase):
-
 
     @unittest.skip("takes too long")
     def test_defualt(self):

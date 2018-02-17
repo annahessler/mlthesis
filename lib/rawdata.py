@@ -74,7 +74,10 @@ class RawData(object):
         return self.burns[burnName].days[date]
 
     def __repr__(self):
-        return "Dataset({})".format(list(self.burns.values()))
+        bs = []
+        for name, burn in sorted(self.burns.items()):
+            bs.append( name + ':' + str(sorted(burn.days.keys())) )
+        return "RawData({})".format(', '.join(bs))
 
 class Burn(object):
 
@@ -163,8 +166,3 @@ class Day(object):
 
     def __repr__(self):
         return "Day({},{})".format(self.burnName, self.date)
-
-
-if __name__ == '__main__':
-    raw = load()
-    print(raw.burns['riceRidge'].days['0731'].weather)

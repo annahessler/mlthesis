@@ -21,6 +21,7 @@ Use cases:
 Datasets:
 -open an existing Dataset
 -I can select which burns and dates to use, and this opens that raw data and makes a dataset from it
+-copy the dataset
 -filter out only vulnerablePixels
 -make the ratio of positive and negative samples the same
 -cut down to certain number of Points, using different schemes

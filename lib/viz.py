@@ -167,7 +167,7 @@ def save(img, name):
     fname = 'output/imgs/{}.png'.format(name)
     cv2.imwrite(fname, img)
 
-def saveModel(model):
+def saveModelDiagram(model):
     from keras.utils import plot_model
     timeString = strftime("%d%b%H:%M", localtime())
     fname = 'output/modelViz/{}.png'.format(timeString)

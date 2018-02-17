@@ -12,25 +12,100 @@ from lib import viz
 from keras.preprocessing.image import ImageDataGenerator
 # from model import InputSettings
 
+# create a class that represents a spatial and temporal location that a sample lives at
+Point = namedtuple('Point', ['burnName', 'date', 'location'])
+
+def load(fname=None):
+    if fname is None:
+        # give us the default dataset of everything
+        return Dataset(rawdata.load())
+    with open(fname, 'r') as fp:
+        data = rawdata.RawData.load()
+        pts = json.load(fp)
+        newBurnDict = {}
+        for burnName, dayDict in pts.items():
+            newDayDict = {}
+            for date, ptList in dayDict.items():
+                newPtList = [Point(name, date, tuple(loc)) for name, date, loc in ptList]
+                newDayDict[date] = newPtList
+            newBurnDict[burnName] = newDayDict
+        # pts = [Point(name, date, tuple(loc)) for name, date, loc in pts]
+        # print(pts)
+        return Dataset(data, newBurnDict)
+
+def load2(fname=None):
+    if fname is None:
+        # give us the default dataset of everything
+        return Dataset(rawdata.load())
+    try:
+        fname = fixFileName(fname)
+        print(fname)
+        result = np.load(fname)
+        return result
+    except e:
+        print(e)
+
+def fixFileName(fname):
+    if not fname.startswith("output/datasets/"):
+        fname = "output/datasets/" + fname
+    if not fname.endswith('.npz'):
+        fname = fname + '.npz'
+    return fname
+
 class Dataset(object):
     '''A set of Point objects'''
     VULNERABLE_RADIUS = 500
 
-    def __init__(self, data, points='all'):
-        print('creating new dataset')
+    def __init__(self, data=None, points='all'):
+        if data is None:
+            # get it all
+            data = rawdata.load()
         self.data = data
 
-        self.points = points
-        if points=='all':
-            points = Dataset.allPixels
-        if hasattr(points, '__call__'):
-            # points is a filter function
-            filterFunc = points
-            self.points = self.filterPoints(self.data, filterFunc)
-        if type(points) == list:
-            self.points = self.toDict(points)
+        self.points = self._decodePoints(points)
+        # if points=='all':
+        #     points = Dataset.allPixels
+        # if hasattr(points, '__call__'):
+        #     # points is a filter function
+        #     filterFunc = points
+        #     self.points = self.filterPoints(self.data, filterFunc)
+        # if type(points) == list:
+        #     self.points = self.toDict(points)
+        #
+        # assert type(self.points) == dict
 
-        assert type(self.points) == type({})
+
+    def _decodePoints(self, points):
+        '''Attempt to decode an input into the form of
+        {str: {str:(nparray, nparray)}}, representing
+        {burnName:{date:(xseries, yseries)}}'''
+        if type(points) == str and points == 'all':
+            points = {burnName:'all' for burnName in self.data.burns}
+        assert type(points) == dict, 'expected "all" or a dictionary for burns'
+        for burnName, dateDict in points.items():
+            assert burnName in self.data.burns, 'Could not find burn {} in RawData {}'.format(burnName, self.data)
+            if type(dateDict) == str and dateDict == 'all':
+                dateDict = {date:'all' for date in self.data.burns[burnName].days}
+                points[burnName] = dateDict
+            for date, series in dateDict.items():
+                assert date in self.data.burns[burnName].days, 'Could not find date {} in self.data.burns[{}].days'.format(date, burnName)
+                if type(series) == str and series == 'all':
+                    perim = self.data.burns[burnName].days[date].startingPerim
+                    series = np.indices(perim.shape).reshape(2,perim.size)
+                    dateDict[date] = series
+        return points
+
+    def copy(self):
+        '''the underlying data doesn't need to be copied,
+        but the dict of points does, since they may change'''
+        newPoints = {}
+        for burnName in self.points:
+            burn = self.points[burnName]
+            d = {}
+            for date in burn:
+                d[date] = burn[date].copy()
+            newPoints[burnName] = d
+        return Dataset(self.data, newPoints)
 
     def getUsedBurnNamesAndDates(self):
         results = []
@@ -66,7 +141,7 @@ class Dataset(object):
         if not fname.startswith("output/datasets/"):
             fname = "output/datasets/" + fname
         if not fname.endswith('.json'):
-            fname = fname + '.'
+            fname = fname + '.json'
 
         class MyEncoder(json.JSONEncoder):
             def default(self, obj):
@@ -82,6 +157,12 @@ class Dataset(object):
         with open(fname, 'w') as fp:
             json.dump(self.points, fp, cls=MyEncoder, sort_keys=True, indent=4)
 
+    def save2(self, fname=None):
+        if fname is None:
+            fname = strftime("%d%b%H-%M", localtime())
+        fname = fixFileName(fname)
+        np.savez_compressed(fname, **self.points)
+
     @staticmethod
     def toList(pointDict):
         '''Flatten the point dictionary to a list of Points'''
@@ -96,7 +177,9 @@ class Dataset(object):
     @staticmethod
     def toDict(pointList):
         burns = {}
-        for p in pointList:
+
+        for i, p in enumerate(pointList):
+            print('\r[' + '-'*(i*50)//p +']')
             burnName, date, location = p
             if burnName not in burns:
                 burns[burnName] = {}
@@ -250,49 +333,3 @@ class Dataset(object):
     def __repr__(self):
         # shorten the string repr of self.points
         return "Dataset({}, with {} points)".format(self.data, len(self.toList(self.points)))
-
-# create a class that represents a spatial and temporal location that a sample lives at
-Point = namedtuple('Point', ['burnName', 'date', 'location'])
-
-def load(fname=None):
-    if fname is None:
-        # give us the default dataset of everything
-        return Dataset(rawdata.load())
-    with open(fname, 'r') as fp:
-        data = rawdata.RawData.load()
-        pts = json.load(fp)
-        newBurnDict = {}
-        for burnName, dayDict in pts.items():
-            newDayDict = {}
-            for date, ptList in dayDict.items():
-                newPtList = [Point(name, date, tuple(loc)) for name, date, loc in ptList]
-                newDayDict[date] = newPtList
-            newBurnDict[burnName] = newDayDict
-        # pts = [Point(name, date, tuple(loc)) for name, date, loc in pts]
-        # print(pts)
-        return Dataset(data, newBurnDict)
-
-
-
-if __name__ == '__main__':
-    d = rawdata.RawData.load()
-    img = d.burns['riceRidge'].layers['b']
-    masterDataSet = Dataset(d, points=Dataset.vulnerablePixels)
-    print(masterDataSet)
-    masterDataSet.points = masterDataSet.evenOutPositiveAndNegative()
-    print(masterDataSet)
-    train, validate, test = masterDataSet.split(ratios=[.6,.7])
-    print(train)
-    print(validate)
-    print(test)
-    p = Point('riceRidge', '0731', (20, 156))
-    # print(p)
-    inpset = InputSettings(['b'], AOIRadius=60)
-    s = Sample(d, p, inpset)
-    print(s)
-    w, aoi = s.getInputs()
-    startPerim = aoi[:,:,1]
-    viz.show(img, startPerim)
-    # viz.show()
-
-    print(s.getOutput())

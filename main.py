@@ -78,8 +78,17 @@ def example():
     res = viz.visualizePredictions(test, predictions)
     viz.showPredictions(res)
 
+def test():
+    # ds = dataset.Dataset()
+    # ds2 = ds.copy()
+    # ds.save2()
+    pass
 
-example()
+
+
+test()
+reloaded = dataset.load2("16Feb20-08.npz")
+# example()
 # train, val, test = openDatasets()
 
 # train.save('train')
