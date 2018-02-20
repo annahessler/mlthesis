@@ -79,15 +79,17 @@ def example():
     viz.showPredictions(res)
 
 def test():
-    # ds = dataset.Dataset()
+    ds = dataset.Dataset()
     # ds2 = ds.copy()
     # ds.save2()
+    for i in ds.getDays():
+        print(i)
     pass
 
 
 
 test()
-reloaded = dataset.load2("16Feb20-08.npz")
+# reloaded = dataset.load("16Feb20-08.npz")
 # example()
 # train, val, test = openDatasets()
 

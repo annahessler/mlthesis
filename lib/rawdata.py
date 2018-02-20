@@ -5,6 +5,7 @@ import cv2
 from lib import util
 
 PIXEL_SIZE = 30
+_memoedAllBurns = None
 
 def availableBurns():
     return util.listdir_nohidden('data/')
@@ -46,6 +47,9 @@ def isValidImg(imgName):
     return img is not None
 
 def load(burnNames='all', dates='all'):
+    global _memoedAllBurns
+    if _memoedAllBurns and burnNames=='all' and dates=='all':
+        return _memoedAllBurns
     if burnNames == 'all':
         burnNames = util.listdir_nohidden('data/')
     if dates == 'all':
@@ -53,7 +57,10 @@ def load(burnNames='all', dates='all'):
     else:
         # assumes dates is a dict, with keys being burnNames and vals being dates
         burns = {n:Burn.load(n, dates[n]) for n in burnNames}
-    return RawData(burns)
+    result = RawData(burns)
+    if burnNames=='all' and dates=='all':
+        _memoedAllBurns = result
+    return result
 
 class RawData(object):
 
@@ -81,9 +88,9 @@ class RawData(object):
 
 class Burn(object):
 
-    def __init__(self, name, days, layers=None):
+    def __init__(self, name, days=None, layers=None):
         self.name = name
-        self.days = days
+        self.days = {} if days is None else days
         self.layers = layers if layers is not None else self.loadLayers()
 
         # what is the height and width of a layer of data
@@ -120,49 +127,51 @@ class Burn(object):
 
     @staticmethod
     def load(burnName, dates='all'):
+        burn = Burn(burnName)
         if dates == 'all':
             dates = availableDates(burnName)
-        days = {date:Day(burnName, date) for date in dates}
-        return Burn(burnName, days)
+        days = {date:Day(burn, date) for date in dates}
+        burn.days = days
+        return burn
 
     def __repr__(self):
         return "Burn({}, {})".format(self.name, [d.date for d in self.days.values()])
 
 class Day(object):
 
-    def __init__(self, burnName, date, weather=None, startingPerim=None, endingPerim=None):
-        self.burnName = burnName
+    def __init__(self, burn, date, weather=None, startingPerim=None, endingPerim=None):
+        self.burn = burn
         self.date = date
         self.weather = weather             if weather       is not None else self.loadWeather()
         self.startingPerim = startingPerim if startingPerim is not None else self.loadStartingPerim()
         self.endingPerim = endingPerim     if endingPerim   is not None else self.loadEndingPerim()
 
     def loadWeather(self):
-        fname = 'data/{}/weather/{}.csv'.format(self.burnName, self.date)
+        fname = 'data/{}/weather/{}.csv'.format(self.burn.name, self.date)
         # the first row is the headers, and only cols 4-11 are actual data
         data = np.loadtxt(fname, skiprows=1, usecols=range(5,12), delimiter=',').T
         # now data is 2D array
         return data
 
     def loadStartingPerim(self):
-        fname = 'data/{}/perims/{}.tif'.format(self.burnName, self.date)
+        fname = 'data/{}/perims/{}.tif'.format(self.burn.name, self.date)
         perim = cv2.imread(fname, cv2.IMREAD_UNCHANGED)
         if perim is None:
-            raise RuntimeError('Could not find a perimeter for the fire {} for the day {}'.format(self.burnName, self.date))
+            raise RuntimeError('Could not find a perimeter for the fire {} for the day {}'.format(self.burn.name, self.date))
         perim[perim!=0] = 255
         return perim
 
     def loadEndingPerim(self):
         guess1, guess2 = possibleNextDates(self.date)
-        fname = 'data/{}/perims/{}.tif'.format(self.burnName, guess1)
+        fname = 'data/{}/perims/{}.tif'.format(self.burn.name, guess1)
         perim = cv2.imread(fname, cv2.IMREAD_UNCHANGED)
         if perim is None:
             # overflowed the month, that file didnt exist
-            fname = 'data/{}/perims/{}.tif'.format(self.burnName, guess2)
+            fname = 'data/{}/perims/{}.tif'.format(self.burn.name, guess2)
             perim = cv2.imread(fname, cv2.IMREAD_UNCHANGED)
             if perim is None:
-                raise RuntimeError('Could not open a perimeter for the fire {} for the day {} or {}'.format(self.burnName, guess1, guess2))
+                raise RuntimeError('Could not open a perimeter for the fire {} for the day {} or {}'.format(self.burn.name, guess1, guess2))
         return perim
 
     def __repr__(self):
-        return "Day({},{})".format(self.burnName, self.date)
+        return "Day({},{})".format(self.burn.name, self.date)

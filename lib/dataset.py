@@ -15,35 +15,35 @@ from keras.preprocessing.image import ImageDataGenerator
 # create a class that represents a spatial and temporal location that a sample lives at
 Point = namedtuple('Point', ['burnName', 'date', 'location'])
 
+# def load(fname=None):
+#     if fname is None:
+#         # give us the default dataset of everything
+#         return Dataset(rawdata.load())
+#     with open(fname, 'r') as fp:
+#         data = rawdata.RawData.load()
+#         pts = json.load(fp)
+#         newBurnDict = {}
+#         for burnName, dayDict in pts.items():
+#             newDayDict = {}
+#             for date, ptList in dayDict.items():
+#                 newPtList = [Point(name, date, tuple(loc)) for name, date, loc in ptList]
+#                 newDayDict[date] = newPtList
+#             newBurnDict[burnName] = newDayDict
+#         # pts = [Point(name, date, tuple(loc)) for name, date, loc in pts]
+#         # print(pts)
+#         return Dataset(data, newBurnDict)
+
 def load(fname=None):
     if fname is None:
         # give us the default dataset of everything
         return Dataset(rawdata.load())
-    with open(fname, 'r') as fp:
-        data = rawdata.RawData.load()
-        pts = json.load(fp)
-        newBurnDict = {}
-        for burnName, dayDict in pts.items():
-            newDayDict = {}
-            for date, ptList in dayDict.items():
-                newPtList = [Point(name, date, tuple(loc)) for name, date, loc in ptList]
-                newDayDict[date] = newPtList
-            newBurnDict[burnName] = newDayDict
-        # pts = [Point(name, date, tuple(loc)) for name, date, loc in pts]
-        # print(pts)
-        return Dataset(data, newBurnDict)
-
-def load2(fname=None):
-    if fname is None:
-        # give us the default dataset of everything
-        return Dataset(rawdata.load())
-    try:
-        fname = fixFileName(fname)
-        print(fname)
-        result = np.load(fname)
-        return result
-    except e:
-        print(e)
+    fname = fixFileName(fname)
+    with np.load(fname) as archive:
+        # np.load gives us back a weird structure.
+        # we need structure of {burnName:{date:nparray}}
+        d = dict(archive)
+        pointList = {burnName:d[burnName][()] for burnName in d}
+        return Dataset(data=None, points=pointList)
 
 def fixFileName(fname):
     if not fname.startswith("output/datasets/"):
@@ -127,37 +127,42 @@ class Dataset(object):
 
     def __len__(self):
         total = 0
-        for burnName, dayDict in self.points.items():
-            for ptList in dayDict.values():
-                total += len(ptList)
+        for dayDict in self.points.values():
+            for series in dayDict.values():
+                total += series.shape[1]
         return total
+    #
+    # def save(self, fname=None):
+    #     timeString = strftime("%d%b%H:%M", localtime())
+    #     if fname is None:
+    #         fname = timeString
+    #     else:
+    #         fname = fname + timeString
+    #     if not fname.startswith("output/datasets/"):
+    #         fname = "output/datasets/" + fname
+    #     if not fname.endswith('.json'):
+    #         fname = fname + '.json'
+    #
+    #     class MyEncoder(json.JSONEncoder):
+    #         def default(self, obj):
+    #             if isinstance(obj, np.integer):
+    #                 return int(obj)
+    #             elif isinstance(obj, np.floating):
+    #                 return float(obj)
+    #             elif isinstance(obj, np.ndarray):
+    #                 return obj.tolist()
+    #             else:
+    #                 return super(MyEncoder, self).default(obj)
+    #
+    #     with open(fname, 'w') as fp:
+    #         json.dump(self.points, fp, cls=MyEncoder, sort_keys=True, indent=4)
+
+    def getDays(self):
+        for burnName, dayDict in self.points.items():
+            for date, pointMask in dayDict.items():
+                yield self.data.burns[burnName].days[date], pointMask
 
     def save(self, fname=None):
-        timeString = strftime("%d%b%H:%M", localtime())
-        if fname is None:
-            fname = timeString
-        else:
-            fname = fname + timeString
-        if not fname.startswith("output/datasets/"):
-            fname = "output/datasets/" + fname
-        if not fname.endswith('.json'):
-            fname = fname + '.json'
-
-        class MyEncoder(json.JSONEncoder):
-            def default(self, obj):
-                if isinstance(obj, np.integer):
-                    return int(obj)
-                elif isinstance(obj, np.floating):
-                    return float(obj)
-                elif isinstance(obj, np.ndarray):
-                    return obj.tolist()
-                else:
-                    return super(MyEncoder, self).default(obj)
-
-        with open(fname, 'w') as fp:
-            json.dump(self.points, fp, cls=MyEncoder, sort_keys=True, indent=4)
-
-    def save2(self, fname=None):
         if fname is None:
             fname = strftime("%d%b%H-%M", localtime())
         fname = fixFileName(fname)
@@ -330,6 +335,12 @@ class Dataset(object):
         ys, xs = np.where(border)
         return list(zip(ys, xs))
 
+    def __eq__(self, other):
+        if isinstance(other, Dataset):
+            return self.points == other.points
+        else:
+            return NotImplemented
+
     def __repr__(self):
         # shorten the string repr of self.points
-        return "Dataset({}, with {} points)".format(self.data, len(self.toList(self.points)))
+        return "Dataset({}, with {} points)".format(self.data, len(self))
