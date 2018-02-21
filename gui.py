@@ -8,8 +8,10 @@ with open('basicgui.py', 'w') as pyfile:
     uic.compileUi('basicgui.ui', pyfile)
 import basicgui
 
-from lib import rawdata, dataset
+from lib import rawdata
+from lib import dataset
 from lib import util
+from lib import model
 
 class GUI(basicgui.Ui_GUI, QtCore.QObject):
 
@@ -65,7 +67,8 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
             return
         self.modelLineEdit.setText(fname)
         self.model = model.load(fname)
-        
+        img = viz.renderModel(self.model)
+        self.showImage(self.modelDisplay, img)
 
 
     def predict(self):

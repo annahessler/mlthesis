@@ -95,9 +95,9 @@ class Ui_GUI(object):
         self.modelBrowseButton.setObjectName("modelBrowseButton")
         self.horizontalLayout_2.addWidget(self.modelBrowseButton)
         self.verticalLayout_3.addLayout(self.horizontalLayout_2)
-        self.modelLabel_3 = QtWidgets.QLabel(self.tab_2)
-        self.modelLabel_3.setObjectName("modelLabel_3")
-        self.verticalLayout_3.addWidget(self.modelLabel_3)
+        self.modelDisplay = QtWidgets.QLabel(self.tab_2)
+        self.modelDisplay.setObjectName("modelDisplay")
+        self.verticalLayout_3.addWidget(self.modelDisplay)
         self.verticalLayout_8.addLayout(self.verticalLayout_3)
         self.tabWidget.addTab(self.tab_2, "")
         self.tab_3 = QtWidgets.QWidget()
@@ -158,7 +158,7 @@ class Ui_GUI(object):
         self.modelLabel.setBuddy(self.modelBrowseButton)
 
         self.retranslateUi(GUI)
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(GUI)
 
     def retranslateUi(self, GUI):
@@ -171,7 +171,7 @@ class Ui_GUI(object):
         self.modelLabel.setText(_translate("GUI", "Model:"))
         self.modelLineEdit.setText(_translate("GUI", "None set..."))
         self.modelBrowseButton.setText(_translate("GUI", "Browse..."))
-        self.modelLabel_3.setText(_translate("GUI", "TextLabel"))
+        self.modelDisplay.setText(_translate("GUI", "TextLabel"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("GUI", "Model"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_3), _translate("GUI", "Train"))
         self.predictButton.setText(_translate("GUI", "Predict!"))

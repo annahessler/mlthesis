@@ -34,7 +34,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -151,7 +151,7 @@
            </layout>
           </item>
           <item>
-           <widget class="QLabel" name="modelLabel_3">
+           <widget class="QLabel" name="modelDisplay">
             <property name="text">
              <string>TextLabel</string>
             </property>
