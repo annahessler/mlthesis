@@ -179,12 +179,13 @@ def save(img, name):
     cv2.imwrite(fname, img)
 
 def renderModel(model):
+    kmodel = model.kerasModel
     import os
     from keras.utils import plot_model
     timeString = strftime("%d%b%H:%M", localtime())
     fname = 'output/modelViz/{}.png'.format(timeString)
     try:
-        plot_model(model, to_file=fname, show_shapes=True)
+        plot_model(kmodel, to_file=fname, show_shapes=True)
         img = cv2.imread(fname)
         return img
     finally:

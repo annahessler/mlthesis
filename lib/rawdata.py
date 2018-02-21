@@ -7,44 +7,7 @@ from lib import util
 PIXEL_SIZE = 30
 _memoedAllBurns = None
 
-def availableBurns():
-    return util.listdir_nohidden('data/')
 
-def availableDates(burnName):
-    '''Given a fire, return a list of all dates that we can train on'''
-    directory = 'data/{}/'.format(burnName)
-
-    weatherFiles = util.listdir_nohidden(directory+'weather/')
-    weatherDates = [fname[:-len('.csv')] for fname in weatherFiles]
-
-    perimFiles = util.listdir_nohidden(directory+'perims/')
-    perimDates = [fname[:-len('.tif')] for fname in perimFiles if isValidImg(directory+'perims/'+fname)]
-
-    # we can only use days which have perimeter data on the following day
-    daysWithFollowingPerims = []
-    for d in perimDates:
-        nextDay1, nextDay2 = possibleNextDates(d)
-        if nextDay1 in perimDates or nextDay2 in perimDates:
-            daysWithFollowingPerims.append(d)
-
-    # now we have to verify that we have weather for these days as well
-    daysWithWeatherAndPerims = [d for d in daysWithFollowingPerims if d in weatherDates]
-    daysWithWeatherAndPerims.sort()
-    return daysWithWeatherAndPerims
-
-def possibleNextDates(dateString):
-    month, day = dateString[:2], dateString[2:]
-
-    nextDay = str(int(day)+1).zfill(2)
-    guess1 = month+nextDay
-
-    nextMonth = str(int(month)+1).zfill(2)
-    guess2 = nextMonth+'01'
-    return guess1, guess2
-
-def isValidImg(imgName):
-    img = cv2.imread(imgName, cv2.IMREAD_UNCHANGED)
-    return img is not None
 
 def load(burnNames='all', dates='all'):
     global _memoedAllBurns
@@ -130,7 +93,7 @@ class Burn(object):
     def load(burnName, dates='all'):
         burn = Burn(burnName)
         if dates == 'all':
-            dates = availableDates(burnName)
+            dates = util.availableDates(burnName)
         days = {date:Day(burn, date) for date in dates}
         burn.days = days
         return burn
@@ -163,7 +126,7 @@ class Day(object):
         return perim
 
     def loadEndingPerim(self):
-        guess1, guess2 = possibleNextDates(self.date)
+        guess1, guess2 = util.possibleNextDates(self.date)
         fname = 'data/{}/perims/{}.tif'.format(self.burn.name, guess1)
         perim = cv2.imread(fname, cv2.IMREAD_UNCHANGED)
         if perim is None:

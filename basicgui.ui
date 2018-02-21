@@ -11,7 +11,7 @@
     <x>0</x>
     <y>0</y>
     <width>588</width>
-    <height>637</height>
+    <height>666</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -34,9 +34,9 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
-      <widget class="QWidget" name="tab">
+      <widget class="QWidget" name="datasetTab">
        <attribute name="title">
         <string>Dataset</string>
        </attribute>
@@ -53,7 +53,7 @@
           <item>
            <widget class="QLabel" name="inputLabel">
             <property name="text">
-             <string>Dataset:</string>
+             <string>Burns and Dates:</string>
             </property>
            </widget>
           </item>
@@ -67,7 +67,7 @@
             </property>
             <layout class="QHBoxLayout" name="horizontalLayout_3">
              <item>
-              <widget class="QListView" name="datasetList">
+              <widget class="QTreeView" name="burnTree">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                  <horstretch>0</horstretch>
@@ -77,7 +77,7 @@
               </widget>
              </item>
              <item>
-              <widget class="QLabel" name="datasetView">
+              <widget class="QLabel" name="burnDisplay">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                  <horstretch>0</horstretch>
@@ -109,7 +109,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab_2">
+      <widget class="QWidget" name="modelTab">
        <attribute name="title">
         <string>Model</string>
        </attribute>
@@ -161,7 +161,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab_3">
+      <widget class="QWidget" name="trainTab">
        <attribute name="title">
         <string>Train</string>
        </attribute>
@@ -171,7 +171,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab_4">
+      <widget class="QWidget" name="predictTab">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
          <horstretch>0</horstretch>
@@ -188,6 +188,13 @@
            <widget class="QPushButton" name="predictButton">
             <property name="text">
              <string>Predict!</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="predictDisplay">
+            <property name="text">
+             <string>TextLabel</string>
             </property>
            </widget>
           </item>

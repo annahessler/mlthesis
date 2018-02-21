@@ -12,6 +12,7 @@ from lib import rawdata
 from lib import dataset
 from lib import util
 from lib import model
+from lib import viz
 
 class GUI(basicgui.Ui_GUI, QtCore.QObject):
 
@@ -42,20 +43,37 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
         self.mainwindow.show()
 
     def getFires(self):
-        burnFolder = 'data/'
+        burnFolder = os.path.abspath('data/')
         burns = util.listdir_nohidden(burnFolder)
         model = QtGui.QStandardItemModel()
-        for name in burns:
-            item = QtGui.QStandardItem(name)
-            item.setCheckable(True)
-            item.setFlags(QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
-            # check = Qt.Unchecked
-            # item.setCheckState(check)
-            item.setCheckable(True)
-            model.appendRow(item)
 
-        self.datasetList.setModel(model)
-        self.datasetList.clicked.connect(self.datasetClicked)
+        # model = QtWidgets.QFileSystemModel()
+        # model = QtWidgets.QFileSystemModel()
+        self.burnTree.setModel(model)
+        self.burnTree.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectItems)
+        self.burnTree.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
+        # model.setRootPath(burnFolder)
+        # self.burnTree.setRootIndex(model.index(burnFolder))
+        # parentItem = model.invisibleRootItem()
+        for name in burns:
+            burnItem = QtGui.QStandardItem(name)
+            model.appendRow(burnItem)
+            dates = util.availableDates(name)
+            for d in dates:
+                dateItem = QtGui.QStandardItem(d)
+                dateItem.setCheckable(True)
+                dateItem.setSelectable(True)
+                dateItem.setFlags(QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
+                dateItem.setCheckState(QtCore.Qt.Unchecked)
+                burnItem.appendRow(dateItem)
+            if len(dates):
+                burnItem.setCheckable(True)
+                burnItem.setFlags(QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
+                burnItem.setCheckState(QtCore.Qt.Unchecked)
+
+        # print(model.headerData())
+        model.setHorizontalHeaderLabels([])
+        # self.burnTree.clicked.connect(self.datasetClicked)
 
     def datasetClicked(self, item):
         print('clicked', item)
@@ -67,13 +85,14 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
             return
         self.modelLineEdit.setText(fname)
         self.model = model.load(fname)
+        print(fname)
         img = viz.renderModel(self.model)
         self.showImage(self.modelDisplay, img)
 
 
     def predict(self):
         selectedBurns = []
-        mod = self.datasetList.model()
+        mod = self.burnTree.model()
         for index in range(mod.rowCount()):
             i = mod.item(index)
             # print(i.checkState())

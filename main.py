@@ -6,6 +6,7 @@ from lib import metrics
 from lib import viz
 from lib import preprocess
 from lib import util
+from lib import model
 
 def openDatasets():
     data = rawdata.load()
@@ -79,12 +80,14 @@ def example():
     viz.showPredictions(res)
 
 def test():
-    ds = dataset.Dataset()
+    # ds = dataset.Dataset()
     # ds2 = ds.copy()
     # ds.save2()
-    for i in ds.getDays():
-        print(i)
-    print(ds)
+    # for i in ds.getDays():
+    #     print(i)
+    # print(ds)
+    m = model.load("/Users/nickcrews/Documents/CSThesis/mlthesis/models/15Nov09_41")
+    viz.renderModel(m)
     pass
 
 
