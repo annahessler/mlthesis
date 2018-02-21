@@ -121,6 +121,7 @@ class Burn(object):
         #the NV pixels occur outside of our AOIRadius
         # When exported from GIS they could take on a variety of values
         # susceptible = ['dem', 'r','g','b','nir',]
+        #TODO
         for name, layer in layers.items():
             pass
         return layers

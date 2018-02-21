@@ -84,6 +84,7 @@ def test():
     # ds.save2()
     for i in ds.getDays():
         print(i)
+    print(ds)
     pass
 
 

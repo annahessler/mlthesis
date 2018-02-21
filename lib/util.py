@@ -26,8 +26,11 @@ def openImg(fname):
         img = img.astype(np.float32)
     except AttributeError:
         raise ValueError("Could not open the file {} as an image".format(fname))
+
+    # go through all the channels
     channels = cv2.split(img)
     for c in channels:
+        # find any "invalid" pixels and set them to nan, so we can find them easily later
         c[invalidPixelIndices(c)] = np.nan
     return cv2.merge(channels)
 

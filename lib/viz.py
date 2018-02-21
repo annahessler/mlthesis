@@ -15,6 +15,17 @@ except:
 from lib import dataset
 from lib import util
 
+def renderDataset(dataset):
+    pass
+
+def renderUsedPixels(dataset, burnName, date):
+    # burnName, date = day.burn.name, day.date
+    mask = dataset.points[burnName][date]
+    # bg = day.burn.layers['dem']
+    # background = cv2.merge((bg,bg,bg))
+    return mask*127
+
+
 def renderPredictions(dataset, predictions):
     # print('predictions are', predictions.values())
     day2pred = {}

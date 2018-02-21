@@ -122,3 +122,4 @@ class Ui_GUI(object):
         self.actionSaveRec.setText(_translate("GUI", "Save"))
         self.actionSaveRecAs.setText(_translate("GUI", "Save As..."))
         self.actionExportSnippet.setText(_translate("GUI", "Export Snippet..."))
+
