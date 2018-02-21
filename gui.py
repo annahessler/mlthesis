@@ -33,7 +33,7 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
         self.predictButton.clicked.connect(self.predict)
 
         img = np.random.random((200,600))*255
-        self.showImage(img)
+        self.showImage(img,self.display)
 
         self.predictions = {}
 
@@ -60,11 +60,13 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
 
     def browseModels(self):
         # print('browsing!')
-        fname = QtGui.QFileDialog.getExistingDirectory(directory='models/', options=QtGui.QFileDialog.ShowDirsOnly)
+        fname = QtWidgets.QFileDialog.getExistingDirectory(directory='models/', options=QtWidgets.QFileDialog.ShowDirsOnly)
         if fname == '':
             return
         self.modelLineEdit.setText(fname)
-        print(fname, type(fname))
+        self.model = model.load(fname)
+        
+
 
     def predict(self):
         selectedBurns = []
@@ -92,11 +94,12 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
     def donePredicting():
         pass
 
-    def showImage(self, img):
+    @staticmethod
+    def showImage(img, label):
         h,w = img.shape[:2]
         QI=QtGui.QImage(img, w, h, QtGui.QImage.Format_Indexed8)
         # QI.setColorTable(COLORTABLE)
-        self.display.setPixmap(QtGui.QPixmap.fromImage(QI))
+        label.setPixmap(QtGui.QPixmap.fromImage(QI))
 
 class CheckableDirModel(QtWidgets.QDirModel):
     def __init__(self, parent=None):
