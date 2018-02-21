@@ -1,5 +1,6 @@
 import os
 import numpy as np
+from functools import wraps
 import cv2
 import multiprocessing
 from PyQt5 import QtCore, QtGui, QtWidgets, uic
@@ -14,6 +15,45 @@ from lib import dataset
 from lib import util
 from lib import model
 from lib import viz
+
+def async(*args):
+
+    assert len(args) in (0,1)
+    if len(args) == 1:
+        callback = args[0]
+    else:
+        callback = False
+
+    class Runner(QtCore.QThread):
+
+        if callback:
+            mySignal = QtCore.pyqtSignal(object,name="mySignal")
+
+        def __init__(self, target, *args, **kwargs):
+            super().__init__()
+            self._target = target
+            self._args = args
+            self._kwargs = kwargs
+            self.callback = callback
+
+        def run(self):
+            print('hi!')
+            result = self._target(*self._args, **self._kwargs)
+            print('done here')
+            if self.callback:
+                self.mySignal.emit(result)
+
+
+    def async_func(func):
+        runner = Runner(func)
+        # Keep the runner somewhere or it will be destroyed
+        func.__runner = runner
+        if callback:
+            runner.mySignal.connect(callback)
+        print('starting thread!')
+        runner.start()
+
+    return async_func
 
 class GUI(basicgui.Ui_GUI, QtCore.QObject):
 
@@ -40,6 +80,7 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
         # self.showImage(img,self.display)
         # self.predictions = {}
 
+        test()
         self.mainwindow.show()
 
     def initBurnTree(self):
@@ -110,35 +151,16 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
         except Exception as e:
             print('Could not open that dataset:', e)
 
+    def donePredicting(self, result):
+        print('got a result:', result)
+        pass
 
+    @async(donePredicting)
     def predict(self):
-        # selectedBurns = []
-        # mod = self.burnTree.model()
-        # for index in range(mod.rowCount()):
-        #     i = mod.item(index)
-        #     # print(i.checkState())
-        #     if i.checkState() == QtCore.Qt.Checked:
-        #         selectedBurns.append(i.text())
-        # print('opening the data for the burns,', selectedBurns)
-        # data = rawdata.RawData.load(burnNames=selectedBurns, dates='all')
-        # ds = dataset.Dataset(data, dataset.Dataset.vulnerablePixels)
-        def async():
-            return self.mode.predict(self.dataset)
-        # from lib import model
-        # modelFileName = self.modelLineEdit.text()
-        # print('loading model', modelFileName)
-        # mod = model.load(modelFileName)
-        # print(mod)
-        # predictions = mod.predict(ds)
-        # self.predictions.update(predictions)
-        # print('opening modelFileName!')
-        # todo: load keras model
-        # self.sigPredict.emit(modelFileName, burnName)
-        print('predict not NotImplemented yet...')
-        pass
-
-    def donePredicting():
-        pass
+        print('starting predictions...')
+        time.sleep(3)
+        print('done computing')
+        return 'this is the result'
 
     @staticmethod
     def showImage(img, label):
@@ -159,37 +181,20 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
         # QI.setColorTable(COLORTABLE)
         label.setPixmap(QtGui.QPixmap.fromImage(QI))
 
-class CheckableDirModel(QtWidgets.QDirModel):
-    def __init__(self, parent=None):
-        QtGui.QDirModel.__init__(self, None)
-        self.checks = {}
-
-    def data(self, index, role=QtCore.Qt.DisplayRole):
-        if role != QtCore.Qt.CheckStateRole:
-            return QtGui.QDirModel.data(self, index, role)
-        else:
-            if index.column() == 0:
-                return self.checkState(index)
-
-    def flags(self, index):
-        return QtGui.QDirModel.flags(self, index) | QtCore.Qt.ItemIsUserCheckable
-
-    def checkState(self, index):
-        if index in self.checks:
-            return self.checks[index]
-        else:
-            return QtCore.Qt.Unchecked
-
-    def setData(self, index, value, role):
-        if (role == QtCore.Qt.CheckStateRole and index.column() == 0):
-            self.checks[index] = value
-            self.emit(QtCore.SIGNAL("dataChanged(QModelIndex,QModelIndex)"), index, index)
-            return True
-
-        return QtGui.QDirModel.setData(self, index, value, role)
-
-def async(func, args, callback):
-    pass
+# def dec(func):
+#
+#     def newFunc():
+#         print('starting')
+#         func()
+#         print('done')
+#
+#     return newFunc
+#
+# @dec
+# def work():
+#     print('im doing work')
+#
+# work()
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication([])
