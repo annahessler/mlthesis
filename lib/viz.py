@@ -20,8 +20,21 @@ def renderDataset(dataset):
 
 def renderBurn(burn):
     dem = burn.layers['dem']
-    # return dem
     return util.normalize(dem)
+
+def renderDay(day):
+    '''render the start and end perimeters over the dem.
+
+    use HSV color space. value of pixel is DEM. Colored pixels
+    represent burned area. color determines if it was burned before or after'''
+    v = util.normalize(day.burn.layers['dem'])
+    h = np.ones_like(v, dtype=np.float32)*.1
+    s = (day.endingPerim*.8).astype(np.float32)
+    h[np.where(day.startingPerim)] = .3
+    hsv = cv2.merge((h,s,v))
+    hsv = (hsv*255).astype(np.uint8)
+    img = cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
+    return img
 
 def renderUsedPixels(dataset, burnName, date):
     # burnName, date = day.burn.name, day.date

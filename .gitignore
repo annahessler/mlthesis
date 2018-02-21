@@ -5,3 +5,4 @@ lib/__pycache__/*
 models/*
 data/*
 output/*
+datasets/*

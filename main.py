@@ -81,18 +81,19 @@ def example():
 
 def test():
     # ds = dataset.Dataset()
+    # ds.save()
     # ds2 = ds.copy()
     # ds.save2()
     # for i in ds.getDays():
     #     print(i)
     # print(ds)
-    m = model.load("/Users/nickcrews/Documents/CSThesis/mlthesis/models/15Nov09_41")
-    viz.renderModel(m)
+    # m = model.load("/Users/nickcrews/Documents/CSThesis/mlthesis/models/15Nov09_41")
+    # viz.renderModel(m)
     pass
 
 
 
-test()
+# test()
 # reloaded = dataset.load("16Feb20-08.npz")
 # example()
 # train, val, test = openDatasets()

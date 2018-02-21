@@ -26,37 +26,26 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
         self.setupUi(self.mainwindow)
 
         self.data = rawdata.load()
+        self.model = None
+        self.dataset = None
 
         # do stuff
-        # chooseBurnsModel = CheckableDirModel()
-        # self.burnTree.setModel(chooseBurnsModel)
-        # self.burnTree.setRootIndex(chooseBurnsModel.index(self.qdir.absoluteFilePath('/home/n_crews/Documents/thesis/mlthesis/data/')))
-        # self.burnTree.setRootIndex(chooseBurnsModel.index(QtGui.QDir.currentPath()));
         self.initBurnTree()
 
         self.modelBrowseButton.clicked.connect(self.browseModels)
+        self.loadDatasetButton.clicked.connect(self.browseDatasets)
         self.predictButton.clicked.connect(self.predict)
 
-        img = np.random.random((200,600))*255
-        self.showImage(img,self.display)
-        self.predictions = {}
+        # img = np.random.random((200,600))*255
+        # self.showImage(img,self.display)
+        # self.predictions = {}
 
         self.mainwindow.show()
 
     def initBurnTree(self):
         model = QtGui.QStandardItemModel()
         self.burnTree.setModel(model)
-        # burnFolder = os.path.abspath('data/')
         burns = sorted(self.data.burns.keys())
-
-
-        # model = QtWidgets.QFileSystemModel()
-        # model = QtWidgets.QFileSystemModel()
-        # self.burnTree.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectItems)
-        # self.burnTree.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
-        # model.setRootPath(burnFolder)
-        # self.burnTree.setRootIndex(model.index(burnFolder))
-        # parentItem = model.invisibleRootItem()
         for name in burns:
             burnItem = QtGui.QStandardItem(name)
             burnItem.setSelectable(True)
@@ -64,23 +53,13 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
             dates = sorted(self.data.burns[name].days.keys())
             for d in dates:
                 dateItem = QtGui.QStandardItem(d)
-                dateItem.setCheckable(True)
+                # dateItem.setCheckable(True)
+                # dateItem.setCheckState(QtCore.Qt.Unchecked)
                 dateItem.setSelectable(True)
-                # dateItem.setFlags(QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
-                dateItem.setCheckState(QtCore.Qt.Unchecked)
                 burnItem.appendRow(dateItem)
-            if len(dates):
-                burnItem.setCheckable(True)
-                # burnItem.setFlags(QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
-                burnItem.setCheckState(QtCore.Qt.Unchecked)
-
         self.burnTree.setColumnWidth(0, 300)
-        # self.burnTree.selectionChanged.connect(self.datasetClicked)
-        # self.burnTree.selectionChanged.connect(datasetClicked)
+        self.burnTree.expandAll()
         self.burnTree.selectionModel().selectionChanged.connect(self.burnDataSelected)
-        # print(model.headerData())
-        # model.setHorizontalHeaderLabels([])
-        # self.burnTree.clicked.connect(self.datasetClicked)
 
     def burnDataSelected(self, selected, deselected):
         idx = selected.indexes()[0]
@@ -94,7 +73,6 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
             self.displayDay(p.text(), item.text())
 
     def displayBurn(self, burnName):
-        print('displaying burn: ' + burnName)
         burn = self.data.burns[burnName]
         dem = viz.renderBurn(burn)
         SIZE = (400,300)
@@ -102,17 +80,36 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
         self.showImage(resized, self.burnDisplay)
 
     def displayDay(self, burnName, date):
-        print('displaying day:', burnName, date)
+        day = self.data.burns[burnName].days[date]
+        img = viz.renderDay(day)
+        SIZE = (400,300)
+        resized = cv2.resize(img, SIZE)
+        self.showImage(resized, self.burnDisplay)
+        # print('displaying day:', day)
 
     def browseModels(self):
         # print('browsing!')
         fname = QtWidgets.QFileDialog.getExistingDirectory(directory='models/', options=QtWidgets.QFileDialog.ShowDirsOnly)
-        if fname == '':
-            return
-        self.modelLineEdit.setText(fname)
-        self.model = model.load(fname)
-        img = viz.renderModel(self.model)
-        self.showImage(self.modelDisplay, img)
+        try:
+            self.model = model.load(fname)
+            self.modelLineEdit.setText(fname)
+            self.predictModelLineEdit.setText(fname)
+            self.trainModelLineEdit.setText(fname)
+        except:
+            print('could not open that model')
+        # img = viz.renderModel(self.model)
+        # self.showImage(self.modelDisplay, img)
+
+    def browseDatasets(self):
+        fname, _ = QtWidgets.QFileDialog.getOpenFileName(directory='datasets/', filter="numpy archives (*.npz)")
+        try:
+            self.dataset = dataset.load(fname)
+            self.datasetDatasetLineEdit.setText(fname)
+            self.trainDatasetLineEdit.setText(fname)
+            self.predictDatasetLineEdit.setText(fname)
+        except Exception as e:
+            print('Could not open that dataset:', e)
+
 
     def predict(self):
         selectedBurns = []
@@ -146,8 +143,16 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
             # convert from float to uint8
             img = (img*255).astype(np.uint8)
         assert img.dtype == np.uint8
-        h,w = img.shape[:2]
-        QI=QtGui.QImage(img, w, h, QtGui.QImage.Format_Indexed8)
+        if len(img.shape) > 2:
+            # color images
+            h, w, bytesPerComponent = img.shape
+            bytesPerLine = bytesPerComponent * w;
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            QI=QtGui.QImage(img.data, w, h, bytesPerLine, QtGui.QImage.Format_RGB888)
+        else:
+            # black and white images
+            h,w = img.shape[:2]
+            QI=QtGui.QImage(img, w, h, QtGui.QImage.Format_Indexed8)
         # QI.setColorTable(COLORTABLE)
         label.setPixmap(QtGui.QPixmap.fromImage(QI))
 

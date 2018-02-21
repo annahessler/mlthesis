@@ -46,8 +46,6 @@ def load(fname=None):
         return Dataset(data=None, points=pointList)
 
 def fixFileName(fname):
-    if not fname.startswith("output/datasets/"):
-        fname = "output/datasets/" + fname
     if not fname.endswith('.npz'):
         fname = fname + '.npz'
     return fname
@@ -160,6 +158,7 @@ class Dataset(object):
         if fname is None:
             fname = strftime("%d%b%H-%M", localtime())
         fname = fixFileName(fname)
+        print('retinrg tot save to ', fname)
         np.savez_compressed(fname, **self.points)
 
     # @staticmethod
