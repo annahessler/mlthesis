@@ -1,5 +1,6 @@
-import numpy as np
 import os
+import numpy as np
+import cv2
 import multiprocessing
 from PyQt5 import QtCore, QtGui, QtWidgets, uic
 
@@ -22,35 +23,35 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
         QtCore.QObject.__init__(self)
         self.app = app
         self.mainwindow = QtWidgets.QMainWindow()
-        self.qdir = QtCore.QDir()
         self.setupUi(self.mainwindow)
+
+        self.data = rawdata.load()
 
         # do stuff
         # chooseBurnsModel = CheckableDirModel()
         # self.burnTree.setModel(chooseBurnsModel)
         # self.burnTree.setRootIndex(chooseBurnsModel.index(self.qdir.absoluteFilePath('/home/n_crews/Documents/thesis/mlthesis/data/')))
         # self.burnTree.setRootIndex(chooseBurnsModel.index(QtGui.QDir.currentPath()));
-        self.getFires()
+        self.initBurnTree()
 
         self.modelBrowseButton.clicked.connect(self.browseModels)
         self.predictButton.clicked.connect(self.predict)
 
         img = np.random.random((200,600))*255
         self.showImage(img,self.display)
-
         self.predictions = {}
-        self.burnSelections = {}
 
         self.mainwindow.show()
 
-    def getFires(self):
-        burnFolder = os.path.abspath('data/')
-        burns = util.listdir_nohidden(burnFolder)
+    def initBurnTree(self):
         model = QtGui.QStandardItemModel()
+        self.burnTree.setModel(model)
+        # burnFolder = os.path.abspath('data/')
+        burns = sorted(self.data.burns.keys())
+
 
         # model = QtWidgets.QFileSystemModel()
         # model = QtWidgets.QFileSystemModel()
-        self.burnTree.setModel(model)
         # self.burnTree.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectItems)
         # self.burnTree.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         # model.setRootPath(burnFolder)
@@ -60,7 +61,7 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
             burnItem = QtGui.QStandardItem(name)
             burnItem.setSelectable(True)
             model.appendRow(burnItem)
-            dates = util.availableDates(name)
+            dates = sorted(self.data.burns[name].days.keys())
             for d in dates:
                 dateItem = QtGui.QStandardItem(d)
                 dateItem.setCheckable(True)
@@ -82,13 +83,9 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
         # self.burnTree.clicked.connect(self.datasetClicked)
 
     def burnDataSelected(self, selected, deselected):
-        # print('clicked', selected)
         idx = selected.indexes()[0]
-        # print(idx)
         item = self.burnTree.model().itemFromIndex(idx)
-        # print(item, item.text())
         p = item.parent()
-        # print(p)
         if p is None:
             # must have selected a burn, not a date
             self.displayBurn(item.text())
@@ -98,6 +95,11 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
 
     def displayBurn(self, burnName):
         print('displaying burn: ' + burnName)
+        burn = self.data.burns[burnName]
+        dem = viz.renderBurn(burn)
+        SIZE = (400,300)
+        resized = cv2.resize(dem, SIZE)
+        self.showImage(resized, self.burnDisplay)
 
     def displayDay(self, burnName, date):
         print('displaying day:', burnName, date)
@@ -109,10 +111,8 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
             return
         self.modelLineEdit.setText(fname)
         self.model = model.load(fname)
-        print(fname)
         img = viz.renderModel(self.model)
         self.showImage(self.modelDisplay, img)
-
 
     def predict(self):
         selectedBurns = []
@@ -142,6 +142,10 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
 
     @staticmethod
     def showImage(img, label):
+        if img.dtype.kind == 'f':
+            # convert from float to uint8
+            img = (img*255).astype(np.uint8)
+        assert img.dtype == np.uint8
         h,w = img.shape[:2]
         QI=QtGui.QImage(img, w, h, QtGui.QImage.Format_Indexed8)
         # QI.setColorTable(COLORTABLE)
