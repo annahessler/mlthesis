@@ -1,7 +1,7 @@
 import numpy as np
 import os
 import multiprocessing
-from pyqtgraph.Qt import QtCore, QtGui, uic
+from PyQt5 import QtCore, QtGui, QtWidgets, uic
 
 # dynamically generate the gui skeleton file from the ui file
 with open('basicgui.py', 'w') as pyfile:
@@ -9,6 +9,7 @@ with open('basicgui.py', 'w') as pyfile:
 import basicgui
 
 from lib import rawdata, dataset
+from lib import util
 
 class GUI(basicgui.Ui_GUI, QtCore.QObject):
 
@@ -17,7 +18,7 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
     def __init__(self, app):
         QtCore.QObject.__init__(self)
         self.app = app
-        self.mainwindow = QtGui.QMainWindow()
+        self.mainwindow = QtWidgets.QMainWindow()
         self.qdir = QtCore.QDir()
         self.setupUi(self.mainwindow)
 
@@ -40,11 +41,9 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
 
     def getFires(self):
         burnFolder = 'data/'
-        burns = os.listdir(burnFolder)
+        burns = util.listdir_nohidden(burnFolder)
         model = QtGui.QStandardItemModel()
         for name in burns:
-            if name.startswith('.'):
-                continue
             item = QtGui.QStandardItem(name)
             item.setCheckable(True)
             item.setFlags(QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
@@ -53,7 +52,11 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
             item.setCheckable(True)
             model.appendRow(item)
 
-        self.burnList.setModel(model)
+        self.datasetList.setModel(model)
+        self.datasetList.clicked.connect(self.datasetClicked)
+
+    def datasetClicked(self, item):
+        print('clicked', item)
 
     def browseModels(self):
         # print('browsing!')
@@ -65,7 +68,7 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
 
     def predict(self):
         selectedBurns = []
-        mod = self.burnList.model()
+        mod = self.datasetList.model()
         for index in range(mod.rowCount()):
             i = mod.item(index)
             # print(i.checkState())
@@ -95,7 +98,7 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
         # QI.setColorTable(COLORTABLE)
         self.display.setPixmap(QtGui.QPixmap.fromImage(QI))
 
-class CheckableDirModel(QtGui.QDirModel):
+class CheckableDirModel(QtWidgets.QDirModel):
     def __init__(self, parent=None):
         QtGui.QDirModel.__init__(self, None)
         self.checks = {}
@@ -128,7 +131,7 @@ def async(func, args, callback):
     pass
 
 if __name__ == '__main__':
-    app = QtGui.QApplication([])
+    app = QtWidgets.QApplication([])
     gui = GUI(app)
 
     app.exec_()
