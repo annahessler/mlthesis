@@ -112,27 +112,30 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
 
 
     def predict(self):
-        selectedBurns = []
-        mod = self.burnTree.model()
-        for index in range(mod.rowCount()):
-            i = mod.item(index)
-            # print(i.checkState())
-            if i.checkState() == QtCore.Qt.Checked:
-                selectedBurns.append(i.text())
-        print('opening the data for the burns,', selectedBurns)
-        data = rawdata.RawData.load(burnNames=selectedBurns, dates='all')
-        ds = dataset.Dataset(data, dataset.Dataset.vulnerablePixels)
-
-        from lib import model
-        modelFileName = self.modelLineEdit.text()
-        print('loading model', modelFileName)
-        mod = model.load(modelFileName)
-        print(mod)
+        # selectedBurns = []
+        # mod = self.burnTree.model()
+        # for index in range(mod.rowCount()):
+        #     i = mod.item(index)
+        #     # print(i.checkState())
+        #     if i.checkState() == QtCore.Qt.Checked:
+        #         selectedBurns.append(i.text())
+        # print('opening the data for the burns,', selectedBurns)
+        # data = rawdata.RawData.load(burnNames=selectedBurns, dates='all')
+        # ds = dataset.Dataset(data, dataset.Dataset.vulnerablePixels)
+        def async():
+            return self.mode.predict(self.dataset)
+        # from lib import model
+        # modelFileName = self.modelLineEdit.text()
+        # print('loading model', modelFileName)
+        # mod = model.load(modelFileName)
+        # print(mod)
         # predictions = mod.predict(ds)
         # self.predictions.update(predictions)
         # print('opening modelFileName!')
         # todo: load keras model
         # self.sigPredict.emit(modelFileName, burnName)
+        print('predict not NotImplemented yet...')
+        pass
 
     def donePredicting():
         pass
