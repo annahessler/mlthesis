@@ -74,6 +74,21 @@
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
+               <property name="selectionBehavior">
+                <enum>QAbstractItemView::SelectItems</enum>
+               </property>
+               <property name="indentation">
+                <number>20</number>
+               </property>
+               <property name="sortingEnabled">
+                <bool>true</bool>
+               </property>
+               <attribute name="headerVisible">
+                <bool>false</bool>
+               </attribute>
+               <attribute name="headerStretchLastSection">
+                <bool>false</bool>
+               </attribute>
               </widget>
              </item>
              <item>

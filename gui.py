@@ -39,6 +39,7 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
         self.showImage(img,self.display)
 
         self.predictions = {}
+        self.burnSelections = {}
 
         self.mainwindow.show()
 
@@ -50,33 +51,56 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
         # model = QtWidgets.QFileSystemModel()
         # model = QtWidgets.QFileSystemModel()
         self.burnTree.setModel(model)
-        self.burnTree.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectItems)
-        self.burnTree.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
+        # self.burnTree.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectItems)
+        # self.burnTree.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         # model.setRootPath(burnFolder)
         # self.burnTree.setRootIndex(model.index(burnFolder))
         # parentItem = model.invisibleRootItem()
         for name in burns:
             burnItem = QtGui.QStandardItem(name)
+            burnItem.setSelectable(True)
             model.appendRow(burnItem)
             dates = util.availableDates(name)
             for d in dates:
                 dateItem = QtGui.QStandardItem(d)
                 dateItem.setCheckable(True)
                 dateItem.setSelectable(True)
-                dateItem.setFlags(QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
+                # dateItem.setFlags(QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
                 dateItem.setCheckState(QtCore.Qt.Unchecked)
                 burnItem.appendRow(dateItem)
             if len(dates):
                 burnItem.setCheckable(True)
-                burnItem.setFlags(QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
+                # burnItem.setFlags(QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
                 burnItem.setCheckState(QtCore.Qt.Unchecked)
 
+        self.burnTree.setColumnWidth(0, 300)
+        # self.burnTree.selectionChanged.connect(self.datasetClicked)
+        # self.burnTree.selectionChanged.connect(datasetClicked)
+        self.burnTree.selectionModel().selectionChanged.connect(self.burnDataSelected)
         # print(model.headerData())
-        model.setHorizontalHeaderLabels([])
+        # model.setHorizontalHeaderLabels([])
         # self.burnTree.clicked.connect(self.datasetClicked)
 
-    def datasetClicked(self, item):
-        print('clicked', item)
+    def burnDataSelected(self, selected, deselected):
+        # print('clicked', selected)
+        idx = selected.indexes()[0]
+        # print(idx)
+        item = self.burnTree.model().itemFromIndex(idx)
+        # print(item, item.text())
+        p = item.parent()
+        # print(p)
+        if p is None:
+            # must have selected a burn, not a date
+            self.displayBurn(item.text())
+        else:
+            # selected a date
+            self.displayDay(p.text(), item.text())
+
+    def displayBurn(self, burnName):
+        print('displaying burn: ' + burnName)
+
+    def displayDay(self, burnName, date):
+        print('displaying day:', burnName, date)
 
     def browseModels(self):
         # print('browsing!')
