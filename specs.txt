@@ -1,0 +1,47 @@
+specs:
+
+A model should be a stable state machine: Train it for however long you want, and then the result is an atomic thing (a directory) that can be ported around, duplicated, etc. You can come back whenever to that directory whenever you want and keep training it.
+
+GUI:
+Viewing Predictions:
+-choose a trained model
+-choose a burn
+-be able to scroll through dates of burn
+-overlay actual results as well
+
+Training models:
+-Select a model
+-select burns and dates
+
+
+
+
+
+Use cases:
+Datasets:
+-open an existing Dataset
+-view the dataset
+-I can select which burns and dates to use, and this opens that raw data and makes a dataset from it
+-copy the dataset
+-filter out only vulnerablePixels
+-make the ratio of positive and negative samples the same
+-cut down to certain number of Points, using different schemes
+-split the dataset into training, validation, and testing sets
+-save the dataset to a certain name
+
+Models:
+-I can open a saved model. This includes the model architecture, weights, and the PreProcessor
+-I can save a model by name.
+-I can ask a model to predict the results of a certain dataset
+
+Training:
+-I choose a dataset and Model
+-train for iterations, time, convergence
+-this happens asynchronously, and a handle is returned to the trainer
+-I can check the status of the training or cancel it using the handle
+-weights are saved automatically
+
+preprocessing:
+-I can choose which burns and dates to apply processing to
+-I can choose the parameters, such as amount of scaling, noise added, etc.
+-How many copies to generate

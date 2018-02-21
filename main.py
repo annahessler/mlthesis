@@ -1,4 +1,3 @@
-
 import numpy as np
 
 from lib import rawdata
@@ -9,7 +8,7 @@ from lib import preprocess
 from lib import util
 
 def openDatasets():
-    data = rawdata.RawData.load(burnNames='all', dates='all')
+    data = rawdata.load()
     masterDataSet = dataset.Dataset(data, dataset.Dataset.vulnerablePixels)
     ptList = masterDataSet.sample(sampleEvenly=False)
     # masterDataSet.points = dataset.Dataset.toDict(ptList)
@@ -61,16 +60,16 @@ def example():
     except:
         print('about to import tkinter')
         from tkinter import Tk
-        from tkinter.filedialog import askopenfilename
+        from tkinter.filedialog import askopenfilename, askdirectory
         print('done!')
         root = Tk()
         print('Tked')
         root.withdraw()
         print('withdrawn')
-        modfname = askopenfilename(initialdir = "models/",title="choose a model")
-        datasetfname = askopenfilename(initialdir = "output/datasets",title="choose a dataset")
+        modfname = askdirectory(initialdir = "models/",title="choose a model")
+        datasetfname = askdirectory(initialdir = "output/datasets",title="choose a dataset")
         root.destroy()
-
+    print('here')
     test = dataset.openDataset(datasetfname)
     mod = getModel(modfname)
     # mod.fit(train, val)
@@ -79,8 +78,20 @@ def example():
     res = viz.visualizePredictions(test, predictions)
     viz.showPredictions(res)
 
+def test():
+    ds = dataset.Dataset()
+    # ds2 = ds.copy()
+    # ds.save2()
+    for i in ds.getDays():
+        print(i)
+    print(ds)
+    pass
 
-example()
+
+
+test()
+# reloaded = dataset.load("16Feb20-08.npz")
+# example()
 # train, val, test = openDatasets()
 
 # train.save('train')

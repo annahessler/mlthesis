@@ -1,17 +1,23 @@
+import os
+from time import localtime, strftime
+import csv
+
 import numpy as np
 import cv2
 from scipy.misc import imsave
 from scipy.ndimage import imread
 from libtiff import TIFF
-from time import localtime, strftime
-import csv
 
 try:
-    import matplotlib.pyplot as plt
+    import matplotlib
+    matplotlib.use("TkAgg")
+    from matplotlib import pyplot as plt
 except:
     pass
 
 def openImg(fname):
+    if not os.path.exists(fname):
+        raise ValueError("The file {} does not exist.".format(fname))
     if "/perims/" in fname:
         img = cv2.imread(fname, 0)
     else:
@@ -20,8 +26,11 @@ def openImg(fname):
         img = img.astype(np.float32)
     except AttributeError:
         raise ValueError("Could not open the file {} as an image".format(fname))
+
+    # go through all the channels
     channels = cv2.split(img)
     for c in channels:
+        # find any "invalid" pixels and set them to nan, so we can find them easily later
         c[invalidPixelIndices(c)] = np.nan
     return cv2.merge(channels)
 
@@ -46,6 +55,15 @@ def saveImg(fname, img):
     tiff.write_image(to_save)
     tiff.close()
     # cv2.imwrite(fname, to_save.astype(np.uint16))
+
+def listdir_nohidden(path):
+    '''List all the files in a path that are not hidden (begin with a .)'''
+    result = []
+
+    for f in os.listdir(path):
+        if not f.startswith('.') and not f.startswith("_"):
+            result.append(f)
+    return result
 
 def validPixelIndices(layer):
     validPixelMask = 1-invalidPixelMask(layer)
@@ -142,7 +160,9 @@ def openPredictions(fname):
 
 if __name__ == '__main__':
     import glob
-    import matplotlib.pyplot as plt
+    import matplotlib
+    matplotlib.use("TkAgg")
+    from matplotlib import pyplot as plt
     import random
     folder = 'data/**/perims/'
     types = ('*.tif', '*.png') # the tuple of file types

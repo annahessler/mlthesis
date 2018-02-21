@@ -4,7 +4,9 @@ import csv
 import numpy as np
 import cv2
 try:
-    import matplotlib.pyplot as plt
+    import matplotlib
+    matplotlib.use("TkAgg")
+    from matplotlib import pyplot as plt
     import matplotlib.animation as animation
     print('Successfully imported pyplot')
 except:
@@ -12,6 +14,17 @@ except:
 
 from lib import dataset
 from lib import util
+
+def renderDataset(dataset):
+    pass
+
+def renderUsedPixels(dataset, burnName, date):
+    # burnName, date = day.burn.name, day.date
+    mask = dataset.points[burnName][date]
+    # bg = day.burn.layers['dem']
+    # background = cv2.merge((bg,bg,bg))
+    return mask*127
+
 
 def renderPredictions(dataset, predictions):
     # print('predictions are', predictions.values())
@@ -165,7 +178,7 @@ def save(img, name):
     fname = 'output/imgs/{}.png'.format(name)
     cv2.imwrite(fname, img)
 
-def saveModel(model):
+def saveModelDiagram(model):
     from keras.utils import plot_model
     timeString = strftime("%d%b%H:%M", localtime())
     fname = 'output/modelViz/{}.png'.format(timeString)
