@@ -1,4 +1,5 @@
 import os
+import time
 import numpy as np
 from functools import wraps
 import cv2
@@ -15,45 +16,7 @@ from lib import dataset
 from lib import util
 from lib import model
 from lib import viz
-
-def async(*args):
-
-    assert len(args) in (0,1)
-    if len(args) == 1:
-        callback = args[0]
-    else:
-        callback = False
-
-    class Runner(QtCore.QThread):
-
-        if callback:
-            mySignal = QtCore.pyqtSignal(object,name="mySignal")
-
-        def __init__(self, target, *args, **kwargs):
-            super().__init__()
-            self._target = target
-            self._args = args
-            self._kwargs = kwargs
-            self.callback = callback
-
-        def run(self):
-            print('hi!')
-            result = self._target(*self._args, **self._kwargs)
-            print('done here')
-            if self.callback:
-                self.mySignal.emit(result)
-
-
-    def async_func(func):
-        runner = Runner(func)
-        # Keep the runner somewhere or it will be destroyed
-        func.__runner = runner
-        if callback:
-            runner.mySignal.connect(callback)
-        print('starting thread!')
-        runner.start()
-
-    return async_func
+from lib.async import async
 
 class GUI(basicgui.Ui_GUI, QtCore.QObject):
 
@@ -74,14 +37,15 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
 
         self.modelBrowseButton.clicked.connect(self.browseModels)
         self.loadDatasetButton.clicked.connect(self.browseDatasets)
-        self.predictButton.clicked.connect(self.predict)
+        self.predictButton.clicked.connect(self.predictButtonPressed)
 
         # img = np.random.random((200,600))*255
         # self.showImage(img,self.display)
         # self.predictions = {}
 
-        test()
         self.mainwindow.show()
+        # print('here!')
+        # self.predict()
 
     def initBurnTree(self):
         model = QtGui.QStandardItemModel()
@@ -151,16 +115,18 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
         except Exception as e:
             print('Could not open that dataset:', e)
 
+    def predictButtonPressed(self, checked=0):
+        self.predict()
+
     def donePredicting(self, result):
         print('got a result:', result)
-        pass
 
-    @async(donePredicting)
+    @async(callback=donePredicting)
     def predict(self):
-        print('starting predictions...')
+        print('starting work')
         time.sleep(3)
-        print('done computing')
-        return 'this is the result'
+        print('done with work')
+        return self, 'this is the result'
 
     @staticmethod
     def showImage(img, label):
@@ -180,21 +146,6 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
             QI=QtGui.QImage(img, w, h, QtGui.QImage.Format_Indexed8)
         # QI.setColorTable(COLORTABLE)
         label.setPixmap(QtGui.QPixmap.fromImage(QI))
-
-# def dec(func):
-#
-#     def newFunc():
-#         print('starting')
-#         func()
-#         print('done')
-#
-#     return newFunc
-#
-# @dec
-# def work():
-#     print('im doing work')
-#
-# work()
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication([])
