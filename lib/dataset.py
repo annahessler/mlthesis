@@ -45,6 +45,9 @@ def load(fname=None):
         pointList = {burnName:d[burnName][()] for burnName in d}
         return Dataset(data=None, points=pointList)
 
+def emptyDataset(rawdata):
+    return Dataset(data=rawdata, points={})
+
 def fixFileName(fname):
     if not fname.endswith('.npz'):
         fname = fname + '.npz'
@@ -81,6 +84,26 @@ class Dataset(object):
                     dateDict[date] = mask
         return points
 
+    def add(self, burnName, date):
+        assert burnName in self.data.burns, 'Could not find burn {} in RawData {}'.format(burnName, self.data)
+        assert date in self.data.burns[burnName].days, 'Could not find date {} in self.data.burns[{}].days'.format(date, burnName)
+        if burnName not in self.points:
+            self.points[burnName] = {}
+        if date in self.points[burnName]:
+            return #nothing to do
+        perim = self.data.burns[burnName].days[date].startingPerim
+        mask = np.ones_like(perim, dtype=np.uint8)
+        self.points[burnName][date] = mask
+
+    def remove(self, burnName, date):
+        if burnName not in self.points:
+            raise ValueError("burnName {} is not in this dataset".format(burnName))
+        if date not in self.points[burnName]:
+            raise ValueError("date {} is not in this dataset.points[{}]".format(date, burnName))
+        del self.points[burnName][date]
+        if len(self.points[burnName]) == 0:
+            del self.points[burnName]
+
     def copy(self):
         '''the underlying RawData object doesn't need to be copied,
         but the dict of masks does, since the masks may change'''
@@ -94,13 +117,9 @@ class Dataset(object):
         return Dataset(self.data, newPoints)
 
     def getUsedBurnNamesAndDates(self):
-        results = []
-        burnNames = self.points.keys()
-        for name in burnNames:
-            dates = self.points[name].keys()
-            for date in dates:
-                results.append((name,date))
-        return results
+        for name in self.points.keys():
+            for date in self.points[name].keys():
+                yield (name,date)
 
     def getAllLayers(self, layerName):
         result = {}
@@ -160,20 +179,15 @@ class Dataset(object):
     #             burns[burnName][date].append(p)
     #     return burns
 
-    # @staticmethod
-    # def filterPoints(data, filterFunction):
-    #     '''Return all the points which satisfy some filterFunction'''
-    #     points = {}
-    #     burns = data.burns.values()
-    #     for b in burns:
-    #         dictOfDays = {}
-    #         points[b.name] = dictOfDays
-    #         days = b.days.values()
-    #         for d in days:
-    #             # get every location that satisfies the condition
-    #             locations = filterFunction(b, d)
-    #             dictOfDays[d.date] = [Point(b.name,d.date,l) for l in locations]
-    #     return points
+    def filterPoints(self, filterFunction, **kwargs):
+        '''Return all the points which satisfy some filterFunction'''
+        newPoints = {}
+        for burnName, date in self.getUsedBurnNamesAndDates():
+            oldMask = self.points[burnName][date]
+            # get every location that satisfies the condition
+            day = self.data.burns[burnName].days[date]
+            newMask = filterFunction(day, **kwargs)
+            self.points[burnName][date] = np.logical_and(oldMask, newMask)
 
     # def evenOutPositiveAndNegative(self):
     #     '''Make it so our dataset is a more even mixture of yes and no outputs'''
@@ -290,16 +304,15 @@ class Dataset(object):
     # def allPixels(burn, day):
     #     return list(np.ndindex(burn.layerSize))
 
-    # @staticmethod
-    # def vulnerablePixels(burn, day, radius=VULNERABLE_RADIUS):
-    #     '''Return the indices of the pixels that close to the current fire perimeter'''
-    #     startingPerim = day.startingPerim
-    #     kernel = np.ones((3,3))
-    #     its = int(round((2*(radius/rawdata.PIXEL_SIZE)**2)**.5))
-    #     dilated = cv2.dilate(startingPerim, kernel, iterations=its)
-    #     border = dilated - startingPerim
-    #     ys, xs = np.where(border)
-    #     return list(zip(ys, xs))
+    @staticmethod
+    def vulnerablePixels(day, radius=VULNERABLE_RADIUS):
+        '''Return the indices of the pixels that close to the current fire perimeter'''
+        startingPerim = day.startingPerim
+        kernel = np.ones((3,3))
+        its = int(round((2*(radius/rawdata.PIXEL_SIZE)**2)**.5))
+        dilated = cv2.dilate(startingPerim, kernel, iterations=its)
+        border = dilated - startingPerim
+        return border
 
     def __len__(self):
         total = 0

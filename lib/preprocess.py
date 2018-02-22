@@ -24,28 +24,37 @@ class PreProcessor(object):
         '''Take a dataset and return the extracted inputs and outputs'''
         # create dictionaries mapping from burnName, date to weather
         metrics = calculateWeatherMetrics(dataset)
+        # print('metrics are', metrics)
         oneMetric = list(metrics.values())[0]
         assert len(oneMetric) == self.numWeatherInputs, "Your weather metric function must return the expected number of metrics"
 
         aois = getSpatialData(dataset, self.whichLayers, self.AOIRadius)
+        # print('aois are', aois)
         outs = getOutputs(dataset)
+        # print('outs are', outs)
 
         # convert the dictionaries into lists, then arrays
         w, i, o = [], [], []
-        ptList = dataset.toList(dataset.points)
-        for pt in ptList:
-            burnName, date, location = pt
-            w.append(metrics[burnName, date])
-            i.append(aois[burnName, date, location])
-            o.append(outs[burnName, date, location])
+        # ptList = dataset.toList(dataset.points)
+        for pt in dataset.getPoints():
+            burnName, date, (ys,xs) = pt
+            tiled = list(metrics[burnName, date]) * len(ys)
+            # print('tiled: ', tiled)
+            w.extend(tiled)
+            theseAois = aois[(burnName, date)]
+            # print('aois: ', aois)
+            i.extend(theseAois)
+            theseOuts = outs[(burnName, date)]
+            # print('outs:', outs)
+            o.extend(theseOuts)
         weatherInputs = np.array(w)
         imgInputs = np.array(i)
         outputs = np.array(o)
 
-        return ([weatherInputs, imgInputs], outputs), ptList
+        return ([weatherInputs, imgInputs], outputs)
 
 def calculateWeatherMetrics(dataset):
-    '''Return a dictionary mapping from (burnName, date) id's to a dictionary of named weather metrics.'''
+    '''Return a dictionary mapping from (burnName, date) id's to a list weather metrics.'''
     metrics = {}
     for burnName, date in dataset.getUsedBurnNamesAndDates():
         wm = dataset.data.getWeather(burnName, date)
@@ -63,7 +72,7 @@ def calculateWeatherMetrics(dataset):
     ids = list(metrics.keys())
     arr = np.array( [metrics[i] for i in ids] )
     normed = util.normalize(arr, axis=0)
-    metrics = {i:nums for (i,nums) in zip(ids, normed)}
+    metrics = dict(zip(ids, normed))
     return metrics
 
 def getSpatialData(dataset, whichLayers, AOIRadius):
@@ -179,13 +188,14 @@ def normalizeNonElevations(nonDems):
     return results
 
 def getOutputs(dataset):
-    return {(d.burn.name, d.date):d.endingPerim for d in dataset.getDays()}
-    # result = {}
-    # for pt in dataset.toList(dataset.points):
-    #     burnName, date, location = pt
-    #     out = dataset.data.getOutput(burnName, date, location)
-    #     result[(burnName, date, location)] = out
-    # return result
+    # return {(d.burn.name, d.date):d.endingPerim for d in dataset.getDays()}
+    result = {}
+    for pt in dataset.getPoints():
+        burnName, date, locations = pt
+        out = dataset.data.burns[burnName].days[date].endingPerim[locations]
+        # print('output is ', out)
+        result[(burnName, date)] = out
+    return result
 
 def stackAndPad(layerDict, whichLayers, dataset, AOIRadius):
     result = {}
@@ -208,15 +218,18 @@ def extract(padded, locations, AOIRadius):
     '''Assume padded is bordered by radius self.inputSettings.AOIRadius'''
     ys,xs = locations
     r = AOIRadius
-    loxs = r+(xs-r)
-    hixs = r+(xs+r+1)
     loys = r+(ys-r)
     hiys = r+(ys+r+1)
-    print(ys,loys, hiys)
-    aoi = padded[loys:hiys,loxs:hixs]
-    print(aoi)
+    loxs = r+(xs-r)
+    hixs = r+(xs+r+1)
+    aois = []
+    for loy,hiy,lox,hix in np.vstack((loys, hiys, loxs, hixs)).T:
+        # print(loy,hiy,lox,hix)
+        aoi = padded[loy:hiy, lox:hiy]
+        # print(aoi)
+        aois.append(aoi)
     # print(stacked.shape, padded.shape)s
-    return aoi
+    return aois
 
 # =================================================================
 # utility functions
