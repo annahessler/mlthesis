@@ -109,52 +109,52 @@ def load(modelFolder):
     return obj
 
 
-class FireModel(Model):
-
-    def __init__(self, preProcessor, weightsFileName=None):
-        self.preProcessor = preProcessor
-
-        kernelDiam = 2*self.preProcessor.AOIRadius+1
-        self.wb = Input((self.preProcessor.numWeatherInputs,),name='weatherInput')
-        self.ib = ImageBranch(len(self.preProcessor.whichLayers), kernelDiam)
-
-        # print('weather branch info:', self.wb.shape)
-        # print('image branch info:', self.ib.input_shape, self.ib.output_shape, self.ib.output)
-
-        concat = Concatenate(name='mergedBranches')([self.wb,self.ib.output])
-        out = Dense(1, kernel_initializer = 'normal', activation = 'sigmoid',name='output')(concat)
-        # print("concat and out info:", concat.shape, out.shape)
-        super().__init__([self.wb, self.ib.input], out)
-
-        # self.add(Concatenate([self.wb, self.ib]))
-        sgd = SGD(lr = 0.1, momentum = 0.9, decay = 0, nesterov = False)
-        #rms = RMSprop(lr=0.001, rho=0.9, epsilon=1e-08, decay=0.0)
-        self.compile(loss = 'binary_crossentropy', optimizer = sgd, metrics = ['accuracy'])
-
-        if weightsFileName is not None:
-            self.load_weights(weightsFileName)
-
-    def fit(self, training, validate, epochs=1):
-        # get the actual samples from the collection of points
-        (tinputs, toutputs), ptList = self.preProcessor.process(training)
-        (vinputs, voutputs), ptList = self.preProcessor.process(validate)
-        print('training on ', training)
-        history = super().fit(tinputs, toutputs, batch_size = 1000, epochs=80, validation_data=(vinputs, voutputs))
-
-        self.saveWeights()
-        return history
-
-    def saveWeights(self, fname=None):
-        if fname is None:
-            timeString = strftime("%d%b%H:%M", localtime())
-            fname = 'models/{}.h5'.format(timeString)
-        self.save_weights(fname)
-
-    def predict(self, dataset):
-        (inputs, outputs), ptList = self.preProcessor.process(dataset)
-        results = super().predict(inputs).flatten()
-        resultDict = {pt:pred for (pt, pred) in zip(ptList, results)}
-        return resultDict
+# class FireModel(Model):
+#
+#     def __init__(self, preProcessor, weightsFileName=None):
+#         self.preProcessor = preProcessor
+#
+#         kernelDiam = 2*self.preProcessor.AOIRadius+1
+#         self.wb = Input((self.preProcessor.numWeatherInputs,),name='weatherInput')
+#         self.ib = ImageBranch(len(self.preProcessor.whichLayers), kernelDiam)
+#
+#         # print('weather branch info:', self.wb.shape)
+#         # print('image branch info:', self.ib.input_shape, self.ib.output_shape, self.ib.output)
+#
+#         concat = Concatenate(name='mergedBranches')([self.wb,self.ib.output])
+#         out = Dense(1, kernel_initializer = 'normal', activation = 'sigmoid',name='output')(concat)
+#         # print("concat and out info:", concat.shape, out.shape)
+#         super().__init__([self.wb, self.ib.input], out)
+#
+#         # self.add(Concatenate([self.wb, self.ib]))
+#         sgd = SGD(lr = 0.1, momentum = 0.9, decay = 0, nesterov = False)
+#         #rms = RMSprop(lr=0.001, rho=0.9, epsilon=1e-08, decay=0.0)
+#         self.compile(loss = 'binary_crossentropy', optimizer = sgd, metrics = ['accuracy'])
+#
+#         if weightsFileName is not None:
+#             self.load_weights(weightsFileName)
+#
+#     def fit(self, training, validate, epochs=1):
+#         # get the actual samples from the collection of points
+#         (tinputs, toutputs), ptList = self.preProcessor.process(training)
+#         (vinputs, voutputs), ptList = self.preProcessor.process(validate)
+#         print('training on ', training)
+#         history = super().fit(tinputs, toutputs, batch_size = 1000, epochs=80, validation_data=(vinputs, voutputs))
+#
+#         self.saveWeights()
+#         return history
+#
+#     def saveWeights(self, fname=None):
+#         if fname is None:
+#             timeString = strftime("%d%b%H:%M", localtime())
+#             fname = 'models/{}.h5'.format(timeString)
+#         self.save_weights(fname)
+#
+#     def predict(self, dataset):
+#         (inputs, outputs), ptList = self.preProcessor.process(dataset)
+#         results = super().predict(inputs).flatten()
+#         resultDict = {pt:pred for (pt, pred) in zip(ptList, results)}
+#         return resultDict
 
 class OurModel(BaseModel):
 
@@ -165,11 +165,10 @@ class OurModel(BaseModel):
         pp = preprocess.PreProcessor(numWeatherInputs, usedLayers, AOIRadius)
 
         if kerasModel is None:
-            kerasModel = self.createModel(pp)
+            kerasModel = OurModel.createModel(pp)
 
         super().__init__(kerasModel, pp)
 
-    @staticmethod
     def createModel(pp):
         # make our keras Model
         kernelDiam = 2*pp.AOIRadius+1

@@ -22,10 +22,11 @@ class PreProcessor(object):
 
     def process(self, dataset):
         '''Take a dataset and return the extracted inputs and outputs'''
-        # create dictionaries mapping from Point to actual data from that Point
+        # create dictionaries mapping from burnName, date to weather
         metrics = calculateWeatherMetrics(dataset)
         oneMetric = list(metrics.values())[0]
         assert len(oneMetric) == self.numWeatherInputs, "Your weather metric function must return the expected number of metrics"
+
         aois = getSpatialData(dataset, self.whichLayers, self.AOIRadius)
         outs = getOutputs(dataset)
 
@@ -74,12 +75,11 @@ def getSpatialData(dataset, whichLayers, AOIRadius):
     paddedLayers = stackAndPad(layers, whichLayers, dataset, AOIRadius)
     # now extract out the aois around each point
     result = {}
-    for pt in dataset.toList(dataset.points):
-        burnName, date, location = pt
+    for burnName, date, locations in dataset.getPoints():
+        print(burnName, date, locations)
         padded = paddedLayers[(burnName, date)]
-        aoi = extract(padded, location, AOIRadius)
-        result[(burnName, date, location)] = aoi
-    # normalizeLayers(result)
+        aois = extract(padded, locations, AOIRadius)
+        result[(burnName, date)] = aois
     return result
 
 def normalizeLayers(layers):
@@ -179,12 +179,13 @@ def normalizeNonElevations(nonDems):
     return results
 
 def getOutputs(dataset):
-    result = {}
-    for pt in dataset.toList(dataset.points):
-        burnName, date, location = pt
-        out = dataset.data.getOutput(burnName, date, location)
-        result[(burnName, date, location)] = out
-    return result
+    return {(d.burn.name, d.date):d.endingPerim for d in dataset.getDays()}
+    # result = {}
+    # for pt in dataset.toList(dataset.points):
+    #     burnName, date, location = pt
+    #     out = dataset.data.getOutput(burnName, date, location)
+    #     result[(burnName, date, location)] = out
+    # return result
 
 def stackAndPad(layerDict, whichLayers, dataset, AOIRadius):
     result = {}
@@ -203,15 +204,17 @@ def stackAndPad(layerDict, whichLayers, dataset, AOIRadius):
         result[(burnName, date)] = padded
     return result
 
-def extract(padded, location, AOIRadius):
+def extract(padded, locations, AOIRadius):
     '''Assume padded is bordered by radius self.inputSettings.AOIRadius'''
-    y,x = location
+    ys,xs = locations
     r = AOIRadius
-    lox = r+(x-r)
-    hix = r+(x+r+1)
-    loy = r+(y-r)
-    hiy = r+(y+r+1)
-    aoi = padded[loy:hiy,lox:hix]
+    loxs = r+(xs-r)
+    hixs = r+(xs+r+1)
+    loys = r+(ys-r)
+    hiys = r+(ys+r+1)
+    print(ys,loys, hiys)
+    aoi = padded[loys:hiys,loxs:hixs]
+    print(aoi)
     # print(stacked.shape, padded.shape)s
     return aoi
 

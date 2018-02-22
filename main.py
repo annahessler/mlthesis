@@ -79,17 +79,9 @@ def example():
     res = viz.visualizePredictions(test, predictions)
     viz.showPredictions(res)
 
-def test():
-    # ds = dataset.Dataset()
-    # ds.save()
-    # ds2 = ds.copy()
-    # ds.save2()
-    # for i in ds.getDays():
-    #     print(i)
-    # print(ds)
-    # m = model.load("/Users/nickcrews/Documents/CSThesis/mlthesis/models/15Nov09_41")
-    # viz.renderModel(m)
-    pass
+a = np.arange(100).reshape((5,20))
+print(a)
+
 
 
 

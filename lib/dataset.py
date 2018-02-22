@@ -56,21 +56,9 @@ class Dataset(object):
 
     def __init__(self, data=None, points='all'):
         if data is None:
-            # get it all
             data = rawdata.load()
         self.data = data
-
         self.points = self._decodePoints(points)
-        # if points=='all':
-        #     points = Dataset.allPixels
-        # if hasattr(points, '__call__'):
-        #     # points is a filter function
-        #     filterFunc = points
-        #     self.points = self.filterPoints(self.data, filterFunc)
-        # if type(points) == list:
-        #     self.points = self.toDict(points)
-        #
-        # assert type(self.points) == dict
 
 
     def _decodePoints(self, points):
@@ -94,8 +82,8 @@ class Dataset(object):
         return points
 
     def copy(self):
-        '''the underlying data doesn't need to be copied,
-        but the dict of points does, since they may change'''
+        '''the underlying RawData object doesn't need to be copied,
+        but the dict of masks does, since the masks may change'''
         newPoints = {}
         for burnName in self.points:
             burn = self.points[burnName]
@@ -123,36 +111,21 @@ class Dataset(object):
             result[burnName] = layer
         return result
 
-    #
-    # def save(self, fname=None):
-    #     timeString = strftime("%d%b%H:%M", localtime())
-    #     if fname is None:
-    #         fname = timeString
-    #     else:
-    #         fname = fname + timeString
-    #     if not fname.startswith("output/datasets/"):
-    #         fname = "output/datasets/" + fname
-    #     if not fname.endswith('.json'):
-    #         fname = fname + '.json'
-    #
-    #     class MyEncoder(json.JSONEncoder):
-    #         def default(self, obj):
-    #             if isinstance(obj, np.integer):
-    #                 return int(obj)
-    #             elif isinstance(obj, np.floating):
-    #                 return float(obj)
-    #             elif isinstance(obj, np.ndarray):
-    #                 return obj.tolist()
-    #             else:
-    #                 return super(MyEncoder, self).default(obj)
-    #
-    #     with open(fname, 'w') as fp:
-    #         json.dump(self.points, fp, cls=MyEncoder, sort_keys=True, indent=4)
-
     def getDays(self):
+        for burnName, dayDict in self.points.items():
+            for date in dayDict:
+                yield self.data.burns[burnName].days[date]
+
+    def getDaysAndMasks(self):
         for burnName, dayDict in self.points.items():
             for date, pointMask in dayDict.items():
                 yield self.data.burns[burnName].days[date], pointMask
+
+    def getPoints(self):
+        for burnName, dayDict in self.points.items():
+            for date, pointMask in dayDict.items():
+                w = np.where(pointMask)
+                yield (burnName, date, w)
 
     def save(self, fname=None):
         if fname is None:

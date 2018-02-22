@@ -1,4 +1,6 @@
 import os
+# ignore the gross warnings
+os.environ["TF_CPP_MIN_LOG_LEVEL"]="3"
 import time
 import numpy as np
 from functools import wraps
@@ -44,8 +46,9 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
         # self.predictions = {}
 
         self.mainwindow.show()
-        # print('here!')
-        # self.predict()
+        self.useModel("/Users/nickcrews/Documents/CSThesis/mlthesis/models/15Nov09_41")
+        self.useDataset("/Users/nickcrews/Documents/CSThesis/mlthesis/datasets/21Feb11-42.npz")
+        self.predict()
 
     def initBurnTree(self):
         model = QtGui.QStandardItemModel()
@@ -95,6 +98,9 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
     def browseModels(self):
         # print('browsing!')
         fname = QtWidgets.QFileDialog.getExistingDirectory(directory='models/', options=QtWidgets.QFileDialog.ShowDirsOnly)
+        self.useModel(fname)
+
+    def useModel(self, fname):
         try:
             self.model = model.load(fname)
             self.modelLineEdit.setText(fname)
@@ -102,11 +108,12 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
             self.trainModelLineEdit.setText(fname)
         except:
             print('could not open that model')
-        # img = viz.renderModel(self.model)
-        # self.showImage(self.modelDisplay, img)
 
     def browseDatasets(self):
         fname, _ = QtWidgets.QFileDialog.getOpenFileName(directory='datasets/', filter="numpy archives (*.npz)")
+        self.useDataset(fname)
+
+    def useDataset(self, fname):
         try:
             self.dataset = dataset.load(fname)
             self.datasetDatasetLineEdit.setText(fname)
@@ -123,8 +130,8 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
 
     @async(callback=donePredicting)
     def predict(self):
-        print('starting work')
-        time.sleep(3)
+        print('starting predictions')
+        result = self.model.predict(self.dataset)
         print('done with work')
         return self, 'this is the result'
 
