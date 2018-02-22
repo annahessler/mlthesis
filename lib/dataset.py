@@ -150,7 +150,6 @@ class Dataset(object):
         if fname is None:
             fname = strftime("%d%b%H-%M", localtime())
         fname = fixFileName(fname)
-        print('retinrg tot save to ', fname)
         np.savez_compressed(fname, **self.points)
 
     # @staticmethod
@@ -187,7 +186,8 @@ class Dataset(object):
             # get every location that satisfies the condition
             day = self.data.burns[burnName].days[date]
             newMask = filterFunction(day, **kwargs)
-            self.points[burnName][date] = np.logical_and(oldMask, newMask)
+            anded = np.bitwise_and(oldMask, newMask)
+            self.points[burnName][date] = anded
 
     # def evenOutPositiveAndNegative(self):
     #     '''Make it so our dataset is a more even mixture of yes and no outputs'''

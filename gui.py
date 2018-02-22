@@ -84,11 +84,17 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
         # idx = modelIndex.indexes()[0]
         dateItem = self.burnTree.model().itemFromIndex(modelIndex)
         p = dateItem.parent()
+        if p is None:
+            # must have highlighted a burn, not clicked a day
+            return
         burnName, date = p.text(), dateItem.text()
-        if dateItem.checkState() == QtCore.Qt.Checked:
-            self.dataset.add(burnName, date)
-        else:
-            self.dataset.remove(burnName, date)
+        try:
+            if dateItem.checkState() == QtCore.Qt.Checked:
+                self.dataset.add(burnName, date)
+            else:
+                self.dataset.remove(burnName, date)
+        except:
+            pass
         self.displayDataset()
 
     def burnDataSelected(self, selected, deselected):
@@ -103,24 +109,33 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
             self.displayDay(p.text(), item.text())
 
     def datasetDaySelected(self,selected, deselected):
-        idx = selected.indexes()[0]
+        idxs = selected.indexes()
+        if len(idxs) == 0:
+            return #must have selected a burn from the dataset Tree
+        idx = idxs[0]
         item = self.datasetTree.model().itemFromIndex(idx)
         p = item.parent()
         burnName, date = p.text(), item.text()
         self.displayDatasetDay(burnName, date)
 
     def displayDatasetDay(self, burnName, date):
+        day = self.data.burns[burnName].days[date]
+        render = viz.renderDay(day)
+        resizedRender = cv2.resize(render, self.BURN_RENDER_SIZE)
         mask = self.dataset.points[burnName][date]
-        resized = cv2.resize(mask, self.BURN_RENDER_SIZE)*255
-        self.showImage(resized, self.datasetDisplay)
+        mask = cv2.merge((mask, mask, mask))
+        resizedMask = cv2.resize(mask, self.BURN_RENDER_SIZE)*255
+        overlayed = np.bitwise_or(resizedRender, resizedMask)
+        self.showImage(overlayed, self.datasetDisplay)
 
     def displayDataset(self):
+        self.dataset.filterPoints(self.dataset.vulnerablePixels)
         model = self.datasetTree.model()
         model.clear()
         burnNames = sorted(self.dataset.points.keys())
         for name in burnNames:
             burnItem = QtGui.QStandardItem(name)
-            burnItem.setSelectable(True)
+            burnItem.setSelectable(False)
             model.appendRow(burnItem)
             dates = sorted(self.dataset.points[name].keys())
             for d in dates:
