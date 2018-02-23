@@ -135,14 +135,31 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
         model.clear()
         burnNames = sorted(self.dataset.points.keys())
         for name in burnNames:
+            dates = sorted(self.dataset.points[name].keys())
+            if not dates:
+                continue
             burnItem = QtGui.QStandardItem(name)
             burnItem.setSelectable(False)
             model.appendRow(burnItem)
-            dates = sorted(self.dataset.points[name].keys())
             for d in dates:
                 dateItem = QtGui.QStandardItem(d)
                 dateItem.setSelectable(True)
                 burnItem.appendRow(dateItem)
+
+        root = self.burnTree.model().invisibleRootItem()
+        for burnIdx in range(root.rowCount()):
+            burnItem = root.child(burnIdx)
+            if burnItem.text() in self.dataset.points:
+                usedDates = self.dataset.points[burnItem.text()].keys()
+            else:
+                usedDates = []
+            for dayIdx in range(burnItem.rowCount()):
+                dateItem = burnItem.child(dayIdx)
+                if dateItem.text() in usedDates:
+                    dateItem.setCheckState(QtCore.Qt.Checked)
+                else:
+                    dateItem.setCheckState(QtCore.Qt.Unchecked)
+
         self.datasetTree.expandAll()
 
     def displayBurn(self, burnName):
@@ -161,6 +178,8 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
     def browseModels(self):
         # print('browsing!')
         fname = QtWidgets.QFileDialog.getExistingDirectory(directory='models/', options=QtWidgets.QFileDialog.ShowDirsOnly)
+        if fname == '':
+            return
         self.useModel(fname)
 
     def useModel(self, fname):
@@ -175,6 +194,8 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
 
     def browseDatasets(self):
         fname, _ = QtWidgets.QFileDialog.getOpenFileName(directory='datasets/', filter="numpy archives (*.npz)")
+        if fname == '':
+            return
         self.useDataset(fname)
 
     def useDataset(self, fname):
@@ -189,14 +210,16 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
         self.displayDataset()
 
     def saveDataset(self):
+        if self.dataset is None:
+            print('No dataset loaded!')
+            return
+        fname, _ = QtWidgets.QFileDialog.getSaveFileName(directory='datasets/')
+        if fname == '':
+            return
         try:
-            if self.dataset is None:
-                raise Exception
-            else:
-                fname, _ = QtWidgets.QFileDialog.getSaveFileName(directory='datasets/')
-                dataset.Dataset.save(fname)
+            self.dataset.save(fname)
         except Exception as e:
-            print("ERROR: No Dataset Loaded.")
+            print("ERROR: couldn't save the dataset {} as {}".format(self.dataset, fname))
 
     def predictButtonPressed(self, checked=0):
         self.predict()
