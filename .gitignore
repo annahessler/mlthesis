@@ -3,7 +3,12 @@
 
 lib/__pycache__/*
 models/*
+!models/.placeholder
 data/*
+!data/.placeholder
 output/*
+!output/.placeholder
 datasets/*
-processed/*/*.npz
+!datasets/.placeholder
+processed/*
+!processed/.placeholder
