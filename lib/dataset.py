@@ -61,7 +61,7 @@ class Dataset(object):
         if data is None:
             data = rawdata.load()
         self.data = data
-        self.points = self._decodePoints(points)
+        self.masks = self._decodePoints(points)
 
 
     def _decodePoints(self, points):
@@ -87,29 +87,29 @@ class Dataset(object):
     def add(self, burnName, date):
         assert burnName in self.data.burns, 'Could not find burn {} in RawData {}'.format(burnName, self.data)
         assert date in self.data.burns[burnName].days, 'Could not find date {} in self.data.burns[{}].days'.format(date, burnName)
-        if burnName not in self.points:
-            self.points[burnName] = {}
-        if date in self.points[burnName]:
+        if burnName not in self.masks:
+            self.masks[burnName] = {}
+        if date in self.masks[burnName]:
             return #nothing to do
         perim = self.data.burns[burnName].days[date].startingPerim
         mask = np.ones_like(perim, dtype=np.uint8)
-        self.points[burnName][date] = mask
+        self.masks[burnName][date] = mask
 
     def remove(self, burnName, date):
-        if burnName not in self.points:
+        if burnName not in self.masks:
             raise ValueError("burnName {} is not in this dataset".format(burnName))
-        if date not in self.points[burnName]:
-            raise ValueError("date {} is not in this dataset.points[{}]".format(date, burnName))
-        del self.points[burnName][date]
-        if len(self.points[burnName]) == 0:
-            del self.points[burnName]
+        if date not in self.masks[burnName]:
+            raise ValueError("date {} is not in this dataset.masks[{}]".format(date, burnName))
+        del self.masks[burnName][date]
+        if len(self.masks[burnName]) == 0:
+            del self.masks[burnName]
 
     def copy(self):
         '''the underlying RawData object doesn't need to be copied,
         but the dict of masks does, since the masks may change'''
         newPoints = {}
-        for burnName in self.points:
-            burn = self.points[burnName]
+        for burnName in self.masks:
+            burn = self.masks[burnName]
             d = {}
             for date in burn:
                 d[date] = burn[date].copy()
@@ -117,13 +117,13 @@ class Dataset(object):
         return Dataset(self.data, newPoints)
 
     def getUsedBurnNamesAndDates(self):
-        for name in self.points.keys():
-            for date in self.points[name].keys():
+        for name in self.masks.keys():
+            for date in self.masks[name].keys():
                 yield (name,date)
 
     def getAllLayers(self, layerName):
         result = {}
-        allBurnNames = self.points.keys()
+        allBurnNames = self.masks.keys()
         for burnName in allBurnNames:
             burn = self.data.burns[burnName]
             layer = burn.layers[layerName]
@@ -131,17 +131,17 @@ class Dataset(object):
         return result
 
     def getDays(self):
-        for burnName, dayDict in self.points.items():
+        for burnName, dayDict in self.masks.items():
             for date in dayDict:
                 yield self.data.burns[burnName].days[date]
 
     def getDaysAndMasks(self):
-        for burnName, dayDict in self.points.items():
+        for burnName, dayDict in self.masks.items():
             for date, pointMask in dayDict.items():
                 yield self.data.burns[burnName].days[date], pointMask
 
     def getPoints(self):
-        for burnName, dayDict in self.points.items():
+        for burnName, dayDict in self.masks.items():
             for date, pointMask in dayDict.items():
                 w = np.where(pointMask)
                 yield (burnName, date, w)
@@ -150,7 +150,7 @@ class Dataset(object):
         if fname is None:
             fname = strftime("%d%b%H-%M", localtime())
         fname = fixFileName(fname)
-        np.savez_compressed(fname, **self.points)
+        np.savez_compressed(fname, **self.masks)
 
     # @staticmethod
     # def toList(pointDict):
@@ -182,37 +182,62 @@ class Dataset(object):
         '''Return all the points which satisfy some filterFunction'''
         newPoints = {}
         for burnName, date in self.getUsedBurnNamesAndDates():
-            oldMask = self.points[burnName][date]
+            oldMask = self.masks[burnName][date]
             # get every location that satisfies the condition
             day = self.data.burns[burnName].days[date]
             newMask = filterFunction(day, **kwargs)
             anded = np.bitwise_and(oldMask, newMask)
-            self.points[burnName][date] = anded
+            self.masks[burnName][date] = anded
 
-    # def evenOutPositiveAndNegative(self):
-    #     '''Make it so our dataset is a more even mixture of yes and no outputs'''
-    #     # yes will contain all 'did burn' points, no contains 'did not burn' points
-    #     yes = []
-    #     no =  []
-    #     for p in self.toList(self.points):
-    #         burnName, date, loc = p
-    #         burn = self.data.burns[burnName]
-    #         day = burn.days[date]
-    #         out = day.endingPerim[loc]
-    #         if out:
-    #             yes.append(p)
-    #         else:
-    #             no.append(p)
-    #     # shorten whichever is longer
-    #     if len(yes) > len(no):
-    #         random.shuffle(yes)
-    #         yes = yes[:len(no)]
-    #     else:
-    #         random.shuffle(no)
-    #         no = no[:len(yes)]
-    #
-    #     # recombine
-    #     return self.toDict(yes+no)
+    def evenOutPositiveAndNegative(self):
+        for burnName, date in self.getUsedBurnNamesAndDates():
+            day = self.data.getDay(burnName, date)
+            burned = day.endingPerim
+            didNotBurn = 1-burned
+            currentMask = self.masks[burnName][date]
+            # all the pixels we are training on that DID and did NOT burn
+            pos = np.bitwise_and(burned, currentMask)
+            neg = np.bitwise_and(didNotBurn, currentMask)
+
+            numPos = np.count_nonzero(pos)
+            numNeg = np.count_nonzero(neg)
+            if numPos > numNeg:
+                idxs = np.where(pos.flatten())[0]
+                numToZero = numPos-numNeg
+            else:
+                idxs = np.where(neg.flatten())[0]
+                numToZero = numNeg-numPos
+            toBeZeroed = np.random.choice(idxs, numToZero)
+            origShape = currentMask.shape
+            currentMask = currentMask.flatten()
+            currentMask[toBeZeroed] = 0
+            currentMask = currentMask.reshape(origShape)
+            self.masks[burnName][date] = currentMask
+
+    def evenOutPositiveAndNegativeOld(self):
+        '''Make it so our dataset is a more even mixture of yes and no outputs'''
+        # yes will contain all 'did burn' points, no contains 'did not burn' points
+        yes = []
+        no =  []
+        for p in self.toList(self.masks):
+            burnName, date, loc = p
+            burn = self.data.burns[burnName]
+            day = burn.days[date]
+            out = day.endingPerim[loc]
+            if out:
+                yes.append(p)
+            else:
+                no.append(p)
+        # shorten whichever is longer
+        if len(yes) > len(no):
+            random.shuffle(yes)
+            yes = yes[:len(no)]
+        else:
+            random.shuffle(no)
+            no = no[:len(yes)]
+
+        # recombine
+        return self.toDict(yes+no)
     #
     # def sample(self, goalNumber='max', sampleEvenly=True):
     #     assert goalNumber == 'max' or (type(goalNumber)==int and goalNumber%2==0)
@@ -286,7 +311,7 @@ class Dataset(object):
     #
     # def makeDay2burnedNotBurnedMap(self):
     #     result = {}
-    #     for burnName, dayDict in self.points.items():
+    #     for burnName, dayDict in self.masks.items():
     #         for date, ptList in dayDict.items():
     #             day = self.data.getDay(burnName, date)
     #             didBurn, didNotBurn = [], []
@@ -316,17 +341,17 @@ class Dataset(object):
 
     def __len__(self):
         total = 0
-        for dayDict in self.points.values():
+        for dayDict in self.masks.values():
             for series in dayDict.values():
                 total += series.shape[1]
         return total
 
     def __eq__(self, other):
         if isinstance(other, Dataset):
-            return self.points == other.points
+            return self.masks == other.masks
         else:
             return NotImplemented
 
     def __repr__(self):
-        # shorten the string repr of self.points
+        # shorten the string repr of self.masks
         return "Dataset({}, with {} points)".format(self.data, len(self))

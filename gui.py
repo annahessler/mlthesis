@@ -123,7 +123,7 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
         day = self.data.burns[burnName].days[date]
         render = viz.renderDay(day)
         resizedRender = cv2.resize(render, self.BURN_RENDER_SIZE)
-        mask = self.dataset.points[burnName][date]
+        mask = self.dataset.masks[burnName][date]
         mask = cv2.merge((mask, mask, mask))
         resizedMask = cv2.resize(mask, self.BURN_RENDER_SIZE)*255
         overlayed = np.bitwise_or(resizedRender, resizedMask)
@@ -131,11 +131,12 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
 
     def displayDataset(self):
         self.dataset.filterPoints(self.dataset.vulnerablePixels)
+        self.dataset.evenOutPositiveAndNegative2()
         model = self.datasetTree.model()
         model.clear()
-        burnNames = sorted(self.dataset.points.keys())
+        burnNames = sorted(self.dataset.masks.keys())
         for name in burnNames:
-            dates = sorted(self.dataset.points[name].keys())
+            dates = sorted(self.dataset.masks[name].keys())
             if not dates:
                 continue
             burnItem = QtGui.QStandardItem(name)
@@ -149,8 +150,8 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
         root = self.burnTree.model().invisibleRootItem()
         for burnIdx in range(root.rowCount()):
             burnItem = root.child(burnIdx)
-            if burnItem.text() in self.dataset.points:
-                usedDates = self.dataset.points[burnItem.text()].keys()
+            if burnItem.text() in self.dataset.masks:
+                usedDates = self.dataset.masks[burnItem.text()].keys()
             else:
                 usedDates = []
             for dayIdx in range(burnItem.rowCount()):

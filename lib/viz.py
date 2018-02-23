@@ -38,7 +38,7 @@ def renderDay(day):
 
 def renderUsedPixels(dataset, burnName, date):
     # burnName, date = day.burn.name, day.date
-    mask = dataset.points[burnName][date]
+    mask = dataset.masks[burnName][date]
     # bg = day.burn.layers['dem']
     # background = cv2.merge((bg,bg,bg))
     return mask*127

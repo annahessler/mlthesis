@@ -12,7 +12,7 @@ def openDatasets():
     data = rawdata.load()
     masterDataSet = dataset.Dataset(data, dataset.Dataset.vulnerablePixels)
     ptList = masterDataSet.sample(sampleEvenly=False)
-    # masterDataSet.points = dataset.Dataset.toDict(ptList)
+    # masterDataSet.masks = dataset.Dataset.toDict(ptList)
     trainPts, validatePts, testPts =  util.partition(ptList, ratios=[.6,.7])
     train = dataset.Dataset(data, trainPts)
     validate = dataset.Dataset(data, validatePts)
@@ -24,7 +24,7 @@ def openAndTrain():
 
     # data = rawdata.RawData.load(burnNames='all', dates='all')
     # masterDataSet = dataset.Dataset(data, dataset.Dataset.vulnerablePixels)
-    # masterDataSet.points = masterDataSet.evenOutPositiveAndNegative()
+    # masterDataSet.masks = masterDataSet.evenOutPositiveAndNegative()
     train, validate, test = openDatasets()
     train.save('train')
     test.save('test')
@@ -79,12 +79,20 @@ def example():
     res = viz.visualizePredictions(test, predictions)
     viz.showPredictions(res)
 
-m = model.load("/Users/nickcrews/Documents/CSThesis/mlthesis/models/15Nov09_41")
-# ds = dataset.load("/Users/nickcrews/Documents/CSThesis/mlthesis/datasets/test.npz")
-# m.preProcessor.processAndSave(ds)
-m.fit_generator("/Users/nickcrews/Documents/CSThesis/mlthesis/processed/23Feb11-45")
+def preProcess():
+    m = model.load("/Users/nickcrews/Documents/CSThesis/mlthesis/models/15Nov09_41")
+    ds = dataset.load("/Users/nickcrews/Documents/CSThesis/mlthesis/datasets/even.npz")
+    ds.filterPoints(ds.vulnerablePixels)
+    ds.evenOutPositiveAndNegative()
+    m.preProcessor.processAndSave(ds)
 
 
+def train(m):
+    m.fit_generator("/Users/nickcrews/Documents/CSThesis/mlthesis/processed/23Feb15-09", epochs=10)
+    return m
+
+def load():
+    return model.load("/Users/nickcrews/Documents/CSThesis/mlthesis/models/15Nov09_41")
 
 # test()
 # reloaded = dataset.load("16Feb20-08.npz")
