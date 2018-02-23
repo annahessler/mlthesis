@@ -29,7 +29,7 @@ class PreProcessor(object):
         assert len(oneMetric) == self.numWeatherInputs, "Your weather metric function must return the expected number of metrics"
 
         aois = getSpatialData(dataset, self.whichLayers, self.AOIRadius)
-        # print('aois are', aois)
+        print('aois are', aois)
         outs = getOutputs(dataset)
         # print('outs are', outs)
 
@@ -41,13 +41,15 @@ class PreProcessor(object):
             tiled = list(metrics[burnName, date]) * len(ys)
             # print('tiled: ', tiled)
             w.extend(tiled)
+            print(w[:10], ".......")
             theseAois = aois[(burnName, date)]
-            # print('aois: ', aois)
+            print('theseaois: ', theseAois)
             i.extend(theseAois)
             theseOuts = outs[(burnName, date)]
             # print('outs:', outs)
             o.extend(theseOuts)
         weatherInputs = np.array(w)
+        print(i)
         imgInputs = np.array(i)
         outputs = np.array(o)
 

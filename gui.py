@@ -49,7 +49,7 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
         # self.predictions = {}
 
         self.mainwindow.show()
-        # self.useModel("/Users/nickcrews/Documents/CSThesis/mlthesis/models/15Nov09_41")
+        self.useModel("/Users/nickcrews/Documents/CSThesis/mlthesis/models/15Nov09_41")
         # self.useDataset("/Users/nickcrews/Documents/CSThesis/mlthesis/datasets/21Feb11-42.npz")
         # self.predict()
 
@@ -189,9 +189,12 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
 
     def predictButtonPressed(self, checked=0):
         self.predict()
+        self.predictButton.setEnabled(False)
 
     def donePredicting(self, result):
+        self.predictButton.setEnabled(True)
         print('got a result:', result)
+
 
     @async(callback=donePredicting)
     def predict(self):
