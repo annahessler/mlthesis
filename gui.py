@@ -1,5 +1,9 @@
 import os
+# ignore the gross warnings
+os.environ["TF_CPP_MIN_LOG_LEVEL"]="3"
+import time
 import numpy as np
+from functools import wraps
 import cv2
 import multiprocessing
 from PyQt5 import QtCore, QtGui, QtWidgets, uic
@@ -14,10 +18,13 @@ from lib import dataset
 from lib import util
 from lib import model
 from lib import viz
+from lib.async import async
 
 class GUI(basicgui.Ui_GUI, QtCore.QObject):
 
     sigPredict = QtCore.pyqtSignal(str,str)
+
+    BURN_RENDER_SIZE = (300,200)
 
     def __init__(self, app):
         QtCore.QObject.__init__(self)
@@ -27,21 +34,25 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
 
         self.data = rawdata.load()
         self.model = None
-        self.dataset = None
+        self.dataset = dataset.emptyDataset(self.data)
 
         # do stuff
         self.initBurnTree()
+        self.initDatasetTree()
 
         self.modelBrowseButton.clicked.connect(self.browseModels)
         self.saveDatasetButton.clicked.connect(self.saveDataset)
         self.loadDatasetButton.clicked.connect(self.browseDatasets)
-        self.predictButton.clicked.connect(self.predict)
+        self.predictButton.clicked.connect(self.predictButtonPressed)
 
         # img = np.random.random((200,600))*255
         # self.showImage(img,self.display)
         # self.predictions = {}
 
         self.mainwindow.show()
+        # self.useModel("/Users/nickcrews/Documents/CSThesis/mlthesis/models/15Nov09_41")
+        # self.useDataset("/Users/nickcrews/Documents/CSThesis/mlthesis/datasets/21Feb11-42.npz")
+        # self.predict()
 
     def initBurnTree(self):
         model = QtGui.QStandardItemModel()
@@ -54,13 +65,38 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
             dates = sorted(self.data.burns[name].days.keys())
             for d in dates:
                 dateItem = QtGui.QStandardItem(d)
-                # dateItem.setCheckable(True)
-                # dateItem.setCheckState(QtCore.Qt.Unchecked)
+                dateItem.setCheckable(True)
+                dateItem.setCheckState(QtCore.Qt.Unchecked)
                 dateItem.setSelectable(True)
                 burnItem.appendRow(dateItem)
         self.burnTree.setColumnWidth(0, 300)
         self.burnTree.expandAll()
         self.burnTree.selectionModel().selectionChanged.connect(self.burnDataSelected)
+        self.burnTree.clicked.connect(self.dayChecked)
+
+    def initDatasetTree(self):
+        model = QtGui.QStandardItemModel()
+        self.datasetTree.setModel(model)
+        self.datasetTree.expandAll()
+        self.datasetTree.setColumnWidth(0, 300)
+        self.datasetTree.selectionModel().selectionChanged.connect(self.datasetDaySelected)
+
+    def dayChecked(self, modelIndex):
+        # idx = modelIndex.indexes()[0]
+        dateItem = self.burnTree.model().itemFromIndex(modelIndex)
+        p = dateItem.parent()
+        if p is None:
+            # must have highlighted a burn, not clicked a day
+            return
+        burnName, date = p.text(), dateItem.text()
+        try:
+            if dateItem.checkState() == QtCore.Qt.Checked:
+                self.dataset.add(burnName, date)
+            else:
+                self.dataset.remove(burnName, date)
+        except:
+            pass
+        self.displayDataset()
 
     def burnDataSelected(self, selected, deselected):
         idx = selected.indexes()[0]
@@ -73,43 +109,84 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
             # selected a date
             self.displayDay(p.text(), item.text())
 
+    def datasetDaySelected(self,selected, deselected):
+        idxs = selected.indexes()
+        if len(idxs) == 0:
+            return #must have selected a burn from the dataset Tree
+        idx = idxs[0]
+        item = self.datasetTree.model().itemFromIndex(idx)
+        p = item.parent()
+        burnName, date = p.text(), item.text()
+        self.displayDatasetDay(burnName, date)
+
+    def displayDatasetDay(self, burnName, date):
+        day = self.data.burns[burnName].days[date]
+        render = viz.renderDay(day)
+        resizedRender = cv2.resize(render, self.BURN_RENDER_SIZE)
+        mask = self.dataset.points[burnName][date]
+        mask = cv2.merge((mask, mask, mask))
+        resizedMask = cv2.resize(mask, self.BURN_RENDER_SIZE)*255
+        overlayed = np.bitwise_or(resizedRender, resizedMask)
+        self.showImage(overlayed, self.datasetDisplay)
+
+    def displayDataset(self):
+        self.dataset.filterPoints(self.dataset.vulnerablePixels)
+        model = self.datasetTree.model()
+        model.clear()
+        burnNames = sorted(self.dataset.points.keys())
+        for name in burnNames:
+            burnItem = QtGui.QStandardItem(name)
+            burnItem.setSelectable(False)
+            model.appendRow(burnItem)
+            dates = sorted(self.dataset.points[name].keys())
+            for d in dates:
+                dateItem = QtGui.QStandardItem(d)
+                dateItem.setSelectable(True)
+                burnItem.appendRow(dateItem)
+        self.datasetTree.expandAll()
+
     def displayBurn(self, burnName):
         burn = self.data.burns[burnName]
         dem = viz.renderBurn(burn)
-        SIZE = (400,300)
-        resized = cv2.resize(dem, SIZE)
+        resized = cv2.resize(dem, self.BURN_RENDER_SIZE)
         self.showImage(resized, self.burnDisplay)
 
     def displayDay(self, burnName, date):
         day = self.data.burns[burnName].days[date]
         img = viz.renderDay(day)
-        SIZE = (400,300)
-        resized = cv2.resize(img, SIZE)
+        resized = cv2.resize(img, self.BURN_RENDER_SIZE)
         self.showImage(resized, self.burnDisplay)
         # print('displaying day:', day)
 
     def browseModels(self):
         # print('browsing!')
         fname = QtWidgets.QFileDialog.getExistingDirectory(directory='models/', options=QtWidgets.QFileDialog.ShowDirsOnly)
+        self.useModel(fname)
+
+    def useModel(self, fname):
         try:
             self.model = model.load(fname)
-            self.modelLineEdit.setText(fname)
-            self.predictModelLineEdit.setText(fname)
-            self.trainModelLineEdit.setText(fname)
         except:
             print('could not open that model')
-        # img = viz.renderModel(self.model)
-        # self.showImage(self.modelDisplay, img)
+            return
+        self.modelLineEdit.setText(fname)
+        self.predictModelLineEdit.setText(fname)
+        self.trainModelLineEdit.setText(fname)
 
     def browseDatasets(self):
         fname, _ = QtWidgets.QFileDialog.getOpenFileName(directory='datasets/', filter="numpy archives (*.npz)")
+        self.useDataset(fname)
+
+    def useDataset(self, fname):
         try:
             self.dataset = dataset.load(fname)
-            self.datasetDatasetLineEdit.setText(fname)
-            self.trainDatasetLineEdit.setText(fname)
-            self.predictDatasetLineEdit.setText(fname)
         except Exception as e:
             print('Could not open that dataset:', e)
+            return
+        self.datasetDatasetLineEdit.setText(fname)
+        self.trainDatasetLineEdit.setText(fname)
+        self.predictDatasetLineEdit.setText(fname)
+        self.displayDataset()
 
     def saveDataset(self):
         try:
@@ -121,35 +198,18 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
         except Exception as e:
             print("ERROR: No Dataset Loaded.")
 
+    def predictButtonPressed(self, checked=0):
+        self.predict()
 
+    def donePredicting(self, result):
+        print('got a result:', result)
+
+    @async(callback=donePredicting)
     def predict(self):
-        # selectedBurns = []
-        # mod = self.burnTree.model()
-        # for index in range(mod.rowCount()):
-        #     i = mod.item(index)
-        #     # print(i.checkState())
-        #     if i.checkState() == QtCore.Qt.Checked:
-        #         selectedBurns.append(i.text())
-        # print('opening the data for the burns,', selectedBurns)
-        # data = rawdata.RawData.load(burnNames=selectedBurns, dates='all')
-        # ds = dataset.Dataset(data, dataset.Dataset.vulnerablePixels)
-        def async():
-            return self.mode.predict(self.dataset)
-        # from lib import model
-        # modelFileName = self.modelLineEdit.text()
-        # print('loading model', modelFileName)
-        # mod = model.load(modelFileName)
-        # print(mod)
-        # predictions = mod.predict(ds)
-        # self.predictions.update(predictions)
-        # print('opening modelFileName!')
-        # todo: load keras model
-        # self.sigPredict.emit(modelFileName, burnName)
-        print('predict not NotImplemented yet...')
-        pass
-
-    def donePredicting():
-        pass
+        print('starting predictions')
+        result = self.model.predict(self.dataset)
+        print('done with work')
+        return self, 'this is the result'
 
     @staticmethod
     def showImage(img, label):
@@ -169,38 +229,6 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
             QI=QtGui.QImage(img, w, h, QtGui.QImage.Format_Indexed8)
         # QI.setColorTable(COLORTABLE)
         label.setPixmap(QtGui.QPixmap.fromImage(QI))
-
-class CheckableDirModel(QtWidgets.QDirModel):
-    def __init__(self, parent=None):
-        QtGui.QDirModel.__init__(self, None)
-        self.checks = {}
-
-    def data(self, index, role=QtCore.Qt.DisplayRole):
-        if role != QtCore.Qt.CheckStateRole:
-            return QtGui.QDirModel.data(self, index, role)
-        else:
-            if index.column() == 0:
-                return self.checkState(index)
-
-    def flags(self, index):
-        return QtGui.QDirModel.flags(self, index) | QtCore.Qt.ItemIsUserCheckable
-
-    def checkState(self, index):
-        if index in self.checks:
-            return self.checks[index]
-        else:
-            return QtCore.Qt.Unchecked
-
-    def setData(self, index, value, role):
-        if (role == QtCore.Qt.CheckStateRole and index.column() == 0):
-            self.checks[index] = value
-            self.emit(QtCore.SIGNAL("dataChanged(QModelIndex,QModelIndex)"), index, index)
-            return True
-
-        return QtGui.QDirModel.setData(self, index, value, role)
-
-def async(func, args, callback):
-    pass
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication([])
