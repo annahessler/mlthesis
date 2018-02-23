@@ -2,6 +2,7 @@ import os
 import numpy as np
 import cv2
 import multiprocessing
+import dataset
 from PyQt5 import QtCore, QtGui, QtWidgets, uic
 
 # dynamically generate the gui skeleton file from the ui file
@@ -112,13 +113,12 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
             print('Could not open that dataset:', e)
 
     def saveDataset(self):
-        #saves to 'datasets' directory, only allows .npz I believe
-
         try:
-            fname, _ = QtWidgets.QFileDialog.getSaveFileName(self, directory='datasets/')
             if self.dataset is None:
                 raise Exception
-            dataset.save(fname)
+            else:
+                fname, _ = QtWidgets.QFileDialog.getSaveFileName(directory='datasets/')
+                dataset.Dataset.save(fname)
         except Exception as e:
             print("ERROR: No Dataset Loaded.")
 
