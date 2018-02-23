@@ -41,6 +41,7 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
         self.initDatasetTree()
 
         self.modelBrowseButton.clicked.connect(self.browseModels)
+        self.saveDatasetButton.clicked.connect(self.saveDataset)
         self.loadDatasetButton.clicked.connect(self.browseDatasets)
         self.predictButton.clicked.connect(self.predictButtonPressed)
 
@@ -186,6 +187,16 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
         self.trainDatasetLineEdit.setText(fname)
         self.predictDatasetLineEdit.setText(fname)
         self.displayDataset()
+
+    def saveDataset(self):
+        try:
+            if self.dataset is None:
+                raise Exception
+            else:
+                fname, _ = QtWidgets.QFileDialog.getSaveFileName(directory='datasets/')
+                dataset.Dataset.save(fname)
+        except Exception as e:
+            print("ERROR: No Dataset Loaded.")
 
     def predictButtonPressed(self, checked=0):
         self.predict()
