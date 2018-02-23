@@ -2,7 +2,6 @@ import os
 import numpy as np
 import cv2
 import multiprocessing
-import dataset
 from PyQt5 import QtCore, QtGui, QtWidgets, uic
 
 # dynamically generate the gui skeleton file from the ui file
