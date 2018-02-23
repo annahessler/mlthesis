@@ -33,6 +33,7 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
         self.initBurnTree()
 
         self.modelBrowseButton.clicked.connect(self.browseModels)
+        self.saveDatasetButton.clicked.connect(self.saveDataset)
         self.loadDatasetButton.clicked.connect(self.browseDatasets)
         self.predictButton.clicked.connect(self.predict)
 
@@ -109,6 +110,17 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
             self.predictDatasetLineEdit.setText(fname)
         except Exception as e:
             print('Could not open that dataset:', e)
+
+    def saveDataset(self):
+        #saves to 'datasets' directory, only allows .npz I believe
+
+        try:
+            fname, _ = QtWidgets.QFileDialog.getSaveFileName(self, directory='datasets/')
+            if self.dataset is None:
+                raise Exception
+            dataset.save(fname)
+        except Exception as e:
+            print("ERROR: No Dataset Loaded.")
 
 
     def predict(self):
