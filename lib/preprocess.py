@@ -37,7 +37,7 @@ class PreProcessor(object):
 
         # convert the dictionaries into lists, then arrays
         w, i, o = [], [], []
-        # ptList = dataset.toList(dataset.points)
+        # ptList = dataset.toList(dataset.masks)
         for pt in dataset.getPoints():
             burnName, date, (ys,xs) = pt
             tiled = list(metrics[burnName, date]) * len(ys)
@@ -98,12 +98,12 @@ def streamFromDir(directory):
     if not os.path.exists(directory):
         raise FileNotFoundException('{} is not a valid directory to stream from'.format(directory))
     while True:
-        print('starting cycle...')
+        # print('starting cycle...')
         for fname in util.listdir_nohidden(directory):
             fname = directory + os.sep + fname
             print('about to load:', fname)
             arrays = np.load(fname)
-            print('done')
+            # print('done')
             wm, aois, outs = arrays['weather'], arrays['aois'], arrays['outputs']
             print("yielding...")
             yield ([wm, aois], outs)

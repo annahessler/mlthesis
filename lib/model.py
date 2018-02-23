@@ -65,7 +65,7 @@ class BaseModel(object):
 
         gen = preprocess.streamFromDir(directory)
         valGen = preprocess.streamFromDir(valDirectory) if valDirectory else None
-        kwargs = {'steps_per_epoch':1, 'epochs':epochs, 'validation_data':valGen, 'verbose':2}
+        kwargs = {'steps_per_epoch':1, 'epochs':epochs, 'validation_data':valGen, 'verbose':1}
         history = self.kerasModel.fit_generator(gen, **kwargs)
         return history
 
@@ -192,8 +192,7 @@ class OurModel(BaseModel):
         kerasModel.compile(loss = 'binary_crossentropy', optimizer = sgd, metrics = ['accuracy'])
         return kerasModel
 
-class OurModel2(BaseModel):
-    pass
+
 
 if __name__ == '__main__':
     m = OurModel()
