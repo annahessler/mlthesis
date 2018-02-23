@@ -79,9 +79,10 @@ def example():
     res = viz.visualizePredictions(test, predictions)
     viz.showPredictions(res)
 
-a = np.arange(100).reshape((5,20))
-print(a)
-
+m = model.load("/Users/nickcrews/Documents/CSThesis/mlthesis/models/15Nov09_41")
+# ds = dataset.load("/Users/nickcrews/Documents/CSThesis/mlthesis/datasets/test.npz")
+# m.preProcessor.processAndSave(ds)
+m.fit_generator("/Users/nickcrews/Documents/CSThesis/mlthesis/processed/23Feb11-45")
 
 
 

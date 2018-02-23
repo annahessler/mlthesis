@@ -9,12 +9,8 @@ from keras.optimizers import SGD, RMSprop
 from keras.layers import Conv2D, MaxPooling2D, AveragePooling2D
 print('done.')
 
-try:
-    from lib import preprocess
-    # from lib import metrics
-except:
-    import preprocess
-    # import metrics
+from lib import preprocess
+from lib import util
 
 class ImageBranch(Sequential):
 
@@ -61,6 +57,16 @@ class BaseModel(object):
             history = self.kerasModel.fit(tinputs, toutputs, batch_size=batch_size, epochs=epochs, validation_data=(vinputs, voutputs))
         else:
             history = self.kerasModel.fit(tinputs, toutputs, batch_size=batch_size, epochs=epochs)
+        return history
+
+    def fit_generator(self, directory, valDirectory=None, epochs=DEFAULT_EPOCHS):
+        assert self.kerasModel is not None, "You must set the kerasModel within a subclass"
+        assert self.preProcessor is not None, "You must set the preProcessor within a subclass"
+
+        gen = preprocess.streamFromDir(directory)
+        valGen = preprocess.streamFromDir(valDirectory) if valDirectory else None
+        kwargs = {'steps_per_epoch':1, 'epochs':epochs, 'validation_data':valGen, 'verbose':2}
+        history = self.kerasModel.fit_generator(gen, **kwargs)
         return history
 
     def predict(self, dataset):

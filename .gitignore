@@ -6,3 +6,4 @@ models/*
 data/*
 output/*
 datasets/*
+processed/*

@@ -229,13 +229,12 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
         self.predictButton.setEnabled(True)
         print('got a result:', result)
 
-
     @async(callback=donePredicting)
     def predict(self):
         print('starting predictions')
         result = self.model.predict(self.dataset)
-        print('done with work')
-        return self, 'this is the result'
+        print('done with predictions')
+        return self, result
 
     @staticmethod
     def showImage(img, label):

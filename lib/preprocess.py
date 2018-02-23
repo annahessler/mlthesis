@@ -1,5 +1,7 @@
 # preprocess.py
 from collections import namedtuple
+import os
+from time import strftime, localtime
 import numpy as np
 try:
     import matplotlib
@@ -23,7 +25,7 @@ class PreProcessor(object):
     def process(self, dataset):
         '''Take a dataset and return the extracted inputs and outputs'''
         # create dictionaries mapping from burnName, date to weather
-        metrics = calculateWeatherMetrics(dataset)
+        metrics = allWeatherMetrics(dataset)
         # print('metrics are', metrics)
         oneMetric = list(metrics.values())[0]
         assert len(oneMetric) == self.numWeatherInputs, "Your weather metric function must return the expected number of metrics"
@@ -55,20 +57,73 @@ class PreProcessor(object):
 
         return ([weatherInputs, imgInputs], outputs)
 
-def calculateWeatherMetrics(dataset):
+    def processAndSave(self, dataset, dirName=None):
+        if dirName is None:
+            dirName = strftime("%d%b%H-%M", localtime())
+        dirName = 'processed' + os.sep + dirName
+        if not os.path.exists(dirName):
+            os.makedirs(dirName)
+
+        preppedLayers = normalizeAndPadSpatialData(dataset, self.whichLayers, self.AOIRadius)
+        for burnName, date, locations in dataset.getPoints():
+            print('processing', burnName, date, locations)
+
+            # get aois
+            prepped = preppedLayers[(burnName, date)]
+            aois = extract(prepped, locations, self.AOIRadius)
+            aois = np.array(aois)
+            print('done with aois...')
+
+            # get outputs
+            out = dataset.data.burns[burnName].days[date].endingPerim[locations]
+            print('done with outputs...')
+
+            # get weather metrics, tile them  so there is a vector for every aoi and output
+            wm = weatherMetrics(dataset.data.getDay(burnName, date))
+            assert len(wm) == self.numWeatherInputs
+            wm = np.tile(wm, (len(out),1))
+            print('done with weather...')
+
+            # sanity check
+            print(wm.shape, aois.shape, out.shape)
+            assert len(out) == len(aois) == len(wm)
+
+            # save the three numpy arrays to a .npz file
+            toBeSaved = {'weather':wm, 'aois':aois, 'outputs':out}
+            fname = dirName + os.sep + burnName+date + '.npz'
+            np.savez(fname, **toBeSaved)
+
+
+def streamFromDir(directory):
+    if not os.path.exists(directory):
+        raise FileNotFoundException('{} is not a valid directory to stream from'.format(directory))
+    while True:
+        print('starting cycle...')
+        for fname in util.listdir_nohidden(directory):
+            fname = directory + os.sep + fname
+            print('about to load:', fname)
+            arrays = np.load(fname)
+            print('done')
+            wm, aois, outs = arrays['weather'], arrays['aois'], arrays['outputs']
+            print("yielding...")
+            yield ([wm, aois], outs)
+
+def weatherMetrics(day):
+    rw = day.weather #rawWeather
+    precip = totalPrecipitation(rw)
+    temp = maximumTemperature1(rw)
+    temp2 = maximumTemperature2(rw)
+    hum = averageHumidity(rw)
+    winds = windMetrics(rw)
+    allMetrics = [precip, temp, temp2, hum] + winds
+    return allMetrics
+
+def allWeatherMetrics(dataset):
     '''Return a dictionary mapping from (burnName, date) id's to a list weather metrics.'''
     metrics = {}
     for burnName, date in dataset.getUsedBurnNamesAndDates():
-        wm = dataset.data.getWeather(burnName, date)
-        # print('for the Day', burnName, date)
-        # print('weather matrix is', wm)
-        precip = totalPrecipitation(wm)
-        temp = maximumTemperature1(wm)
-        temp2 = maximumTemperature2(wm)
-        hum = averageHumidity(wm)
-        winds = windMetrics(wm)
-        entry = [precip, temp, temp2, hum] + winds
-        metrics[(burnName, date)] = entry
+        day = dataset.data.getDay(burnName, date)
+        metrics[(burnName, date)] = weatherMetrics(day)
     # now normalize all of them
     # ensure we keep order
     ids = list(metrics.keys())
@@ -77,19 +132,23 @@ def calculateWeatherMetrics(dataset):
     metrics = dict(zip(ids, normed))
     return metrics
 
-def getSpatialData(dataset, whichLayers, AOIRadius):
+def normalizeAndPadSpatialData(dataset, whichLayers, AOIRadius):
     # for each channel in the dataset, get all of the used data
     layers = {layerName:dataset.getAllLayers(layerName) for layerName in whichLayers}
     # now normalize them
     layers = normalizeLayers(layers)
     # now order them in the whichLayers order, stack them, and pad them
     paddedLayers = stackAndPad(layers, whichLayers, dataset, AOIRadius)
+    return paddedLayers
+
+def getSpatialData(dataset, whichLayers, AOIRadius):
+    preppedLayers = normalizeAndPadSpatialData(dataset, whichLayers, AOIRadius)
     # now extract out the aois around each point
     result = {}
     for burnName, date, locations in dataset.getPoints():
         print(burnName, date, locations)
-        padded = paddedLayers[(burnName, date)]
-        aois = extract(padded, locations, AOIRadius)
+        prepped = preppedLayers[(burnName, date)]
+        aois = extract(prepped, locations, AOIRadius)
         result[(burnName, date)] = aois
     return result
 
@@ -226,8 +285,10 @@ def extract(padded, locations, AOIRadius):
     hixs = r+(xs+r+1)
     aois = []
     for loy,hiy,lox,hix in np.vstack((loys, hiys, loxs, hixs)).T:
+        aoi = padded[loy:hiy, lox:hix]
+        # print(padded.shape)
+        # print(aoi.shape)
         # print(loy,hiy,lox,hix)
-        aoi = padded[loy:hiy, lox:hiy]
         # print(aoi)
         aois.append(aoi)
     # print(stacked.shape, padded.shape)s
