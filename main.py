@@ -80,8 +80,8 @@ def example():
     viz.showPredictions(res)
 
 def preProcess():
-    m = model.load("/Users/nickcrews/Documents/CSThesis/mlthesis/models/15Nov09_41")
-    ds = dataset.load("/Users/nickcrews/Documents/CSThesis/mlthesis/datasets/even.npz")
+    m = model.load("/Users/nickcrews/Documents/CSThesis/mcscn/mlthesis/models/15Nov09_41")
+    ds = dataset.load("/Users/nickcrews/Documents/CSThesis/mcscn/mlthesis/datasets/even.npz")
     ds.filterPoints(ds.vulnerablePixels)
     ds.evenOutPositiveAndNegative()
     m.preProcessor.processAndSave(ds)
@@ -94,6 +94,17 @@ def train(m):
 def load():
     return model.load("/Users/nickcrews/Documents/CSThesis/mlthesis/models/15Nov09_41")
 
+def mcscnMakeDS():
+    ds = dataset.load()
+    print(ds)
+    ds.filterPoints(ds.vulnerablePixels)
+    ds.evenOutPositiveAndNegative()
+    ds.save('training.npz')
+
+def mcscnTrain():
+    m = model.load("models/15Nov09_41")
+    ds = dataset.load('training.npz')
+    m.preProcessor.processAndSave(ds)
 # test()
 # reloaded = dataset.load("16Feb20-08.npz")
 # example()

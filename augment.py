@@ -42,7 +42,7 @@ def collectData(fireName, days):
     landsat3 = util.openImg('data/'+ fireName + '/band_3.tif')
     print('landsat3.tif shae', landsat3.shape)
     landsat2 = util.openImg('data/'+ fireName + '/band_2.tif')
-    np.savetxt('band2lookatthis.csv', landsat2, delimiter=',')
+    # np.savetxt('band2lookatthis.csv', landsat2, delimiter=',')
     landsat5 = util.openImg('data/'+ fireName + '/band_5.tif')
     print('before landsat4 shape is ', landsat4.shape)
 
@@ -74,7 +74,7 @@ def rotateWindDirection(theta, fire, date, int_index):
     headings = headings.reshape( (1,) + headings.shape)
     result = np.vstack((headings, all_weather))
     f = 'data/' + fire+ 'Augmented' + int_index + '/weather/' + date + '.csv'
-    np.savetxt(f, result, delimiter=',')
+    # np.savetxt(f, result, delimiter=',')
 
     return weather
 
@@ -90,7 +90,7 @@ def doMore(toaugment, fire, days, f_tuple, perim_array):
 
     toaugment = np.lib.pad(toaugment, ((1,1),(1,1),(0,0)), 'constant', constant_values=np.nan )
     augmented, theta = oidg.random_transform(toaugment, 7)
-    np.savetxt('landsat2directlyafterrandomtransformcall.csv', augmented[:,:,4], delimiter=',')
+    # np.savetxt('landsat2directlyafterrandomtransformcall.csv', augmented[:,:,4], delimiter=',')
     print(np.array_equal(augmented[:,:,4], toaugment[:,:,4]))
     int_index = makeFolders(fire)
 

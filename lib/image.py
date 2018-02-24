@@ -419,7 +419,7 @@ class ourImageDataGenerator(object):
                              'a tuple or list of two floats. '
                              'Received arg: ', zoom_range)
 
-    def random_transform(self, x):
+    def random_transform(self, x, seed=None):
         """Randomly augment a single image tensor.
         # Arguments
             x: 3D tensor, single image.
