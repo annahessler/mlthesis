@@ -65,6 +65,7 @@ class PreProcessor(object):
             os.makedirs(dirName)
 
         preppedLayers = normalizeAndPadSpatialData(dataset, self.whichLayers, self.AOIRadius)
+            
         for burnName, date, locations in dataset.getPoints():
             print('processing', burnName, date, locations)
 

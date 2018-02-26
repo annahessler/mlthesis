@@ -100,11 +100,14 @@ def mcscnMakeDS():
     ds.filterPoints(ds.vulnerablePixels)
     ds.evenOutPositiveAndNegative()
     ds.save('training.npz')
+    return ds
 
-def mcscnTrain():
+def mcscnPreprocess():
     m = model.load("models/15Nov09_41")
     ds = dataset.load('training.npz')
     m.preProcessor.processAndSave(ds)
+
+ds = mcscnMakeDS()
 # test()
 # reloaded = dataset.load("16Feb20-08.npz")
 # example()

@@ -186,15 +186,17 @@ class Dataset(object):
             # get every location that satisfies the condition
             day = self.data.burns[burnName].days[date]
             newMask = filterFunction(day, **kwargs)
+            oldMask = oldMask.astype(np.uint8)
+            newMask = newMask.astype(np.uint8)
             anded = np.bitwise_and(oldMask, newMask)
             self.masks[burnName][date] = anded
 
     def evenOutPositiveAndNegative(self):
         for burnName, date in self.getUsedBurnNamesAndDates():
             day = self.data.getDay(burnName, date)
-            burned = day.endingPerim
+            burned = day.endingPerim.astype(np.uint8)
             didNotBurn = 1-burned
-            currentMask = self.masks[burnName][date]
+            currentMask = self.masks[burnName][date].astype(np.uint8)
             # all the pixels we are training on that DID and did NOT burn
             pos = np.bitwise_and(burned, currentMask)
             neg = np.bitwise_and(didNotBurn, currentMask)
@@ -207,6 +209,8 @@ class Dataset(object):
             else:
                 idxs = np.where(neg.flatten())[0]
                 numToZero = numNeg-numPos
+            if len(idxs) == 0:
+                continue
             toBeZeroed = np.random.choice(idxs, numToZero)
             origShape = currentMask.shape
             currentMask = currentMask.flatten()
@@ -332,12 +336,12 @@ class Dataset(object):
     @staticmethod
     def vulnerablePixels(day, radius=VULNERABLE_RADIUS):
         '''Return the indices of the pixels that close to the current fire perimeter'''
-        startingPerim = day.startingPerim
+        startingPerim = day.startingPerim.astype(np.uint8)
         kernel = np.ones((3,3))
         its = int(round((2*(radius/rawdata.PIXEL_SIZE)**2)**.5))
         dilated = cv2.dilate(startingPerim, kernel, iterations=its)
         border = dilated - startingPerim
-        return border
+        return border.astype(np.uint8)
 
     def __len__(self):
         total = 0
