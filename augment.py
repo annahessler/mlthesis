@@ -2,7 +2,7 @@ from keras.preprocessing.image import ImageDataGenerator, array_to_img, img_to_a
 import os
 import cv2
 import numpy as np
-from lib import image, util
+from hottopic import image, util
 import time
 from time import localtime, strftime
 from scipy.misc import imsave

@@ -9,8 +9,8 @@ from keras.optimizers import SGD, RMSprop
 from keras.layers import Conv2D, MaxPooling2D, AveragePooling2D
 print('done.')
 
-from lib import preprocess
-from lib import util
+from hottopic import preprocess
+from hottopic import util
 
 class ImageBranch(Sequential):
 

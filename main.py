@@ -1,12 +1,12 @@
 import numpy as np
 
-from lib import rawdata
-from lib import dataset
-from lib import metrics
-from lib import viz
-from lib import preprocess
-from lib import util
-from lib import model
+from hottopic import rawdata
+from hottopic import dataset
+from hottopic import metrics
+from hottopic import viz
+from hottopic import preprocess
+from hottopic import util
+from hottopic import model
 
 def openDatasets():
     data = rawdata.load()
@@ -20,7 +20,7 @@ def openDatasets():
     return train, validate, test
 
 def openAndTrain():
-    from lib import model
+    from hottopic import model
 
     # data = rawdata.RawData.load(burnNames='all', dates='all')
     # masterDataSet = dataset.Dataset(data, dataset.Dataset.vulnerablePixels)
@@ -44,7 +44,7 @@ def reloadPredictions():
     return test, predictions
 
 def getModel(weightsFile=None):
-    from lib import model
+    from hottopic import model
     numWeatherInputs = 8
     usedLayers = ['dem','ndvi', 'aspect', 'band_2', 'band_3', 'band_4', 'band_5'] #, 'slope'
     AOIRadius = 30

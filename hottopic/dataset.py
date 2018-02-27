@@ -7,8 +7,8 @@ from time import localtime, strftime
 import numpy as np
 import cv2
 # from rawdata import
-from lib import rawdata
-from lib import viz
+from hottopic import rawdata
+from hottopic import viz
 from keras.preprocessing.image import ImageDataGenerator
 
 def load(fname=None):

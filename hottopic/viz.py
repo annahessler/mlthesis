@@ -12,8 +12,8 @@ try:
 except:
     print('Failed to import pyplot ')
 
-from lib import dataset
-from lib import util
+from hottopic import dataset
+from hottopic import util
 
 def renderDataset(dataset):
     pass

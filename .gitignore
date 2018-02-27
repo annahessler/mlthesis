@@ -1,7 +1,7 @@
 **/*.pyc
 **/*.DS_Store
 
-lib/__pycache__/*
+hottopic/__pycache__/*
 models/*
 !models/.placeholder
 data/*

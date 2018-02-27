@@ -1,6 +1,6 @@
 import keras
 from sklearn.metrics import roc_auc_score
-from lib import viz
+from hottopic import viz
 import matplotlib
 matplotlib.use("TkAgg")
 from matplotlib import animation

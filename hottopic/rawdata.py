@@ -2,7 +2,7 @@
 import numpy as np
 import cv2
 
-from lib import util
+from hottopic import util
 
 PIXEL_SIZE = 30
 _memoedAllBurns = None

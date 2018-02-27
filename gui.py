@@ -13,11 +13,11 @@ with open('basicgui.py', 'w') as pyfile:
     uic.compileUi('basicgui.ui', pyfile)
 import basicgui
 
-from lib import rawdata
-from lib import dataset
-from lib import util
-from lib import model
-from lib import viz
+from hottopic import rawdata
+from hottopic import dataset
+from hottopic import util
+from hottopic import model
+from hottopic import viz
 from lib.async import async
 
 class GUI(basicgui.Ui_GUI, QtCore.QObject):

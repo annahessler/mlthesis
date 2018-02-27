@@ -1,8 +1,8 @@
 #test.py
 import unittest
 
-from lib import rawdata
-from lib import dataset
+from hottopic import rawdata
+from hottopic import dataset
 
 class TestRawdata(unittest.TestCase):
 

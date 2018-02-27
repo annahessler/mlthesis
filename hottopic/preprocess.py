@@ -11,7 +11,7 @@ except:
     pass
 
 
-from lib import util
+from hottopic import util
 
 class PreProcessor(object):
     '''What is responsible for extracting the used data from the dataset and then
