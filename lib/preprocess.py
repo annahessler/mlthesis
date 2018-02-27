@@ -65,8 +65,9 @@ class PreProcessor(object):
             os.makedirs(dirName)
 
         preppedLayers = normalizeAndPadSpatialData(dataset, self.whichLayers, self.AOIRadius)
-            
-        for burnName, date, locations in dataset.getPoints():
+
+        def dealWith(p):
+            burnName, date, locations = p
             print('processing', burnName, date, locations)
 
             # get aois
@@ -94,6 +95,15 @@ class PreProcessor(object):
             fname = dirName + os.sep + burnName+date + '.npz'
             np.savez(fname, **toBeSaved)
 
+        # import concurrent.futures
+        # executor = concurrent.futures.ProcessPoolExecutor(10)
+        # futures = [executor.submit(dealWith, pt) for pt in dataset.getPoints()]
+        # concurrent.futures.wait(futures)
+
+        for p in dataset.getPoints():
+            dealWith(p)
+
+
 
 def streamFromDir(directory):
     if not os.path.exists(directory):
@@ -102,11 +112,15 @@ def streamFromDir(directory):
         # print('starting cycle...')
         for fname in util.listdir_nohidden(directory):
             fname = directory + os.sep + fname
-            print('about to load:', fname)
+            # print('about to load:', fname)
             arrays = np.load(fname)
             # print('done')
             wm, aois, outs = arrays['weather'], arrays['aois'], arrays['outputs']
-            print("yielding...")
+            if len(wm) == 0:
+                print('skipping fname ' + fname)
+                continue
+            # print("yielding [{}, {}], {}".format(wm,aois,outs))
+            print('yielding ' + fname)
             yield ([wm, aois], outs)
 
 def weatherMetrics(day):

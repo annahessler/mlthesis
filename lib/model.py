@@ -59,13 +59,13 @@ class BaseModel(object):
             history = self.kerasModel.fit(tinputs, toutputs, batch_size=batch_size, epochs=epochs)
         return history
 
-    def fit_generator(self, directory, valDirectory=None, epochs=DEFAULT_EPOCHS):
+    def fit_generator(self, directory, valDirectory=None, epochs=DEFAULT_EPOCHS, steps_per_epoch=1):
         assert self.kerasModel is not None, "You must set the kerasModel within a subclass"
         assert self.preProcessor is not None, "You must set the preProcessor within a subclass"
 
         gen = preprocess.streamFromDir(directory)
         valGen = preprocess.streamFromDir(valDirectory) if valDirectory else None
-        kwargs = {'steps_per_epoch':1, 'epochs':epochs, 'validation_data':valGen, 'verbose':1}
+        kwargs = {'steps_per_epoch':steps_per_epoch, 'epochs':epochs, 'validation_data':valGen, 'verbose':1}
         history = self.kerasModel.fit_generator(gen, **kwargs)
         return history
 

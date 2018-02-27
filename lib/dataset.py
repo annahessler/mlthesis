@@ -10,28 +10,6 @@ import cv2
 from lib import rawdata
 from lib import viz
 from keras.preprocessing.image import ImageDataGenerator
-# from model import InputSettings
-
-# create a class that represents a spatial and temporal location that a sample lives at
-Point = namedtuple('Point', ['burnName', 'date', 'location'])
-
-# def load(fname=None):
-#     if fname is None:
-#         # give us the default dataset of everything
-#         return Dataset(rawdata.load())
-#     with open(fname, 'r') as fp:
-#         data = rawdata.RawData.load()
-#         pts = json.load(fp)
-#         newBurnDict = {}
-#         for burnName, dayDict in pts.items():
-#             newDayDict = {}
-#             for date, ptList in dayDict.items():
-#                 newPtList = [Point(name, date, tuple(loc)) for name, date, loc in ptList]
-#                 newDayDict[date] = newPtList
-#             newBurnDict[burnName] = newDayDict
-#         # pts = [Point(name, date, tuple(loc)) for name, date, loc in pts]
-#         # print(pts)
-#         return Dataset(data, newBurnDict)
 
 def load(fname=None):
     if fname is None:
@@ -41,8 +19,15 @@ def load(fname=None):
     with np.load(fname) as archive:
         # np.load gives us back a weird structure.
         # we need structure of {burnName:{date:nparray}}
+        print('loaded the dataset file {}'.format(fname))
         d = dict(archive)
-        pointList = {burnName:d[burnName][()] for burnName in d}
+        print('converted to dict')
+        pointList = {}
+        for burnName in d:
+            print('opening burn {}'.format(burnName))
+            pointList[burnName] = d[burnName][()]
+
+        print('creating dataset...')
         return Dataset(data=None, points=pointList)
 
 def emptyDataset(rawdata):
@@ -59,8 +44,10 @@ class Dataset(object):
 
     def __init__(self, data=None, points='all'):
         if data is None:
+            print('loading rawdata...')
             data = rawdata.load()
         self.data = data
+        print('decoding points...')
         self.masks = self._decodePoints(points)
 
 

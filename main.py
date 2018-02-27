@@ -86,7 +86,6 @@ def preProcess():
     ds.evenOutPositiveAndNegative()
     m.preProcessor.processAndSave(ds)
 
-
 def train(m):
     m.fit_generator("/Users/nickcrews/Documents/CSThesis/mlthesis/processed/23Feb15-09", epochs=10)
     return m
@@ -103,18 +102,20 @@ def mcscnMakeDS():
     return ds
 
 def mcscnPreprocess():
+    print('loading model...')
     m = model.load("models/15Nov09_41")
-    ds = dataset.load('training.npz')
+    print('\rloading model...done\nloading dataset...')
+    ds = dataset.load('datasets/training.npz')
+    print('\rloading dataset...done\nprocessing...')
     m.preProcessor.processAndSave(ds)
 
-ds = mcscnMakeDS()
-# test()
-# reloaded = dataset.load("16Feb20-08.npz")
-# example()
-# train, val, test = openDatasets()
+def mcscnTrain(modelFile=None):
+    if modelFile is None:
+        m = model.OurModel()
+    else:
+        m = model.load(modelFile)
+    directory = 'processed/26Feb14-49'
+    m.fit_generator(directory, epochs=15, steps_per_epoch=1)
+    m.save()
 
-# train.save('train')
-# test.save('test')
-# val.save('validate')
-# viz.show(res)
-# viz.save(res,'predictions')
+ds = mcscnTrain()

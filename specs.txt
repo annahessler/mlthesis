@@ -15,11 +15,9 @@ Training models:
 
 
 
-
-
 Use cases:
 Datasets:
--open an existing Dataset
+-open an existing Dataset (consisting of raw and augmented burns)
 -view the dataset
 -I can select which burns and dates to use, and this opens that raw data and makes a dataset from it
 -copy the dataset
@@ -29,13 +27,33 @@ Datasets:
 -split the dataset into training, validation, and testing sets
 -save the dataset to a certain name
 
+Normalization:
+-Any data needs to be able to be normalized the same way
+-DEMs normed so that variation of 5k feet is mapped from 0-1
+-All other layers mapped so all reasonable values mapped between 0-1
+-weather has temp, pressure, dew pt, temp2, wind dir, wind speed, precip, rel humidity
+-weather temps normed so 20F->0 and 120F->1
+-winds decomposed into cardinal directions. 1 indicates 50 mph winds for all 24 hours
+-precip is really skewed. maybe log(1+x) or something?
+-This happens before augmentation, and we just ensure augmentation doesn't mess any of these properties up
+
+Augmenting:
+-choose a days worth of data (weather, perimeter, and spatial) and mash it up
+-do we need to save this?
+    we can't revisit what it was training on
+    we don't have memory overhead
+    there is a bit of processor overhead. this is dealt with in a different thread so the model always has stuff ready?
+
 Models:
 -I can open a saved model. This includes the model architecture, weights, and the PreProcessor
 -I can save a model by name.
 -I can ask a model to predict the results of a certain dataset
 
 Training:
--I choose a dataset and Model
+-I choose a model
+-I choose a dataset
+    this could be a list of days and augmentation parameters
+
 -train for iterations, time, convergence
 -this happens asynchronously, and a handle is returned to the trainer
 -I can check the status of the training or cancel it using the handle
