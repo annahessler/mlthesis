@@ -11,7 +11,7 @@ class Dataset(object):
         self.whichPixels = whichPixels if whichPixels is not None else 'all'
 
     def getData(self):
-        return self.data #return input/output?
+        return self.data
 
     def getPixels(self):
         return self.pixels

@@ -20,11 +20,6 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
         self.qdir = QtCore.QDir()
         self.setupUi(self.mainwindow)
 
-        # do stuff
-        # chooseBurnsModel = CheckableDirModel()
-        # self.burnTree.setModel(chooseBurnsModel)
-        # self.burnTree.setRootIndex(chooseBurnsModel.index(self.qdir.absoluteFilePath('/home/n_crews/Documents/thesis/mlthesis/data/')))
-        # self.burnTree.setRootIndex(chooseBurnsModel.index(QtGui.QDir.currentPath()));
         self.getFires()
 
         self.modelBrowseButton.clicked.connect(self.browseModels)
@@ -47,15 +42,12 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
             item = QtGui.QStandardItem(name)
             item.setCheckable(True)
             item.setFlags(QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
-            # check = Qt.Unchecked
-            # item.setCheckState(check)
             item.setCheckable(True)
             model.appendRow(item)
 
         self.burnList.setModel(model)
 
     def browseModels(self):
-        # print('browsing!')
         fname = QtGui.QFileDialog.getExistingDirectory(directory='models/', options=QtGui.QFileDialog.ShowDirsOnly)
         if fname == '':
             return
@@ -67,7 +59,6 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
         mod = self.burnList.model()
         for index in range(mod.rowCount()):
             i = mod.item(index)
-            # print(i.checkState())
             if i.checkState() == QtCore.Qt.Checked:
                 selectedBurns.append(i.text())
         print('opening the data for the burns,', selectedBurns)
@@ -81,14 +72,10 @@ class GUI(basicgui.Ui_GUI, QtCore.QObject):
         print(mod)
         predictions = mod.predict(ds)
         self.predictions.update(predictions)
-        # print('opening modelFileName!')
-        # todo: load keras model
-        # self.sigPredict.emit(modelFileName, burnName)
 
     def showImage(self, img):
         h,w = img.shape[:2]
         QI=QtGui.QImage(img, w, h, QtGui.QImage.Format_Indexed8)
-        # QI.setColorTable(COLORTABLE)
         self.display.setPixmap(QtGui.QPixmap.fromImage(QI))
 class CheckableDirModel(QtGui.QDirModel):
     def __init__(self, parent=None):

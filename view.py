@@ -20,7 +20,6 @@ try:
 except:
     fname = sys.argv[1]
 
-# img = imread(fname, 'F')
 img = cv2.imread(fname, cv2.IMREAD_UNCHANGED)
 print('img has shape and dtype:', img.shape, img.dtype)
 

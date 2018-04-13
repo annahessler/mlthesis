@@ -32,20 +32,12 @@ def saveImg(fname, img):
     print("to save shape is", to_save.shape)
     print('max is ', max_float)
     to_save[np.where(np.isnan(to_save))] = max_float
-    # for listed in to_save:
-    #     for e in listed:
-    #         if np.isnan(e):
-    #             print('e is ', e)
-    #             listed[e] = max_float
     print('after conversions', to_save)
     if 'landsat' in fname:
         print('landsat to_save shape is ', to_save.shape)
-        # np.savetxt('landsatrightafter32bitconversion.csv', to_save[:,:,0], delimiter=',')
-    # imsave(fname, to_save.astype(np.uint8))
     tiff = TIFF.open(fname, mode='w')
     tiff.write_image(to_save)
     tiff.close()
-    # cv2.imwrite(fname, to_save.astype(np.uint16))
 
 def validPixelIndices(layer):
     validPixelMask = 1-invalidPixelMask(layer)
@@ -68,11 +60,6 @@ def invalidPixelMask(layer):
     seeds = [(0,0), (0,h-1), (w-1,0), (w-1,h-1)]
     for seed in seeds:
         cv2.floodFill(layer.copy(), noDataMask, seed, fill)
-        # plt.figure('layer')
-        # plt.imshow(layer)
-        # plt.figure('noDataMask')
-        # plt.imshow(noDataMask)
-        # plt.show()
 
     # extract ouf the center of the mask, which corresponds to orig image
     noDataMask = noDataMask[1:h+1, 1:w+1]
@@ -85,12 +72,9 @@ def normalize(arr, axis=None):
     if axis=1, then each row is normalized independently'''
 
     arr = arr.astype(np.float32)
-    # print('subtracting min')
     res = arr - np.nanmin(arr, axis=axis)
-    # print('dividing where', res)
     # where dividing by zero, just use zero
     res = np.divide(res, np.nanmax(res, axis=axis), out=np.zeros_like(res), where=res!=0)
-    # print('done')
     return res
 
 def partition(things, ratios=None):
@@ -101,7 +85,6 @@ def partition(things, ratios=None):
     partitions = []
     for r in ratios:
         endIndex = int(round(r * len(things)))
-        # print(beginIndex, endIndex)
         section = things[beginIndex:endIndex]
         partitions.append(section)
         beginIndex = endIndex
@@ -149,11 +132,8 @@ if __name__ == '__main__':
     files_grabbed = []
     for files in types:
         files_grabbed.extend(glob.glob(folder+files))
-    # random.shuffle(files_grabbed)
     for f in files_grabbed:
         print(f)
-        # if 'riceRidge' not in f:
-        #     continue
         img = openImg(f)
         plt.figure(f)
         if len(img.shape) > 2 and img.shape[2] > 3:

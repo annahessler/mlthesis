@@ -1,5 +1,6 @@
 
 import numpy as np
+import random
 
 from lib import rawdata
 from lib import dataset
@@ -14,7 +15,7 @@ def predictFires():
     new_data = rawdata.RawData.load(burnNames='untrain', dates='all')
     newDataSet = dataset.Dataset(new_data, dataset.Dataset.vulnerablePixels)
     pointLst = newDataSet.toList(newDataSet.points)
-    pointLst = random.sample(pointLst, 1000)
+    pointLst = random.sample(pointLst, 500000)
     test = dataset.Dataset(new_data, pointLst)
     return test
 
@@ -22,7 +23,6 @@ def openDatasets():
     data = rawdata.RawData.load(burnNames='all', dates='all')
     masterDataSet = dataset.Dataset(data, dataset.Dataset.vulnerablePixels)
     ptList = masterDataSet.sample(sampleEvenly=False)
-    # masterDataSet.points = dataset.Dataset.toDict(ptList)
     trainPts, validatePts, testPts =  util.partition(ptList, ratios=[.6,.7])
     train = dataset.Dataset(data, trainPts)
     validate = dataset.Dataset(data, validatePts)
@@ -44,14 +44,10 @@ def openAndPredict(weightsFile):
 def openAndTrain():
     from lib import model
 
-    # data = rawdata.RawData.load(burnNames='all', dates='all')
-    # masterDataSet = dataset.Dataset(data, dataset.Dataset.vulnerablePixels)
-    # masterDataSet.points = masterDataSet.evenOutPositiveAndNegative()
     train, validate, test = openDatasets()
     train.save('train')
     test.save('test')
     validate.save('validate')
-    # print(train, validate, test)
     mod = getModel()
     mod.fit(train, validate)
     mod.saveWeights()
@@ -97,19 +93,22 @@ def example():
 
     test = dataset.openDataset(datasetfname)
     mod = getModel(modfname)
-    # mod.fit(train, val)
     predictions = mod.predict(test)
-    # test, predictions = openAndTrain()
     res = viz.visualizePredictions(test, predictions)
     viz.showPredictions(res)
 
-#openAndTrain()
-# openAndPredict('') #enter weightsFile
-example()
-# train, val, test = openDatasets()
+#uncomment openAndTrain() to train a new model
+#if you create a new dataset, must change name to have "_" instead of "/" for it to work with example()
+openAndTrain()
 
-# train.save('train')
-# test.save('test')
-# val.save('validate')
-# viz.show(res)
-# viz.save(res,'predictions')
+#uncomment the next two lines to create a validation dataset
+# test = predictFires()
+# dataset.Dataset.save(test)
+
+# openAndPredict('') #enter weightsFile
+
+#uncomment example() to make test images appear
+#To run: python3 main.py models/model_name output/datasets/dataset_name
+#final model: 11Apr17_55.h5
+#test dataset: 11Apr20_49.              #this has 500,000 points
+# example()

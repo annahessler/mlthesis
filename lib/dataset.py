@@ -6,11 +6,9 @@ from time import localtime, strftime
 
 import numpy as np
 import cv2
-# from rawdata import
 from lib import rawdata
 from lib import viz
 from keras.preprocessing.image import ImageDataGenerator
-# from model import InputSettings
 
 class Dataset(object):
     '''A set of Point objects'''
@@ -150,7 +148,6 @@ class Dataset(object):
         assert goalNumber == 'max' or (type(goalNumber)==int and goalNumber%2==0)
         # map from (burnName, date) -> [pts that burned], [pts that didn't burn]
         day2res = self.makeDay2burnedNotBurnedMap()
-        # print('day2res', day2res)
         # find the limiting size for each day
         limits = {day:min(len(yes), len(no)) for day, (yes, no) in day2res.items()}
         print(limits)
@@ -270,8 +267,6 @@ def openDataset(fname):
                 newPtList = [Point(name, date, tuple(loc)) for name, date, loc in ptList]
                 newDayDict[date] = newPtList
             newBurnDict[burnName] = newDayDict
-        # pts = [Point(name, date, tuple(loc)) for name, date, loc in pts]
-        # print(pts)
         return Dataset(data, newBurnDict)
 
 if __name__ == '__main__':
@@ -286,13 +281,10 @@ if __name__ == '__main__':
     print(validate)
     print(test)
     p = Point('riceRidge', '0731', (20, 156))
-    # print(p)
     inpset = InputSettings(['b'], AOIRadius=60)
     s = Sample(d, p, inpset)
     print(s)
     w, aoi = s.getInputs()
     startPerim = aoi[:,:,1]
     viz.show(img, startPerim)
-    # viz.show()
-
     print(s.getOutput())

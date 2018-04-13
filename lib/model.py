@@ -11,10 +11,8 @@ print('done.')
 
 try:
     from lib import preprocess
-    # from lib import metrics
 except:
     import preprocess
-    # import metrics
 
 class ImageBranch(Sequential):
 
@@ -118,18 +116,11 @@ class FireModel(Model):
         self.wb = Input((self.preProcessor.numWeatherInputs,),name='weatherInput')
         self.ib = ImageBranch(len(self.preProcessor.whichLayers), kernelDiam)
 
-        # print('weather branch info:', self.wb.shape)
-        # print('image branch info:', self.ib.input_shape, self.ib.output_shape, self.ib.output)
-
         concat = Concatenate(name='mergedBranches')([self.wb,self.ib.output])
         out = Dense(1, kernel_initializer = 'normal', activation = 'sigmoid',name='output')(concat)
-        # out = Dropout(0.2)(out)
-        # print("concat and out info:", concat.shape, out.shape)
         super().__init__([self.wb, self.ib.input], out)
 
-        # self.add(Concatenate([self.wb, self.ib]))
         sgd = SGD(lr = 0.1, momentum = 0.9, decay = 0, nesterov = False)
-        #rms = RMSprop(lr=0.001, rho=0.9, epsilon=1e-08, decay=0.0)
         self.compile(loss = 'binary_crossentropy', optimizer = sgd, metrics = ['accuracy'])
 
         if weightsFileName is not None:
@@ -140,7 +131,7 @@ class FireModel(Model):
         (tinputs, toutputs), ptList = self.preProcessor.process(training)
         (vinputs, voutputs), ptList = self.preProcessor.process(validate)
         print('training on ', training)
-        history = super().fit(tinputs, toutputs, batch_size = 1000, epochs=5, validation_data=(vinputs, voutputs))
+        history = super().fit(tinputs, toutputs, batch_size = 1000, epochs=epochs, validation_data=(vinputs, voutputs))
 
         self.saveWeights()
         return history
@@ -163,7 +154,7 @@ class OurModel(BaseModel):
 
     def __init__(self, kerasModel=None):
         numWeatherInputs = 8
-        usedLayers = ['dem','ndvi', 'aspect', 'band_2', 'band_3', 'band_4', 'band_5'] #, 'slope'
+        usedLayers = ['dem','ndvi', 'aspect', 'band_2', 'band_3', 'band_4', 'band_5', 'slope']
         AOIRadius = 30
         pp = preprocess.PreProcessor(numWeatherInputs, usedLayers, AOIRadius)
 
@@ -181,12 +172,9 @@ class OurModel(BaseModel):
 
         concat = Concatenate(name='mergedBranches')([wb,ib.output])
         out = Dense(1, kernel_initializer = 'normal', activation = 'sigmoid',name='output')(concat)
-        # print("concat and out info:", concat.shape, out.shape)
         kerasModel = Model([wb, ib.input], out)
 
-        # self.add(Concatenate([self.wb, self.ib]))
         sgd = SGD(lr = 0.1, momentum = 0.9, decay = 0, nesterov = False)
-        #rms = RMSprop(lr=0.001, rho=0.9, epsilon=1e-08, decay=0.0)
         kerasModel.compile(loss = 'binary_crossentropy', optimizer = sgd, metrics = ['accuracy'])
         return kerasModel
 

@@ -47,8 +47,6 @@ def calculateWeatherMetrics(dataset):
     metrics = {}
     for burnName, date in dataset.getUsedBurnNamesAndDates():
         wm = dataset.data.getWeather(burnName, date)
-        # print('for the Day', burnName, date)
-        # print('weather matrix is', wm)
         precip = totalPrecipitation(wm)
         temp = maximumTemperature1(wm)
         temp2 = maximumTemperature2(wm)
@@ -78,18 +76,14 @@ def getSpatialData(dataset, whichLayers, AOIRadius):
         padded = paddedLayers[(burnName, date)]
         aoi = extract(padded, location, AOIRadius)
         result[(burnName, date, location)] = aoi
-    # normalizeLayers(result)
     return result
 
 def normalizeLayers(layers):
     result = {}
     for name, data in layers.items():
-        # if name != 'ndvi':
-        #     continue
         if name == 'dem':
             result[name] = normalizeElevations(data)
         else:
-            # print('normalizing layer', name)
             result[name] = normalizeNonElevations(data)
     return result
 
@@ -104,27 +98,16 @@ def normalizeElevations(dems):
         avgElevation[burnName] = np.mean(validPixels)
         ranges[burnName] = validPixels.max()-validPixels.min()
 
-        # vis = dem.copy()
-        # vis[validIndices] = 42
-        # plt.imshow(dem)
-        # plt.figure("valid")
-        # plt.imshow(vis)
-        # plt.show()
     maxRange = max(ranges.values())
     results = {}
     for burnName, dem in dems.items():
         validIndices = validIndicesDict[burnName]
-        # print(validIndices)
         validPixels = dem[validIndices]
-        # print('valid pixels size:', validPixels.size)
         normed = util.normalize(validPixels)
         blank = np.zeros_like(dem, dtype=np.float32)
         thisRange = ranges[burnName]
         scaleFactor = thisRange/maxRange
         blank[validIndices] = scaleFactor * normed
-        # print('scaleFactor is ', scaleFactor)
-        # plt.imshow(blank)
-        # plt.show()
         results[burnName] = blank
     return results
 
@@ -138,43 +121,21 @@ def normalizeNonElevations(nonDems):
         validIndices = np.where(np.isfinite(layer))
         validPixels = layer[validIndices]
 
-        # print('valid indices:', validIndices)
-        # print('len of valid pixels', validPixels.shape, len(validPixels))
-
-        # vis = np.zeros_like(layer)
-        # vis[validIndices] = 42
-        # plt.figure('before '+name)
-        # plt.imshow(layer)
-        # plt.figure('valid '+name)
-        # plt.imshow(vis)
-        # plt.show()
-
         validPixelsList += validPixels.tolist()
         splitIndices.append(splitIndices[-1] + len(validPixels))
         validIndicesList.append(validIndices)
 
     # now layers.shape is (nburns, height, width)
     arr = np.array(validPixelsList)
-    # print('array is', arr, arr.min(), arr.max())
     normed = util.normalize(arr)
-    # print(normed)
-    # print('split indices', splitIndices)
     splitIndices = splitIndices[1:]
-    # print('split indices', splitIndices)
     splitBackUp = np.split(normed, splitIndices)
-    # print('split back up:', splitBackUp.shape)
     results = {}
     for name, validIndices, normedPixels in zip(names,validIndicesList,splitBackUp):
-        # print(name, validIndices, normedPixels)
         src = nonDems[name]
         img = np.zeros_like(src, dtype=np.float32)
         img[validIndices] = normedPixels
         results[name] = img
-        # if normedPixels.size > 0:
-        #     print('min and max of ', name, normedPixels.min(), normedPixels.max())
-        # plt.figure('normed'+name)
-        # plt.imshow(img)
-    # plt.show()
     return results
 
 def getOutputs(dataset):
@@ -211,7 +172,6 @@ def extract(padded, location, AOIRadius):
     loy = r+(y-r)
     hiy = r+(y+r+1)
     aoi = padded[loy:hiy,lox:hix]
-    # print(stacked.shape, padded.shape)s
     return aoi
 
 # =================================================================
@@ -238,21 +198,15 @@ def windMetrics(weatherMatrix):
     wDirRad = [(np.pi/180) * wDirDeg for wDirDeg in wdir]
     n, s, e, w = 0, 0, 0, 0
     for hr in range(len(wdir)):
-        # print(wdir[i], wDirRad[i], wspeed[i])
         if wdir[hr] > 90 and wdir[hr] < 270: #from south
-            # print('south!', -np.cos(wDirRad[i]) * wspeed[i])
             s += abs(np.cos(wDirRad[hr]) * wspeed[hr])
         if wdir[hr] < 90 or wdir[hr] > 270: #from north
-            # print('north!', np.cos(wDirRad[i]) * wspeed[i])
             n += abs(np.cos(wDirRad[hr]) * wspeed[hr])
         if wdir[hr] < 360 and wdir[hr] > 180: #from west
-            # print('west!', -np.sin(wDirRad[i]) * wspeed[i])
             w += abs(np.sin(wDirRad[hr]) * wspeed[hr])
         if wdir[hr] > 0 and wdir[hr] < 180: #from east
-            # print('east!',np.sin(wDirRad[i]) * wspeed[i])
             e += abs(np.sin(wDirRad[hr]) * wspeed[hr])
     components = [n, s, e, w]
-    # print(weather)
     return components
 
 # =========================================================

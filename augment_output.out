@@ -1,15 +1,7 @@
 Using TensorFlow backend.
-img shap is  (483, 617)
-img shap is  (483, 617)
-img shap is  (483, 617)
 landsat4.tif shae (483, 617)
-img shap is  (483, 617)
 landsat3.tif shae (483, 617)
-img shap is  (483, 617)
-img shap is  (483, 617)
 before landsat4 shape is  (483, 617)
-img shap is  (483, 617)
-img shap is  (483, 617)
 day is  0731
 day is  0801
 day is  0802
@@ -117,7 +109,7 @@ landsat shape is  (485, 619, 4)
   [ nan  nan  nan  nan]
   [ nan  nan  nan  nan]
   [ nan  nan  nan  nan]]]
-current dir is  ['.DS_Store', 'main.sbatch', 'band2lookatthis.csv', 'loadmodules.sh', '.gitignore', 'res.csv', 'main.py', 'landsatrightbeforesavetif.csv', 'view.py', 'augment_output.out', '.git', 'landsat2directlyafterrandomtransformcall.csv', 'README.md', 'augment.py', 'lib', 'data', 'main_out.out', 'models', 'output', 'augment.sbatch', '._main.py']
+current dir is  ['.DS_Store', 'main.sbatch', 'output.zip', 'band2lookatthis.csv', 'loadmodules.sh', '.gitignore', 'res.csv', 'main.py', 'landsatrightbeforesavetif.csv', 'view.py', 'augment_output.out', '.git', 'landsat2directlyafterrandomtransformcall.csv', 'README.md', 'augment.py', 'lib', 'data', 'main_out.out', 'models', 'output', 'augment.sbatch', '._main.py']
 datatype of saveimg is  float32
 to save shape is (485, 619)
 max is  3.40282e+38
@@ -295,17 +287,9 @@ after conversions [[  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.
  [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
     3.40282347e+38   3.40282347e+38]]
 done with 1+++++++++++++++++++++++++++++++++++++++++++++++++++
-img shap is  (215, 267)
-img shap is  (215, 267)
-img shap is  (215, 267)
 landsat4.tif shae (215, 267)
-img shap is  (215, 267)
 landsat3.tif shae (215, 267)
-img shap is  (215, 267)
-img shap is  (215, 267)
 before landsat4 shape is  (215, 267)
-img shap is  (215, 267)
-img shap is  (215, 267)
 day is  0711
 day is  0712
 day is  0713
@@ -413,7 +397,7 @@ landsat shape is  (217, 269, 4)
   [ nan  nan  nan  nan]
   [ nan  nan  nan  nan]
   [ nan  nan  nan  nan]]]
-current dir is  ['.DS_Store', 'main.sbatch', 'band2lookatthis.csv', 'loadmodules.sh', '.gitignore', 'res.csv', 'main.py', 'landsatrightbeforesavetif.csv', 'view.py', 'augment_output.out', '.git', 'landsat2directlyafterrandomtransformcall.csv', 'README.md', 'augment.py', 'lib', 'data', 'main_out.out', 'models', 'output', 'augment.sbatch', '._main.py']
+current dir is  ['.DS_Store', 'main.sbatch', 'output.zip', 'band2lookatthis.csv', 'loadmodules.sh', '.gitignore', 'res.csv', 'main.py', 'landsatrightbeforesavetif.csv', 'view.py', 'augment_output.out', '.git', 'landsat2directlyafterrandomtransformcall.csv', 'README.md', 'augment.py', 'lib', 'data', 'main_out.out', 'models', 'output', 'augment.sbatch', '._main.py']
 datatype of saveimg is  float32
 to save shape is (217, 269)
 max is  3.40282e+38
@@ -591,17 +575,9 @@ after conversions [[  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.
  [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
     3.40282347e+38   3.40282347e+38]]
 done with 1+++++++++++++++++++++++++++++++++++++++++++++++++++
-img shap is  (1307, 1190)
-img shap is  (1307, 1190)
-img shap is  (1307, 1190)
 landsat4.tif shae (1307, 1190)
-img shap is  (1307, 1190)
 landsat3.tif shae (1307, 1190)
-img shap is  (1307, 1190)
-img shap is  (1307, 1190)
 before landsat4 shape is  (1307, 1190)
-img shap is  (1307, 1190)
-img shap is  (1307, 1190)
 day is  0712
 day is  0713
 day is  0714
@@ -713,7 +689,7 @@ landsat shape is  (1309, 1192, 4)
   [ nan  nan  nan  nan]
   [ nan  nan  nan  nan]
   [ nan  nan  nan  nan]]]
-current dir is  ['.DS_Store', 'main.sbatch', 'band2lookatthis.csv', 'loadmodules.sh', '.gitignore', 'res.csv', 'main.py', 'landsatrightbeforesavetif.csv', 'view.py', 'augment_output.out', '.git', 'landsat2directlyafterrandomtransformcall.csv', 'README.md', 'augment.py', 'lib', 'data', 'main_out.out', 'models', 'output', 'augment.sbatch', '._main.py']
+current dir is  ['.DS_Store', 'main.sbatch', 'output.zip', 'band2lookatthis.csv', 'loadmodules.sh', '.gitignore', 'res.csv', 'main.py', 'landsatrightbeforesavetif.csv', 'view.py', 'augment_output.out', '.git', 'landsat2directlyafterrandomtransformcall.csv', 'README.md', 'augment.py', 'lib', 'data', 'main_out.out', 'models', 'output', 'augment.sbatch', '._main.py']
 datatype of saveimg is  float32
 to save shape is (1309, 1192)
 max is  3.40282e+38
@@ -955,614 +931,70 @@ after conversions [[  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.
  [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
     3.40282347e+38   3.40282347e+38]]
 done with 1+++++++++++++++++++++++++++++++++++++++++++++++++++
-img shap is  (647, 900)
-img shap is  (647, 900)
-img shap is  (647, 900)
 landsat4.tif shae (647, 900)
-img shap is  (647, 900)
 landsat3.tif shae (647, 900)
-img shap is  (647, 900)
-img shap is  (647, 900)
 before landsat4 shape is  (647, 900)
-img shap is  (647, 900)
-img shap is  (647, 900)
 day is  1028
 day is  1029
 day is  1030
-COLLECT DATA SHAPES:  (647, 900) (647, 900) (647, 900) (647, 900) (647, 900) (647, 900) (647, 900) (647, 900)
-firetuple shape is  8
-toaugment shape  (647, 900, 11)
-x is (11, 649, 902)
-False
-days is  ['1028', '1029', '1030']
-other layers are (649, 902, 3) [[[ nan  nan  nan]
-  [ nan  nan  nan]
-  [ nan  nan  nan]
-  ..., 
-  [ nan  nan  nan]
-  [ nan  nan  nan]
-  [ nan  nan  nan]]
-
- [[ nan  nan  nan]
-  [ nan  nan  nan]
-  [ nan  nan  nan]
-  ..., 
-  [ nan  nan  nan]
-  [ nan  nan  nan]
-  [ nan  nan  nan]]
-
- [[ nan  nan  nan]
-  [ nan  nan  nan]
-  [ nan  nan  nan]
-  ..., 
-  [ nan  nan  nan]
-  [ nan  nan  nan]
-  [ nan  nan  nan]]
-
- ..., 
- [[ nan  nan  nan]
-  [ nan  nan  nan]
-  [ nan  nan  nan]
-  ..., 
-  [ nan  nan  nan]
-  [ nan  nan  nan]
-  [ nan  nan  nan]]
-
- [[ nan  nan  nan]
-  [ nan  nan  nan]
-  [ nan  nan  nan]
-  ..., 
-  [ nan  nan  nan]
-  [ nan  nan  nan]
-  [ nan  nan  nan]]
-
- [[ nan  nan  nan]
-  [ nan  nan  nan]
-  [ nan  nan  nan]
-  ..., 
-  [ nan  nan  nan]
-  [ nan  nan  nan]
-  [ nan  nan  nan]]]
-landsat shape is  (649, 902, 4)
-[[[ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  ..., 
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]]
-
- [[ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  ..., 
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]]
-
- [[ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  ..., 
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]]
-
- ..., 
- [[ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  ..., 
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]]
-
- [[ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  ..., 
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]]
-
- [[ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  ..., 
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]]]
-current dir is  ['.DS_Store', 'main.sbatch', 'band2lookatthis.csv', 'loadmodules.sh', '.gitignore', 'res.csv', 'main.py', 'landsatrightbeforesavetif.csv', 'view.py', 'augment_output.out', '.git', 'landsat2directlyafterrandomtransformcall.csv', 'README.md', 'augment.py', 'lib', 'data', 'main_out.out', 'models', 'output', 'augment.sbatch', '._main.py']
-datatype of saveimg is  float32
-to save shape is (649, 902)
-max is  3.40282e+38
-after conversions [[  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- ..., 
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]]
-datatype of saveimg is  float32
-to save shape is (649, 902)
-max is  3.40282e+38
-after conversions [[  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- ..., 
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]]
-datatype of saveimg is  float32
-to save shape is (649, 902)
-max is  3.40282e+38
-after conversions [[  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- ..., 
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]]
-datatype of saveimg is  float32
-to save shape is (649, 902)
-max is  3.40282e+38
-after conversions [[  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- ..., 
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]]
-datatype of saveimg is  float32
-to save shape is (649, 902)
-max is  3.40282e+38
-after conversions [[  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- ..., 
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]]
-datatype of saveimg is  float32
-to save shape is (649, 902)
-max is  3.40282e+38
-after conversions [[  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- ..., 
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]]
-datatype of saveimg is  float32
-to save shape is (649, 902)
-max is  3.40282e+38
-after conversions [[  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- ..., 
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]]
-datatype of saveimg is  float32
-to save shape is (649, 902)
-max is  3.40282e+38
-after conversions [[  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- ..., 
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]]
-datatype of saveimg is  float32
-to save shape is (649, 902)
-max is  3.40282e+38
-after conversions [[  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- ..., 
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]]
-datatype of saveimg is  float32
-to save shape is (649, 902)
-max is  3.40282e+38
-after conversions [[  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- ..., 
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]]
-done with 1+++++++++++++++++++++++++++++++++++++++++++++++++++
-img shap is  (647, 900)
-img shap is  (647, 900)
-img shap is  (647, 900)
-landsat4.tif shae (647, 900)
-img shap is  (647, 900)
-landsat3.tif shae (647, 900)
-img shap is  (647, 900)
-img shap is  (647, 900)
-before landsat4 shape is  (647, 900)
-img shap is  (647, 900)
-img shap is  (647, 900)
 day is  1020
 day is  1021
-COLLECT DATA SHAPES:  (647, 900) (647, 900) (647, 900) (647, 900) (647, 900) (647, 900) (647, 900) (647, 900)
-firetuple shape is  8
-toaugment shape  (647, 900, 10)
-x is (10, 649, 902)
-False
-days is  ['1020', '1021']
-other layers are (649, 902, 2) [[[ nan  nan]
-  [ nan  nan]
-  [ nan  nan]
-  ..., 
-  [ nan  nan]
-  [ nan  nan]
-  [ nan  nan]]
-
- [[ nan  nan]
-  [ nan  nan]
-  [ nan  nan]
-  ..., 
-  [ nan  nan]
-  [ nan  nan]
-  [ nan  nan]]
-
- [[ nan  nan]
-  [ nan  nan]
-  [ nan  nan]
-  ..., 
-  [ nan  nan]
-  [ nan  nan]
-  [ nan  nan]]
-
- ..., 
- [[ nan  nan]
-  [ nan  nan]
-  [ nan  nan]
-  ..., 
-  [ nan  nan]
-  [ nan  nan]
-  [ nan  nan]]
-
- [[ nan  nan]
-  [ nan  nan]
-  [ nan  nan]
-  ..., 
-  [ nan  nan]
-  [ nan  nan]
-  [ nan  nan]]
-
- [[ nan  nan]
-  [ nan  nan]
-  [ nan  nan]
-  ..., 
-  [ nan  nan]
-  [ nan  nan]
-  [ nan  nan]]]
-landsat shape is  (649, 902, 4)
-[[[ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  ..., 
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]]
-
- [[ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  ..., 
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]]
-
- [[ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  ..., 
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]]
-
- ..., 
- [[ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  ..., 
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]]
-
- [[ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  ..., 
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]]
-
- [[ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  ..., 
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]]]
-current dir is  ['.DS_Store', 'main.sbatch', 'band2lookatthis.csv', 'loadmodules.sh', '.gitignore', 'res.csv', 'main.py', 'landsatrightbeforesavetif.csv', 'view.py', 'augment_output.out', '.git', 'landsat2directlyafterrandomtransformcall.csv', 'README.md', 'augment.py', 'lib', 'data', 'main_out.out', 'models', 'output', 'augment.sbatch', '._main.py']
-datatype of saveimg is  float32
-to save shape is (649, 902)
-max is  3.40282e+38
-after conversions [[  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- ..., 
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]]
-datatype of saveimg is  float32
-to save shape is (649, 902)
-max is  3.40282e+38
-after conversions [[  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- ..., 
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]]
-datatype of saveimg is  float32
-to save shape is (649, 902)
-max is  3.40282e+38
-after conversions [[  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- ..., 
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]]
-datatype of saveimg is  float32
-to save shape is (649, 902)
-max is  3.40282e+38
-after conversions [[  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- ..., 
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]]
-datatype of saveimg is  float32
-to save shape is (649, 902)
-max is  3.40282e+38
-after conversions [[  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- ..., 
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]]
-datatype of saveimg is  float32
-to save shape is (649, 902)
-max is  3.40282e+38
-after conversions [[  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- ..., 
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]]
-datatype of saveimg is  float32
-to save shape is (649, 902)
-max is  3.40282e+38
-after conversions [[  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- ..., 
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]]
-datatype of saveimg is  float32
-to save shape is (649, 902)
-max is  3.40282e+38
-after conversions [[  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- ..., 
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]]
-datatype of saveimg is  float32
-to save shape is (649, 902)
-max is  3.40282e+38
-after conversions [[  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- ..., 
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]]
-done with 1+++++++++++++++++++++++++++++++++++++++++++++++++++
-img shap is  (647, 900)
-img shap is  (647, 900)
-img shap is  (647, 900)
-landsat4.tif shae (647, 900)
-img shap is  (647, 900)
-landsat3.tif shae (647, 900)
-img shap is  (647, 900)
-img shap is  (647, 900)
-before landsat4 shape is  (647, 900)
-img shap is  (647, 900)
-img shap is  (647, 900)
 day is  1023
 day is  1024
 COLLECT DATA SHAPES:  (647, 900) (647, 900) (647, 900) (647, 900) (647, 900) (647, 900) (647, 900) (647, 900)
 firetuple shape is  8
-toaugment shape  (647, 900, 10)
-x is (10, 649, 902)
+toaugment shape  (647, 900, 15)
+x is (15, 649, 902)
 False
-days is  ['1023', '1024']
-other layers are (649, 902, 2) [[[ nan  nan]
-  [ nan  nan]
-  [ nan  nan]
+days is  ['1028', '1029', '1030', '1020', '1021', '1023', '1024']
+other layers are (649, 902, 7) [[[ nan  nan  nan ...,  nan  nan  nan]
+  [ nan  nan  nan ...,  nan  nan  nan]
+  [ nan  nan  nan ...,  nan  nan  nan]
   ..., 
-  [ nan  nan]
-  [ nan  nan]
-  [ nan  nan]]
+  [ nan  nan  nan ...,  nan  nan  nan]
+  [ nan  nan  nan ...,  nan  nan  nan]
+  [ nan  nan  nan ...,  nan  nan  nan]]
 
- [[ nan  nan]
-  [ nan  nan]
-  [ nan  nan]
+ [[ nan  nan  nan ...,  nan  nan  nan]
+  [ nan  nan  nan ...,  nan  nan  nan]
+  [ nan  nan  nan ...,  nan  nan  nan]
   ..., 
-  [ nan  nan]
-  [ nan  nan]
-  [ nan  nan]]
+  [ nan  nan  nan ...,  nan  nan  nan]
+  [ nan  nan  nan ...,  nan  nan  nan]
+  [ nan  nan  nan ...,  nan  nan  nan]]
 
- [[ nan  nan]
-  [ nan  nan]
-  [ nan  nan]
+ [[ nan  nan  nan ...,  nan  nan  nan]
+  [ nan  nan  nan ...,  nan  nan  nan]
+  [ nan  nan  nan ...,  nan  nan  nan]
   ..., 
-  [ nan  nan]
-  [ nan  nan]
-  [ nan  nan]]
+  [ nan  nan  nan ...,  nan  nan  nan]
+  [ nan  nan  nan ...,  nan  nan  nan]
+  [ nan  nan  nan ...,  nan  nan  nan]]
 
  ..., 
- [[ nan  nan]
-  [ nan  nan]
-  [ nan  nan]
+ [[ nan  nan  nan ...,  nan  nan  nan]
+  [ nan  nan  nan ...,  nan  nan  nan]
+  [ nan  nan  nan ...,  nan  nan  nan]
   ..., 
-  [ nan  nan]
-  [ nan  nan]
-  [ nan  nan]]
+  [ nan  nan  nan ...,  nan  nan  nan]
+  [ nan  nan  nan ...,  nan  nan  nan]
+  [ nan  nan  nan ...,  nan  nan  nan]]
 
- [[ nan  nan]
-  [ nan  nan]
-  [ nan  nan]
+ [[ nan  nan  nan ...,  nan  nan  nan]
+  [ nan  nan  nan ...,  nan  nan  nan]
+  [ nan  nan  nan ...,  nan  nan  nan]
   ..., 
-  [ nan  nan]
-  [ nan  nan]
-  [ nan  nan]]
+  [ nan  nan  nan ...,  nan  nan  nan]
+  [ nan  nan  nan ...,  nan  nan  nan]
+  [ nan  nan  nan ...,  nan  nan  nan]]
 
- [[ nan  nan]
-  [ nan  nan]
-  [ nan  nan]
+ [[ nan  nan  nan ...,  nan  nan  nan]
+  [ nan  nan  nan ...,  nan  nan  nan]
+  [ nan  nan  nan ...,  nan  nan  nan]
   ..., 
-  [ nan  nan]
-  [ nan  nan]
-  [ nan  nan]]]
+  [ nan  nan  nan ...,  nan  nan  nan]
+  [ nan  nan  nan ...,  nan  nan  nan]
+  [ nan  nan  nan ...,  nan  nan  nan]]]
 landsat shape is  (649, 902, 4)
 [[[ nan  nan  nan  nan]
   [ nan  nan  nan  nan]
@@ -1612,7 +1044,87 @@ landsat shape is  (649, 902, 4)
   [ nan  nan  nan  nan]
   [ nan  nan  nan  nan]
   [ nan  nan  nan  nan]]]
-current dir is  ['.DS_Store', 'main.sbatch', 'band2lookatthis.csv', 'loadmodules.sh', '.gitignore', 'res.csv', 'main.py', 'landsatrightbeforesavetif.csv', 'view.py', 'augment_output.out', '.git', 'landsat2directlyafterrandomtransformcall.csv', 'README.md', 'augment.py', 'lib', 'data', 'main_out.out', 'models', 'output', 'augment.sbatch', '._main.py']
+current dir is  ['.DS_Store', 'main.sbatch', 'output.zip', 'band2lookatthis.csv', 'loadmodules.sh', '.gitignore', 'res.csv', 'main.py', 'landsatrightbeforesavetif.csv', 'view.py', 'augment_output.out', '.git', 'landsat2directlyafterrandomtransformcall.csv', 'README.md', 'augment.py', 'lib', 'data', 'main_out.out', 'models', 'output', 'augment.sbatch', '._main.py']
+datatype of saveimg is  float32
+to save shape is (649, 902)
+max is  3.40282e+38
+after conversions [[  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
+    3.40282347e+38   3.40282347e+38]
+ [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
+    3.40282347e+38   3.40282347e+38]
+ [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
+    3.40282347e+38   3.40282347e+38]
+ ..., 
+ [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
+    3.40282347e+38   3.40282347e+38]
+ [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
+    3.40282347e+38   3.40282347e+38]
+ [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
+    3.40282347e+38   3.40282347e+38]]
+datatype of saveimg is  float32
+to save shape is (649, 902)
+max is  3.40282e+38
+after conversions [[  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
+    3.40282347e+38   3.40282347e+38]
+ [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
+    3.40282347e+38   3.40282347e+38]
+ [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
+    3.40282347e+38   3.40282347e+38]
+ ..., 
+ [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
+    3.40282347e+38   3.40282347e+38]
+ [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
+    3.40282347e+38   3.40282347e+38]
+ [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
+    3.40282347e+38   3.40282347e+38]]
+datatype of saveimg is  float32
+to save shape is (649, 902)
+max is  3.40282e+38
+after conversions [[  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
+    3.40282347e+38   3.40282347e+38]
+ [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
+    3.40282347e+38   3.40282347e+38]
+ [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
+    3.40282347e+38   3.40282347e+38]
+ ..., 
+ [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
+    3.40282347e+38   3.40282347e+38]
+ [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
+    3.40282347e+38   3.40282347e+38]
+ [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
+    3.40282347e+38   3.40282347e+38]]
+datatype of saveimg is  float32
+to save shape is (649, 902)
+max is  3.40282e+38
+after conversions [[  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
+    3.40282347e+38   3.40282347e+38]
+ [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
+    3.40282347e+38   3.40282347e+38]
+ [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
+    3.40282347e+38   3.40282347e+38]
+ ..., 
+ [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
+    3.40282347e+38   3.40282347e+38]
+ [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
+    3.40282347e+38   3.40282347e+38]
+ [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
+    3.40282347e+38   3.40282347e+38]]
+datatype of saveimg is  float32
+to save shape is (649, 902)
+max is  3.40282e+38
+after conversions [[  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
+    3.40282347e+38   3.40282347e+38]
+ [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
+    3.40282347e+38   3.40282347e+38]
+ [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
+    3.40282347e+38   3.40282347e+38]
+ ..., 
+ [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
+    3.40282347e+38   3.40282347e+38]
+ [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
+    3.40282347e+38   3.40282347e+38]
+ [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
+    3.40282347e+38   3.40282347e+38]]
 datatype of saveimg is  float32
 to save shape is (649, 902)
 max is  3.40282e+38
@@ -1758,279 +1270,9 @@ after conversions [[  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.
  [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
     3.40282347e+38   3.40282347e+38]]
 done with 1+++++++++++++++++++++++++++++++++++++++++++++++++++
-img shap is  (1030, 1129)
-img shap is  (1030, 1129)
-img shap is  (1030, 1129)
-landsat4.tif shae (1030, 1129)
-img shap is  (1030, 1129)
-landsat3.tif shae (1030, 1129)
-img shap is  (1030, 1129)
-img shap is  (1030, 1129)
-before landsat4 shape is  (1030, 1129)
-img shap is  (1030, 1129)
-img shap is  (1030, 1129)
-day is  0710
-day is  0711
-COLLECT DATA SHAPES:  (1030, 1129) (1030, 1129) (1030, 1129) (1030, 1129) (1030, 1129) (1030, 1129) (1030, 1129) (1030, 1129)
-firetuple shape is  8
-toaugment shape  (1030, 1129, 10)
-x is (10, 1032, 1131)
-False
-days is  ['0710', '0711']
-other layers are (1032, 1131, 2) [[[ nan  nan]
-  [ nan  nan]
-  [ nan  nan]
-  ..., 
-  [ nan  nan]
-  [ nan  nan]
-  [ nan  nan]]
-
- [[ nan  nan]
-  [ nan  nan]
-  [ nan  nan]
-  ..., 
-  [ nan  nan]
-  [ nan  nan]
-  [ nan  nan]]
-
- [[ nan  nan]
-  [ nan  nan]
-  [ nan  nan]
-  ..., 
-  [ nan  nan]
-  [ nan  nan]
-  [ nan  nan]]
-
- ..., 
- [[ nan  nan]
-  [ nan  nan]
-  [ nan  nan]
-  ..., 
-  [ nan  nan]
-  [ nan  nan]
-  [ nan  nan]]
-
- [[ nan  nan]
-  [ nan  nan]
-  [ nan  nan]
-  ..., 
-  [ nan  nan]
-  [ nan  nan]
-  [ nan  nan]]
-
- [[ nan  nan]
-  [ nan  nan]
-  [ nan  nan]
-  ..., 
-  [ nan  nan]
-  [ nan  nan]
-  [ nan  nan]]]
-landsat shape is  (1032, 1131, 4)
-[[[ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  ..., 
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]]
-
- [[ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  ..., 
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]]
-
- [[ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  ..., 
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]]
-
- ..., 
- [[ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  ..., 
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]]
-
- [[ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  ..., 
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]]
-
- [[ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  ..., 
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]]]
-current dir is  ['.DS_Store', 'main.sbatch', 'band2lookatthis.csv', 'loadmodules.sh', '.gitignore', 'res.csv', 'main.py', 'landsatrightbeforesavetif.csv', 'view.py', 'augment_output.out', '.git', 'landsat2directlyafterrandomtransformcall.csv', 'README.md', 'augment.py', 'lib', 'data', 'main_out.out', 'models', 'output', 'augment.sbatch', '._main.py']
-datatype of saveimg is  float32
-to save shape is (1032, 1131)
-max is  3.40282e+38
-after conversions [[  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- ..., 
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]]
-datatype of saveimg is  float32
-to save shape is (1032, 1131)
-max is  3.40282e+38
-after conversions [[  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- ..., 
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]]
-datatype of saveimg is  float32
-to save shape is (1032, 1131)
-max is  3.40282e+38
-after conversions [[  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- ..., 
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]]
-datatype of saveimg is  float32
-to save shape is (1032, 1131)
-max is  3.40282e+38
-after conversions [[  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- ..., 
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]]
-datatype of saveimg is  float32
-to save shape is (1032, 1131)
-max is  3.40282e+38
-after conversions [[  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- ..., 
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]]
-datatype of saveimg is  float32
-to save shape is (1032, 1131)
-max is  3.40282e+38
-after conversions [[  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- ..., 
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]]
-datatype of saveimg is  float32
-to save shape is (1032, 1131)
-max is  3.40282e+38
-after conversions [[  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- ..., 
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]]
-datatype of saveimg is  float32
-to save shape is (1032, 1131)
-max is  3.40282e+38
-after conversions [[  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- ..., 
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]]
-datatype of saveimg is  float32
-to save shape is (1032, 1131)
-max is  3.40282e+38
-after conversions [[  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- ..., 
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]]
-done with 1+++++++++++++++++++++++++++++++++++++++++++++++++++
-img shap is  (1010, 796)
-img shap is  (1010, 796)
-img shap is  (1010, 796)
 landsat4.tif shae (1010, 796)
-img shap is  (1010, 796)
 landsat3.tif shae (1010, 796)
-img shap is  (1010, 796)
-img shap is  (1010, 796)
 before landsat4 shape is  (1010, 796)
-img shap is  (1010, 796)
-img shap is  (1010, 796)
 day is  0911
 day is  0912
 COLLECT DATA SHAPES:  (1010, 796) (1010, 796) (1010, 796) (1010, 796) (1010, 796) (1010, 796) (1010, 796) (1010, 796)
@@ -2136,7 +1378,7 @@ landsat shape is  (1012, 798, 4)
   [ nan  nan  nan  nan]
   [ nan  nan  nan  nan]
   [ nan  nan  nan  nan]]]
-current dir is  ['.DS_Store', 'main.sbatch', 'band2lookatthis.csv', 'loadmodules.sh', '.gitignore', 'res.csv', 'main.py', 'landsatrightbeforesavetif.csv', 'view.py', 'augment_output.out', '.git', 'landsat2directlyafterrandomtransformcall.csv', 'README.md', 'augment.py', 'lib', 'data', 'main_out.out', 'models', 'output', 'augment.sbatch', '._main.py']
+current dir is  ['.DS_Store', 'main.sbatch', 'output.zip', 'band2lookatthis.csv', 'loadmodules.sh', '.gitignore', 'res.csv', 'main.py', 'landsatrightbeforesavetif.csv', 'view.py', 'augment_output.out', '.git', 'landsat2directlyafterrandomtransformcall.csv', 'README.md', 'augment.py', 'lib', 'data', 'main_out.out', 'models', 'output', 'augment.sbatch', '._main.py']
 datatype of saveimg is  float32
 to save shape is (1012, 798)
 max is  3.40282e+38
@@ -2282,17 +1524,9 @@ after conversions [[  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.
  [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
     3.40282347e+38   3.40282347e+38]]
 done with 1+++++++++++++++++++++++++++++++++++++++++++++++++++
-img shap is  (272, 270)
-img shap is  (272, 270)
-img shap is  (272, 270)
 landsat4.tif shae (272, 270)
-img shap is  (272, 270)
 landsat3.tif shae (272, 270)
-img shap is  (272, 270)
-img shap is  (272, 270)
 before landsat4 shape is  (272, 270)
-img shap is  (272, 270)
-img shap is  (272, 270)
 day is  0719
 day is  0720
 COLLECT DATA SHAPES:  (272, 270) (272, 270) (272, 270) (272, 270) (272, 270) (272, 270) (272, 270) (272, 270)
@@ -2398,7 +1632,7 @@ landsat shape is  (274, 272, 4)
   [ nan  nan  nan  nan]
   [ nan  nan  nan  nan]
   [ nan  nan  nan  nan]]]
-current dir is  ['.DS_Store', 'main.sbatch', 'band2lookatthis.csv', 'loadmodules.sh', '.gitignore', 'res.csv', 'main.py', 'landsatrightbeforesavetif.csv', 'view.py', 'augment_output.out', '.git', 'landsat2directlyafterrandomtransformcall.csv', 'README.md', 'augment.py', 'lib', 'data', 'main_out.out', 'models', 'output', 'augment.sbatch', '._main.py']
+current dir is  ['.DS_Store', 'main.sbatch', 'output.zip', 'band2lookatthis.csv', 'loadmodules.sh', '.gitignore', 'res.csv', 'main.py', 'landsatrightbeforesavetif.csv', 'view.py', 'augment_output.out', '.git', 'landsat2directlyafterrandomtransformcall.csv', 'README.md', 'augment.py', 'lib', 'data', 'main_out.out', 'models', 'output', 'augment.sbatch', '._main.py']
 datatype of saveimg is  float32
 to save shape is (274, 272)
 max is  3.40282e+38
@@ -2544,313 +1778,9 @@ after conversions [[  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.
  [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
     3.40282347e+38   3.40282347e+38]]
 done with 1+++++++++++++++++++++++++++++++++++++++++++++++++++
-img shap is  (643, 529)
-img shap is  (643, 529)
-img shap is  (643, 529)
-landsat4.tif shae (643, 529)
-img shap is  (643, 529)
-landsat3.tif shae (643, 529)
-img shap is  (643, 529)
-img shap is  (643, 529)
-before landsat4 shape is  (643, 529)
-img shap is  (643, 529)
-img shap is  (643, 529)
-day is  0703
-day is  0704
-day is  0705
-day is  0706
-COLLECT DATA SHAPES:  (643, 529) (643, 529) (643, 529) (643, 529) (643, 529) (643, 529) (643, 529) (643, 529)
-firetuple shape is  8
-toaugment shape  (643, 529, 12)
-x is (12, 645, 531)
-False
-days is  ['0703', '0704', '0705', '0706']
-other layers are (645, 531, 4) [[[ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  ..., 
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]]
-
- [[ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  ..., 
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]]
-
- [[ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  ..., 
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]]
-
- ..., 
- [[ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  ..., 
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]]
-
- [[ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  ..., 
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]]
-
- [[ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  ..., 
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]]]
-landsat shape is  (645, 531, 4)
-[[[ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  ..., 
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]]
-
- [[ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  ..., 
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]]
-
- [[ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  ..., 
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]]
-
- ..., 
- [[ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  ..., 
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]]
-
- [[ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  ..., 
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]]
-
- [[ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  ..., 
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]
-  [ nan  nan  nan  nan]]]
-current dir is  ['.DS_Store', 'main.sbatch', 'band2lookatthis.csv', 'loadmodules.sh', '.gitignore', 'res.csv', 'main.py', 'landsatrightbeforesavetif.csv', 'view.py', 'augment_output.out', '.git', 'landsat2directlyafterrandomtransformcall.csv', 'README.md', 'augment.py', 'lib', 'data', 'main_out.out', 'models', 'output', 'augment.sbatch', '._main.py']
-datatype of saveimg is  float32
-to save shape is (645, 531)
-max is  3.40282e+38
-after conversions [[  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- ..., 
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]]
-datatype of saveimg is  float32
-to save shape is (645, 531)
-max is  3.40282e+38
-after conversions [[  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- ..., 
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]]
-datatype of saveimg is  float32
-to save shape is (645, 531)
-max is  3.40282e+38
-after conversions [[  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- ..., 
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]]
-datatype of saveimg is  float32
-to save shape is (645, 531)
-max is  3.40282e+38
-after conversions [[  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- ..., 
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]]
-datatype of saveimg is  float32
-to save shape is (645, 531)
-max is  3.40282e+38
-after conversions [[  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- ..., 
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]]
-datatype of saveimg is  float32
-to save shape is (645, 531)
-max is  3.40282e+38
-after conversions [[  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- ..., 
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]]
-datatype of saveimg is  float32
-to save shape is (645, 531)
-max is  3.40282e+38
-after conversions [[  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- ..., 
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]]
-datatype of saveimg is  float32
-to save shape is (645, 531)
-max is  3.40282e+38
-after conversions [[  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- ..., 
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]]
-datatype of saveimg is  float32
-to save shape is (645, 531)
-max is  3.40282e+38
-after conversions [[  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- ..., 
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]]
-datatype of saveimg is  float32
-to save shape is (645, 531)
-max is  3.40282e+38
-after conversions [[  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- ..., 
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]]
-datatype of saveimg is  float32
-to save shape is (645, 531)
-max is  3.40282e+38
-after conversions [[  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- ..., 
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]
- [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
-    3.40282347e+38   3.40282347e+38]]
-done with 1+++++++++++++++++++++++++++++++++++++++++++++++++++
-img shap is  (416, 334)
-img shap is  (416, 334)
-img shap is  (416, 334)
 landsat4.tif shae (416, 334)
-img shap is  (416, 334)
 landsat3.tif shae (416, 334)
-img shap is  (416, 334)
-img shap is  (416, 334)
 before landsat4 shape is  (416, 334)
-img shap is  (416, 334)
-img shap is  (416, 334)
 day is  0628
 day is  0629
 day is  0630
@@ -2957,7 +1887,7 @@ landsat shape is  (418, 336, 4)
   [ nan  nan  nan  nan]
   [ nan  nan  nan  nan]
   [ nan  nan  nan  nan]]]
-current dir is  ['.DS_Store', 'main.sbatch', 'band2lookatthis.csv', 'loadmodules.sh', '.gitignore', 'res.csv', 'main.py', 'landsatrightbeforesavetif.csv', 'view.py', 'augment_output.out', '.git', 'landsat2directlyafterrandomtransformcall.csv', 'README.md', 'augment.py', 'lib', 'data', 'main_out.out', 'models', 'output', 'augment.sbatch', '._main.py']
+current dir is  ['.DS_Store', 'main.sbatch', 'output.zip', 'band2lookatthis.csv', 'loadmodules.sh', '.gitignore', 'res.csv', 'main.py', 'landsatrightbeforesavetif.csv', 'view.py', 'augment_output.out', '.git', 'landsat2directlyafterrandomtransformcall.csv', 'README.md', 'augment.py', 'lib', 'data', 'main_out.out', 'models', 'output', 'augment.sbatch', '._main.py']
 datatype of saveimg is  float32
 to save shape is (418, 336)
 max is  3.40282e+38
@@ -3119,17 +2049,9 @@ after conversions [[  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.
  [  3.40282347e+38   3.40282347e+38   3.40282347e+38 ...,   3.40282347e+38
     3.40282347e+38   3.40282347e+38]]
 done with 1+++++++++++++++++++++++++++++++++++++++++++++++++++
-img shap is  (272, 270)
-img shap is  (272, 270)
-img shap is  (272, 270)
 landsat4.tif shae (272, 270)
-img shap is  (272, 270)
 landsat3.tif shae (272, 270)
-img shap is  (272, 270)
-img shap is  (272, 270)
 before landsat4 shape is  (272, 270)
-img shap is  (272, 270)
-img shap is  (272, 270)
 day is  0719
 day is  0720
 COLLECT DATA SHAPES:  (272, 270) (272, 270) (272, 270) (272, 270) (272, 270) (272, 270) (272, 270) (272, 270)
@@ -3235,7 +2157,7 @@ landsat shape is  (274, 272, 4)
   [ nan  nan  nan  nan]
   [ nan  nan  nan  nan]
   [ nan  nan  nan  nan]]]
-current dir is  ['.DS_Store', 'main.sbatch', 'band2lookatthis.csv', 'loadmodules.sh', '.gitignore', 'res.csv', 'main.py', 'landsatrightbeforesavetif.csv', 'view.py', 'augment_output.out', '.git', 'landsat2directlyafterrandomtransformcall.csv', 'README.md', 'augment.py', 'lib', 'data', 'main_out.out', 'models', 'output', 'augment.sbatch', '._main.py']
+current dir is  ['.DS_Store', 'main.sbatch', 'output.zip', 'band2lookatthis.csv', 'loadmodules.sh', '.gitignore', 'res.csv', 'main.py', 'landsatrightbeforesavetif.csv', 'view.py', 'augment_output.out', '.git', 'landsat2directlyafterrandomtransformcall.csv', 'README.md', 'augment.py', 'lib', 'data', 'main_out.out', 'models', 'output', 'augment.sbatch', '._main.py']
 datatype of saveimg is  float32
 to save shape is (274, 272)
 max is  3.40282e+38

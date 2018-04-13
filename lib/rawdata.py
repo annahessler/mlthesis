@@ -21,7 +21,7 @@ class RawData(object):
             print('1')
         if burnNames == 'untrain':
             print('2')
-            burnNames = listdir_nohidden('/data/_untrained/')
+            burnNames = listdir_nohidden('data/_untrained/')
             print('2')
         if dates == 'all':
             print('3')
@@ -63,17 +63,16 @@ class Burn(object):
     def loadLayers(self):
         folder = 'data/{}/'.format(self.name)
         dem = util.openImg(folder+'dem.tif')
-        # slope = util.openImg(folder+'slope.tif')
+        slope = util.openImg(folder+'slope.tif')
         band_2 = util.openImg(folder+'band_2.tif')
         band_3 = util.openImg(folder+'band_3.tif')
         band_4 = util.openImg(folder+'band_4.tif')
         band_5 = util.openImg(folder+'band_5.tif')
         ndvi = util.openImg(folder+'ndvi.tif')
         aspect = util.openImg(folder+'aspect.tif')
-        # r,g,b,nir = cv2.split(landsat)
 
         layers = {'dem':dem,
-                # 'slope':slope,
+                'slope':slope,
                 'ndvi':ndvi,
                 'aspect':aspect,
                 'band_4':band_4,
@@ -92,6 +91,7 @@ class Burn(object):
     @staticmethod
     def load(burnName, dates='all'):
         print("in load")
+        print(dates)
         if dates == 'all':
             dates = Day.allGoodDays(burnName)
         days = {date:Day(burnName, date) for date in dates}

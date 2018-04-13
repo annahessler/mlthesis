@@ -31,12 +31,11 @@ if pil_image is not None:
         'bilinear': pil_image.BILINEAR,
         'bicubic': pil_image.BICUBIC,
     }
-    # These methods were only introduced in version 3.4.0 (2016).
+
     if hasattr(pil_image, 'HAMMING'):
         _PIL_INTERPOLATION_METHODS['hamming'] = pil_image.HAMMING
     if hasattr(pil_image, 'BOX'):
         _PIL_INTERPOLATION_METHODS['box'] = pil_image.BOX
-    # This method is new in version 1.1.3 (2013).
     if hasattr(pil_image, 'LANCZOS'):
         _PIL_INTERPOLATION_METHODS['lanczos'] = pil_image.LANCZOS
 
@@ -181,39 +180,6 @@ def transform_matrix_offset_center(matrix, x, y):
     reset_matrix = np.array([[1, 0, -o_x], [0, 1, -o_y], [0, 0, 1]])
     transform_matrix = np.dot(np.dot(offset_matrix, matrix), reset_matrix)
     return transform_matrix
-
-
-# def apply_transform(x,
-#                     transform_matrix,
-#                     channel_axis=0,
-#                     fill_mode='nearest',
-#                     cval=0.):
-#     """Apply the image transformation specified by a matrix.
-#     # Arguments
-#         x: 2D numpy array, single image.
-#         transform_matrix: Numpy array specifying the geometric transformation.
-#         channel_axis: Index of axis for channels in the input tensor.
-#         fill_mode: Points outside the boundaries of the input
-#             are filled according to the given mode
-#             (one of `{'constant', 'nearest', 'reflect', 'wrap'}`).
-#         cval: Value used for points outside the boundaries
-#             of the input if `mode='constant'`.
-#     # Returns
-#         The transformed version of the input.
-#     """
-#     x = np.rollaxis(x, channel_axis, 0)
-#     final_affine_matrix = transform_matrix[:2, :2]
-#     final_offset = transform_matrix[:2, 2]
-#     channel_images = [ndi.interpolation.affine_transform(
-#         x_channel,
-#         final_affine_matrix,
-#         final_offset,
-#         order=0,
-#         mode=fill_mode,
-#         cval=cval) for x_channel in x]
-#     x = np.stack(channel_images, axis=0)
-#     x = np.rollaxis(x, 0, channel_axis + 1)
-#     return x
 
 
 def flip_axis(x, axis):
@@ -507,15 +473,6 @@ class ourImageDataGenerator(object):
                 x = flip_axis(x, img_row_axis)
         others = x[:,:,2:]
         landsat = others[:,:,:4]
-        # np.savetxt('data/demafterrandomtransform.csv', x[:,:,3], delimiter=',')
-        # plt.imshow(x[:,:,3])
-        # plt.figure()
-        # plt.imshow(x[:,:,4])
-        # plt.show()
-        # print('image.py landsat is ', landsat)
-
-        # np.savetxt('data/landsat2afteraugmentcall.csv', x[:,:,4], delimiter=',')
-
         return x, theta
 
 def apply_transform(x,
@@ -536,7 +493,6 @@ def apply_transform(x,
     # Returns
         The transformed version of the input.
     """
-    # np.savetxt('data/dembeforeapplytransform.csv', x[:,:,0], delimiter=',')
     x = np.rollaxis(x, channel_axis, 0)
     print('x is', x.shape)
     final_affine_matrix = transform_matrix[:2, :2]
@@ -550,7 +506,6 @@ def apply_transform(x,
         cval=cval) for x_channel in x]
     x = np.stack(channel_images, axis=0)
     x = np.rollaxis(x, 0, channel_axis + 1)
-    # np.savetxt('data/demafterapplytransform.csv', x[:,:,0], delimiter=',')
     return x
 
 class ImageDataGenerator(object):

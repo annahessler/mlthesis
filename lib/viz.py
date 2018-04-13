@@ -14,7 +14,6 @@ from lib import dataset
 from lib import util
 
 def renderPredictions(dataset, predictions):
-    # print('predictions are', predictions.values())
     day2pred = {}
     for pt, pred in predictions.items():
         burnName, date, location = pt
@@ -22,23 +21,15 @@ def renderPredictions(dataset, predictions):
         if day not in day2pred:
             day2pred[day] = []
         pair = (location, float(pred))
-        # print('storing prediction', pair)
         day2pred[day].append(pair)
 
-    # print('these are all the original days:', day2pred.keys())
     results = {}
     for (burnName, date), locsAndPreds in day2pred.items():
-        # print('locs and preds', locsAndPreds)
         locs, preds = zip(*locsAndPreds)
-        # print('reds:', preds)
         xs,ys = zip(*locs)
         preds = [pred+1 for pred in preds]
-        # print((xs,ys))
-        # print(max(preds), min(preds))
-        # print(len(xs), len(preds))
         burn = dataset.data.burns[burnName]
         canvas = np.zeros(burn.layerSize, dtype=np.float32)
-        # print(canvas)
         canvas[(xs,ys)] = np.array(preds, dtype=np.float32)
         results[(burnName, date)] = canvas
     return results
@@ -49,7 +40,6 @@ def createCanvases(dataset):
         burn = dataset.data.burns[burnName]
         day = dataset.data.getDay(burnName, date)
         h,w = day.startingPerim.shape
-        # canvas = np.zeros((h,w,3), dtype=np.uint8)
         normedDEM = util.normalize(burn.layers['dem'])
         canvas = cv2.cvtColor(normedDEM, cv2.COLOR_GRAY2RGB)
 
@@ -59,9 +49,6 @@ def createCanvases(dataset):
         cv2.drawContours(canvas, startContour, -1, (0,1,0), 1)
 
         result[(burnName, date)] = canvas
-
-        # plt.imshow(canvas)
-        # plt.show()
     return result
 
 def overlay(predictionRenders, canvases):
@@ -72,17 +59,9 @@ def overlay(predictionRenders, canvases):
         yellowToRed = np.dstack((np.ones_like(render), 1-(render-1), np.zeros_like(render)))
         canvas[render>1] = yellowToRed[render>1]
         result[(burnName, date)] = canvas
-
-        # plt.imshow(canvases[(burnName, date)])
-        # plt.figure('render')
-        # plt.imshow(render)
-        # plt.figure(burnName +' '+date)
-        # plt.imshow(canvas)
-        # plt.show()
     return result
 
 def visualizePredictions(dataset, predictions):
-    # print('these are all the burns Im going to start rendering:', predictions.keys())
     predRenders = renderPredictions(dataset, predictions)
     canvases = createCanvases(dataset)
     overlayed = overlay(predRenders, canvases)
@@ -90,15 +69,12 @@ def visualizePredictions(dataset, predictions):
 
 def showPredictions(predictionsRenders):
     # sort by burn
-    # print("Here are all the renders:", predictionsRenders.keys())
     burns = {}
     for (burnName, date), render in predictionsRenders.items():
         if burnName not in burns:
             burns[burnName] = []
         burns[burnName].append((date, render))
 
-    # isRunning = {}
-    # print("These are all the burns I'm showing:", burns.keys())
     for burnName, frameList in burns.items():
         frameList.sort()
         fig = plt.figure(burnName, figsize=(8, 6))
@@ -128,17 +104,12 @@ def showPredictions(predictionsRenders):
                         anim._step()
                     anim._draw_next_frame = saved
                     anim._step()
-                    # print(success)
-                    # if not success:
-                    #     anim.frame_seq = anim.new_frame_seq()
-                    #     anim._step()
                 elif event.key =='down':
                     anim.event_source.stop()
                 elif event.key =='up':
                     anim.event_source.start()
             return onKey
 
-        # fig.canvas.mpl_connect('button_press_event', onClick)
         fig.canvas.mpl_connect('key_press_event', createMyOnKey(anim))
         plt.show()
 
