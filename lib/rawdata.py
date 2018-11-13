@@ -55,7 +55,8 @@ class Burn(object):
     def __init__(self, name, days, layers=None):
         self.name = name
         self.days = days
-        self.layers = layers if layers is not None else self.loadLayers()
+        self.layers = layers if layers is not None else self.loadLayers
+        
 
         # what is the height and width of a layer of data
         self.layerSize = list(self.layers.values())[0].shape[:2]

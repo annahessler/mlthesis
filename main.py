@@ -75,7 +75,7 @@ def getModel(weightsFile=None):
 
     mod = model.FireModel(pp, weightsFile)
     return mod
-
+    
 def example():
     try:
         modfname = sys.argv[1]

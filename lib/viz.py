@@ -37,6 +37,7 @@ def renderPredictions(dataset, predictions, preResu):
         results[(burnName, date)] = canvas
     return results
 
+#This function gathers a bunch of statistics about the predictions and prints them out
 def getNumbers(dataset, loc, res, size, fireDate):
     total_f_score = 0
     perim_num = 0

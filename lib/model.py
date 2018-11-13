@@ -10,6 +10,7 @@ from keras.layers import Conv2D, MaxPooling2D, AveragePooling2D
 import random
 print('done.')
 
+
 try:
     from lib import preprocess
 except:

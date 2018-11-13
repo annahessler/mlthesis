@@ -198,6 +198,7 @@ def maximumTemperature2(weatherMatrix):
     temp, dewpt, temp2, wdir, wspeed, precip, hum = weatherMatrix
     return max(temp2)
 
+    
 def windMetrics(weatherMatrix):
     temp, dewpt, temp2, wdir, wspeed, precip, hum = weatherMatrix
     wDirRad = [(np.pi/180) * wDirDeg for wDirDeg in wdir]

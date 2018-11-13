@@ -16,6 +16,7 @@ def openImg(fname):
         img = cv2.imread(fname, 0)
     else:
         img = cv2.imread(fname, cv2.IMREAD_UNCHANGED)
+        
     try:
         img = img.astype(np.float32)
     except AttributeError:
