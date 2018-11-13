@@ -7,6 +7,7 @@ from keras.models import Sequential, Model
 from keras.layers import Dense, Activation, Dropout, Flatten, Concatenate, Input
 from keras.optimizers import SGD, RMSprop
 from keras.layers import Conv2D, MaxPooling2D, AveragePooling2D
+import random
 print('done.')
 
 try:
@@ -63,9 +64,13 @@ class BaseModel(object):
 
     def predict(self, dataset):
         assert self.kerasModel is not None, "You must set the kerasModel within a subclass"
+        print("In predict")
         (inputs, outputs), ptList = self.preProcessor.process(dataset)
         results = self.kerasModel.predict(inputs).flatten()
-        resultDict = {pt:pred for (pt, pred) in zip(ptList, results)}
+        if mode:
+            resultDict = {pt:radnom.utility(0.0, 1.0) for (pt, pred) in zip(ptList, results)}
+        else:
+            resultDict = {pt:pred for (pt, pred) in zip(ptList, results)}
         return resultDict
 
     def save(self, name=None):
@@ -142,13 +147,19 @@ class FireModel(Model):
             fname = 'models/{}.h5'.format(timeString)
         self.save_weights(fname)
 
-    def predict(self, dataset):
+    def predict(self, dataset, mode):
         print('start predict')
         (inputs, outputs), ptList = self.preProcessor.process(dataset)
         results = super().predict(inputs).flatten()
-        resultDict = {pt:pred for (pt, pred) in zip(ptList, results)}
+        # for (p, pre) in zip(ptList, results):
+        #     print(p)
+        #     print(pre)
+        if mode:
+            resultDict = {pt:random.uniform(0.0,1.0) for (pt, pred) in zip(ptList, results)}
+        else:
+            resultDict = {pt:pred for (pt, pred) in zip(ptList, results)}
         print("end predict")
-        return resultDict
+        return resultDict, results
 
 class OurModel(BaseModel):
 

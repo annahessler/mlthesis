@@ -90,8 +90,8 @@ class Burn(object):
 
     @staticmethod
     def load(burnName, dates='all'):
-        print("in load")
-        print(dates)
+        # print("in load")
+        # print(dates)
         if dates == 'all':
             dates = Day.allGoodDays(burnName)
         days = {date:Day(burnName, date) for date in dates}

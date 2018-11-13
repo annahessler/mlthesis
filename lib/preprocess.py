@@ -141,9 +141,14 @@ def normalizeNonElevations(nonDems):
 def getOutputs(dataset):
     result = {}
     for pt in dataset.toList(dataset.points):
-        burnName, date, location = pt
+        burnName, date, location = pt #location is tuples of (y, x) locations
         out = dataset.data.getOutput(burnName, date, location)
         result[(burnName, date, location)] = out
+
+    #this prints out the date and tuples of (y, x) locations for sampled pixels
+    # for loc in result:
+    #     print("date ", loc[1], " pixel location: ", loc[2])
+
     return result
 
 def stackAndPad(layerDict, whichLayers, dataset, AOIRadius):

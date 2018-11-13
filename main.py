@@ -1,6 +1,7 @@
 
 import numpy as np
 import random
+import sys
 
 from lib import rawdata
 from lib import dataset
@@ -9,13 +10,16 @@ from lib import viz
 from lib import preprocess
 from lib import util
 
+SAMPLE_SIZE = 100000
+
+rand = False
 
 def predictFires():
     #create a new Data and make burn names those three instead of all. Pass all 3 fires
     new_data = rawdata.RawData.load(burnNames='untrain', dates='all')
     newDataSet = dataset.Dataset(new_data, dataset.Dataset.vulnerablePixels)
     pointLst = newDataSet.toList(newDataSet.points)
-    pointLst = random.sample(pointLst, 500000)
+    pointLst = random.sample(pointLst, SAMPLE_SIZE)
     test = dataset.Dataset(new_data, pointLst)
     return test
 
@@ -74,7 +78,6 @@ def getModel(weightsFile=None):
 
 def example():
     try:
-        import sys
         modfname = sys.argv[1]
         datasetfname = sys.argv[2]
         print("working")
@@ -91,19 +94,45 @@ def example():
         datasetfname = askopenfilename(initialdir = "output/datasets",title="choose a dataset")
         root.destroy()
 
+
+
     test = dataset.openDataset(datasetfname)
     mod = getModel(modfname)
-    predictions = mod.predict(test)
-    res = viz.visualizePredictions(test, predictions)
+    predictions, resu = mod.predict(test, rand) #Could have messed this up by returning two things!!!!!!!!!
+    # count = 0
+    fireDate = []
+    samples = []
+    preResu = []
+
+
+
+    print("SIZE OF PREDICTIONS: " , len(predictions))
+    for pre in predictions:
+        fireDate.append(pre[1])
+        samples.append(pre[2])
+        preResu.append(predictions.get(pre))
+        # print(predictions.get(pre))
+        # exit()
+        # count = count + 1
+
+    if rand:
+        print("THIS IS A RANDOM TEST!!!")
+
+    # for pt, pred in predictions.items():
+
+    # viz.getNumbersNonConsecutive(test, samples, preResu, len(predictions), fireDate)
+    viz.getNumbers(test, samples, preResu, len(predictions), fireDate)
+    res = viz.visualizePredictions(test, predictions, preResu)
     viz.showPredictions(res)
 
 #uncomment openAndTrain() to train a new model
 #if you create a new dataset, must change name to have "_" instead of "/" for it to work with example()
-openAndTrain()
+# openAndTrain()
 
 #uncomment the next two lines to create a validation dataset
-# test = predictFires()
-# dataset.Dataset.save(test)
+if sys.argv[1] is None:
+    test = predictFires()
+    dataset.Dataset.save(test)
 
 # openAndPredict('') #enter weightsFile
 
@@ -111,4 +140,5 @@ openAndTrain()
 #To run: python3 main.py models/model_name output/datasets/dataset_name
 #final model: 11Apr17_55.h5
 #test dataset: 11Apr20_49.              #this has 500,000 points
-# example()
+else:
+    example()

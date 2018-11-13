@@ -267,6 +267,7 @@ def openDataset(fname):
                 newPtList = [Point(name, date, tuple(loc)) for name, date, loc in ptList]
                 newDayDict[date] = newPtList
             newBurnDict[burnName] = newDayDict
+            print("SIZE OF PTLIST: " , len(newPtList))
         return Dataset(data, newBurnDict)
 
 if __name__ == '__main__':
