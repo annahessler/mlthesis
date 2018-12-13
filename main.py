@@ -75,7 +75,7 @@ def getModel(weightsFile=None):
 
     mod = model.FireModel(pp, weightsFile)
     return mod
-    
+
 def example():
     try:
         modfname = sys.argv[1]
@@ -130,9 +130,8 @@ def example():
 # openAndTrain()
 
 #uncomment the next two lines to create a validation dataset
-if sys.argv[1] is None:
-    test = predictFires()
-    dataset.Dataset.save(test)
+# test = predictFires()
+# dataset.Dataset.save(test)
 
 # openAndPredict('') #enter weightsFile
 
@@ -140,5 +139,14 @@ if sys.argv[1] is None:
 #To run: python3 main.py models/model_name output/datasets/dataset_name
 #final model: 11Apr17_55.h5
 #test dataset: 11Apr20_49.              #this has 500,000 points
-else:
+
+# example()
+
+if len(sys.argv) == 3:
     example()
+elif len(sys.argv) == 2:
+    print('Please include a model and a dataset.')
+    exit()
+else:
+    test = predictFires()
+    dataset.Dataset.save(test)

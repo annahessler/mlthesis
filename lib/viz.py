@@ -55,6 +55,18 @@ def getNumbers(dataset, loc, res, size, fireDate):
         normedDEM = util.normalize(burn.layers['dem'])
         numOfFire = len(dataset.getUsedBurnNamesAndDates())
 
+        new_burn = 0
+        initial_perim = 0
+
+        for i in range(0, h):
+            for j in range(0, w):
+                if day.startingPerim.astype(np.uint8)[i][j] == 1:
+                    initial_perim = initial_perim + 1
+                if day.startingPerim.astype(np.uint8)[i][j] == 0 and day.endingPerim.astype(np.uint8)[i][j] == 1:
+                    new_burn = new_burn + 1
+
+        perc_burned = new_burn / initial_perim
+
         curDay = []
         curRes = []
         pixelsForDate = 0
@@ -91,20 +103,25 @@ def getNumbers(dataset, loc, res, size, fireDate):
                 shouldBeBurnt = shouldBeBurnt + 1
                 if curRes[pos] > 0.97:
                     didBurn = didBurn + 1
-            if curRes[pos] > 0.97 and day.endingPerim.astype(np.uint8)[posy[pos]][posx[pos]] == 1:
+            if curRes[pos] > 0.5 and day.endingPerim.astype(np.uint8)[posy[pos]][posx[pos]] == 1:
                 correct = correct + 1
                 TP = TP + 1
-            elif curRes[pos] < 0.03 and day.endingPerim.astype(np.uint8)[posy[pos]][posx[pos]] == 0:
+            elif curRes[pos] < 0.5 and day.endingPerim.astype(np.uint8)[posy[pos]][posx[pos]] == 0:
                 correct = correct + 1
                 TN = TN + 1
-            elif curRes[pos] < 0.03 and day.endingPerim.astype(np.uint8)[posy[pos]][posx[pos]] == 1:
+            elif curRes[pos] < 0.5 and day.endingPerim.astype(np.uint8)[posy[pos]][posx[pos]] == 1: #.03
                 FN = FN + 1
                 incorrect = incorrect + 1
-            elif curRes[pos] > 0.97 and day.endingPerim.astype(np.uint8)[posy[pos]][posx[pos]] == 0:
+            elif curRes[pos] > 0.5 and day.endingPerim.astype(np.uint8)[posy[pos]][posx[pos]] == 0: #.97
                 FP = FP + 1
                 incorrect = incorrect + 1
-            elif curRes[pos] > 0.03 and curRes[pos] < 0.97:
-                middle = middle + 1
+            # elif curRes[pos] > 0.03 and curRes[pos] < 0.97:
+            #     middle = middle + 1
+
+
+
+
+
             # else:
             #     incorrect = incorrect + 1
         #
@@ -159,6 +176,7 @@ def getNumbers(dataset, loc, res, size, fireDate):
         print(date , " percent model thinks burned that actually did: ", burnAcc,  " %")
         print(date , " accuracy correct: ", accCor,  " %")
         print(date , " accuracy incorrect: ", accIncor, " %")
+        print(date , " percent fire grew: ", perc_burned)
         print("TOTAL F SCORE AND PERIM NUM: ", total_f_score, " ", perim_num)
 
     #print avg f_score
