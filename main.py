@@ -120,8 +120,9 @@ def example():
 
     # for pt, pred in predictions.items():
 
+    viz.compare_farsite(test, samples, preResu, len(predictions), fireDate)
     # viz.getNumbersNonConsecutive(test, samples, preResu, len(predictions), fireDate)
-    viz.getNumbers(test, samples, preResu, len(predictions), fireDate)
+    # viz.getNumbers(test, samples, preResu, len(predictions), fireDate)
     res = viz.visualizePredictions(test, predictions, preResu)
     viz.showPredictions(res)
 

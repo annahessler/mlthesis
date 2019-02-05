@@ -37,9 +37,164 @@ def renderPredictions(dataset, predictions, preResu):
         results[(burnName, date)] = canvas
     return results
 
+#loads farsite .tif as a 2D array and compares with perims
+def compare_farsite(dataset, loc, res, size, fireDate):
+    total_f_score = 0
+    total_precision = 0
+    total_recall = 0
+    perim_num = 0
+    max_f_score = 0
+    max_f_score_date = 0
+    min_f_score = 1
+    min_f_score_date = 0
+    max_burn_name = ""
+    min_burn_name = ""
+
+    farsite = cv2.imread('First711BurnFloat01.tif', cv2.IMREAD_UNCHANGED)
+
+
+    # plt.imshow(farsite, cmap = 'gray', interpolation = 'bicubic')
+    # plt.xticks([]), plt.yticks([])  # to hide tick values on X and Y axis
+    # plt.show()
+    # exit()
+
+    for burnName, date in dataset.getUsedBurnNamesAndDates():
+        perim_num = perim_num + 1
+        burn = dataset.data.burns[burnName]
+        day = dataset.data.getDay(burnName, date)
+        h,w = day.startingPerim.shape
+        normedDEM = util.normalize(burn.layers['dem'])
+        numOfFire = len(dataset.getUsedBurnNamesAndDates())
+
+        curDay = []
+        curRes = []
+        pixelsForDate = 0
+        while(len(fireDate) > 0 and date == fireDate[0]):
+            curDay.append(loc[0])
+            # if rand is True:
+            #     curRes.append(random.uniform(0.0, 1.0))
+            # else:
+            curRes.append(res[0])
+            loc.pop(0)
+            res.pop(0)
+            fireDate.pop(0)
+
+        posx = []
+        posy = []
+
+        for tup in curDay:
+            posx.append(tup[1])
+            posy.append(tup[0])
+
+        if date == '0711':
+            new_burn = 0
+            initial_perim = 0
+            farsite_burn = 0
+
+            for i in range(0, h):
+                for j in range(0, w):
+                    if day.startingPerim.astype(np.uint8)[i][j] == 1:
+                        initial_perim = initial_perim + 1
+                    if day.startingPerim.astype(np.uint8)[i][j] == 0 and day.endingPerim.astype(np.uint8)[i][j] == 1:
+                        new_burn = new_burn + 1
+                    if day.startingPerim.astype(np.uint8)[i][j] == 0 and farsite[i][j] == 1:
+                        farsite_burn = farsite_burn + 1
+
+            perc_burned = farsite / initial_perim
+
+
+
+            correct = 0
+            incorrect = 0
+            shouldBeBurnt = 0
+            didBurn = 0
+            middle = 0
+            TP=0
+            FP=0
+            TN=0
+            FN=0
+
+            for pos in range(0, len(posx)):
+                # print(day.startingPerim.astype(np.uint8)[posy[pos]][posx[pos]])
+                # print("far: ", farsite[posy[pos]][posx[pos]])
+                if day.endingPerim.astype(np.uint8)[posy[pos]][posx[pos]] == 1:
+                    shouldBeBurnt = shouldBeBurnt + 1
+                    if farsite[posy[pos]][posx[pos]] == 1:
+                        didBurn = didBurn + 1
+                if farsite[posy[pos]][posx[pos]] == 1 and day.endingPerim.astype(np.uint8)[posy[pos]][posx[pos]] == 1:
+                    correct = correct + 1
+                    TP = TP + 1
+                elif farsite[posy[pos]][posx[pos]] == 0 and day.endingPerim.astype(np.uint8)[posy[pos]][posx[pos]] == 0:
+                    correct = correct + 1
+                    TN = TN + 1
+                elif farsite[posy[pos]][posx[pos]] == 0 and day.endingPerim.astype(np.uint8)[posy[pos]][posx[pos]] == 1: #.03
+                    FN = FN + 1
+                    incorrect = incorrect + 1
+                elif farsite[posy[pos]][posx[pos]] == 1 and day.endingPerim.astype(np.uint8)[posy[pos]][posx[pos]] == 0: #.97
+                    FP = FP + 1
+                    incorrect = incorrect + 1
+
+            try:
+                precision = (TP/(TP + FP))
+                recall = (TP/(TP + FN))
+                f_frac = ((precision * recall)/(precision + recall))
+                f_score = 2 * f_frac
+                total_recall = total_recall + recall
+                total_precision = total_precision + precision
+            except:
+                print("ERROR: Not enough points to calculate F-score")
+                precision = 0
+                recall = 0
+                f_score = 0
+
+
+            total_f_score = total_f_score + f_score
+
+            print()
+            print("pixels tested " , len(posx))
+
+            try:
+                burnAcc = float("%0.2f" % ((didBurn/shouldBeBurnt) * 100))
+            except:
+                burnAcc = 0
+                print("ERROR: No pixels tested are inside of the next fire perimeter")
+
+            f_score_print = float("%0.4f" % f_score)
+            accCor = float("%0.2f" % ((correct/(correct + incorrect)) * 100))
+            accIncor = float("%0.2f" % ((incorrect/len(posx)) * 100))
+
+            if f_score > max_f_score:
+                max_f_score = f_score_print
+                max_f_score_date = date
+                max_burn_name = burnName
+            elif f_score < min_f_score:
+                min_f_score = f_score_print
+                min_f_score_date = date
+                min_burn_name = burnName
+
+
+            # print(didBurn)
+            # print(shouldBeBurnt)
+            print(date, " farsite fire: ", burnName)
+            print(date , " farsite precision: ", precision)
+            print(date , " farsite recall: ", recall)
+            print(date , " farsite F score: ", f_score_print)
+            #This is the percent of pixels that actually burned that the model was correct on (doesn't count what
+            #the model said would burn that didnt)
+            print(date , " farsite percent model thinks burned that actually did: ", burnAcc,  " %")
+            print(date , " farsite accuracy correct: ", accCor,  " %")
+            print(date , " farsite accuracy incorrect: ", accIncor, " %")
+            print(date , " farsite percent fire grew: ", perc_burned)
+            # print("TOTAL F SCORE AND PERIM NUM: ", total_f_score, " ", perim_num)
+            exit()
+
+
+
 #This function gathers a bunch of statistics about the predictions and prints them out
 def getNumbers(dataset, loc, res, size, fireDate):
     total_f_score = 0
+    total_precision = 0
+    total_recall = 0
     perim_num = 0
     max_f_score = 0
     max_f_score_date = 0
@@ -87,6 +242,35 @@ def getNumbers(dataset, loc, res, size, fireDate):
             posx.append(tup[1])
             posy.append(tup[0])
 
+        burnThePerim = False #this just burns the 20 pixels around the fire
+
+        if burnThePerim:
+            print("Burning the perimeter only.")
+            for pos in range(0, len(curDay)):
+                try:
+                    if day.startingPerim.astype(np.uint8)[posy[pos] + 20][posx[pos] + 20] == 1:
+                        curRes[pos] = 1
+                    elif day.startingPerim.astype(np.uint8)[posy[pos]][posx[pos] + 20] == 1:
+                        curRes[pos] = 1
+                    elif day.startingPerim.astype(np.uint8)[posy[pos] - 20][posx[pos] + 20] == 1:
+                        curRes[pos] = 1
+                    elif day.startingPerim.astype(np.uint8)[posy[pos] + 20][posx[pos]] == 1:
+                        curRes[pos] = 1
+                    elif day.startingPerim.astype(np.uint8)[posy[pos]][posx[pos]] == 1:
+                        curRes[pos] = 1
+                    elif day.startingPerim.astype(np.uint8)[posy[pos] - 20][posx[pos]] == 1:
+                        curRes[pos] = 1
+                    elif day.startingPerim.astype(np.uint8)[posy[pos] + 20][posx[pos] - 20] == 1:
+                        curRes[pos] = 1
+                    elif day.startingPerim.astype(np.uint8)[posy[pos]][posx[pos] - 20] == 1:
+                        curRes[pos] = 1
+                    elif day.startingPerim.astype(np.uint8)[posy[pos] - 20][posx[pos] - 20] == 1:
+                        curRes[pos] = 1
+                    else:
+                        curRes[pos] = 0
+                except:
+                    curRes[pos] = 0
+
         correct = 0
         incorrect = 0
         shouldBeBurnt = 0
@@ -133,6 +317,8 @@ def getNumbers(dataset, loc, res, size, fireDate):
             recall = (TP/(TP + FN))
             f_frac = ((precision * recall)/(precision + recall))
             f_score = 2 * f_frac
+            total_recall = total_recall + recall
+            total_precision = total_precision + precision
         except:
             print("ERROR: Not enough points to calculate F-score")
             precision = 0
@@ -188,6 +374,8 @@ def getNumbers(dataset, loc, res, size, fireDate):
 
 #fun exercise would be to do quicksort on a list/dict of these and print the whole thing out to see which fires are better
 
+    print("AVERAGE recall: ", total_recall/perim_num)
+    print("AVERAGE percision: ", total_precision/perim_num)
 
     print("AVERAGE F SCORE: ", avg_f_score)
     print("Maximum F-score: ", max_f_score)
@@ -202,7 +390,10 @@ def getNumbers(dataset, loc, res, size, fireDate):
 #but the perimeters inside the pairs do (e.g. 0716, 0717, 0801, 0802)
 def getNumbersNonConsecutive(dataset, loc, res, size, fireDate):
     loopNum = 0
+    initial_perim = 0
+    new_burn = 0
     for burnName, date in dataset.getUsedBurnNamesAndDates():
+        print("Starting loop number ", loopNum)
         loopNum = loopNum + 1
         burn = dataset.data.burns[burnName]
         day = dataset.data.getDay(burnName, date)
@@ -210,6 +401,24 @@ def getNumbersNonConsecutive(dataset, loc, res, size, fireDate):
         normedDEM = util.normalize(burn.layers['dem'])
         numOfFire = len(dataset.getUsedBurnNamesAndDates())
         loopIt = int(size/numOfFire)
+
+
+        for i in range(0, h):
+            for j in range(0, w):
+                if loopNum == 1:
+                    if day.startingPerim.astype(np.uint8)[i][j] == 1:
+                        initial_perim = initial_perim + 1
+                if loopNum == 2:
+                    if day.endingPerim.astype(np.uint8)[i][j] == 1:
+                        new_burn = new_burn + 1
+
+
+        if loopNum == 2:
+            new_burn = new_burn - initial_perim
+            perc_burned = new_burn / initial_perim
+            print("new burn: ", new_burn)
+            print("initial perim: ", initial_perim)
+            print("day: ", day)
 
         if loopNum == 1:
             curDay = []
@@ -278,8 +487,6 @@ def getNumbersNonConsecutive(dataset, loc, res, size, fireDate):
             print()
             print(date, " Number of pixels tested " , len(posx))
 
-            if(rand):
-                print("THIS IS A RANDOM TEST")
 
             try:
                 burnAcc = float("%0.2f" % ((didBurn/shouldBeBurnt) * 100))
@@ -298,6 +505,8 @@ def getNumbersNonConsecutive(dataset, loc, res, size, fireDate):
             print(date , " percent model thinks burned that actually did: ", burnAcc,  " %")
             print(date , " accuracy correct: ", accCor,  " %")
             print(date , " accuracy incorrect: ", accIncor, " %")
+            print(date , " percent fire grew: ", perc_burned)
+
 
 
 
