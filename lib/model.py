@@ -69,7 +69,7 @@ class BaseModel(object):
         (inputs, outputs), ptList = self.preProcessor.process(dataset)
         results = self.kerasModel.predict(inputs).flatten()
         if mode:
-            resultDict = {pt:radnom.utility(0.0, 1.0) for (pt, pred) in zip(ptList, results)}
+            resultDict = {pt:random.utility(0.0, 1.0) for (pt, pred) in zip(ptList, results)}
         else:
             resultDict = {pt:pred for (pt, pred) in zip(ptList, results)}
         return resultDict

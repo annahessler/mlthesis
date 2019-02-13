@@ -50,7 +50,26 @@ def compare_farsite(dataset, loc, res, size, fireDate):
     max_burn_name = ""
     min_burn_name = ""
 
-    farsite = cv2.imread('First711BurnFloat01.tif', cv2.IMREAD_UNCHANGED)
+    FARSITE_total_f_score = 0
+    FARSITE_total_precision = 0
+    FARSITE_total_recall = 0
+    FARSITE_perim_num = 0
+    FARSITE_max_f_score = 0
+    FARSITE_max_f_score_date = 0
+    FARSITE_min_f_score = 1
+    FARSITE_min_f_score_date = 0
+    FARSITE_max_burn_name = ""
+    FARSITE_min_burn_name = ""
+
+
+
+
+    # farsite_days = ['0711', '0712', '0713', '0714', '0715']
+    # farsite_wet = ['0711', '0712', '0713', '0714', '0715']
+    farsite_days = ['0715']
+    farsite_wet = ['0711', '0712', '0713', '0714', '0715']
+    farsite_day_idx = 0
+    next_day = False
 
 
     # plt.imshow(farsite, cmap = 'gray', interpolation = 'bicubic')
@@ -59,12 +78,26 @@ def compare_farsite(dataset, loc, res, size, fireDate):
     # exit()
 
     for burnName, date in dataset.getUsedBurnNamesAndDates():
-        perim_num = perim_num + 1
+
+
+
         burn = dataset.data.burns[burnName]
         day = dataset.data.getDay(burnName, date)
         h,w = day.startingPerim.shape
         normedDEM = util.normalize(burn.layers['dem'])
         numOfFire = len(dataset.getUsedBurnNamesAndDates())
+
+        new_burn = 0
+        initial_perim = 0
+
+        for i in range(0, h):
+            for j in range(0, w):
+                if day.startingPerim.astype(np.uint8)[i][j] == 1:
+                    initial_perim = initial_perim + 1
+                if day.startingPerim.astype(np.uint8)[i][j] == 0 and day.endingPerim.astype(np.uint8)[i][j] == 1:
+                    new_burn = new_burn + 1
+
+        perc_burned = new_burn / initial_perim
 
         curDay = []
         curRes = []
@@ -86,21 +119,151 @@ def compare_farsite(dataset, loc, res, size, fireDate):
             posx.append(tup[1])
             posy.append(tup[0])
 
-        if date == '0711':
-            new_burn = 0
-            initial_perim = 0
-            farsite_burn = 0
+# if dry
+        # if date in farsite_days:
+        #     if date == farsite_days[farsite_day_idx]:
+        #         farsite = cv2.imread('farsite_files/' + farsite_days[farsite_day_idx] + '_dry.tif', cv2.IMREAD_UNCHANGED)
+#endif
+#if dry nonconsecutive
+        if date == '0801':
+            next_day = True
+            if date == '0801':
+                farsite = cv2.imread('farsite_files/' + farsite_days[0] + '_dry.tif', cv2.IMREAD_UNCHANGED)
+#endif
 
-            for i in range(0, h):
-                for j in range(0, w):
-                    if day.startingPerim.astype(np.uint8)[i][j] == 1:
-                        initial_perim = initial_perim + 1
-                    if day.startingPerim.astype(np.uint8)[i][j] == 0 and day.endingPerim.astype(np.uint8)[i][j] == 1:
-                        new_burn = new_burn + 1
-                    if day.startingPerim.astype(np.uint8)[i][j] == 0 and farsite[i][j] == 1:
-                        farsite_burn = farsite_burn + 1
+# #if wet
+#         if date in farsite_wet:
+#             if date == farsite_wet[farsite_day_idx]:
+#                 farsite = cv2.imread('farsite_files/' + farsite_wet[farsite_day_idx] + '_wet.tif', cv2.IMREAD_UNCHANGED)
+# # endif
 
-            perc_burned = farsite / initial_perim
+            
+            
+                
+                
+
+                
+
+                FARSITE_new_burn = 0
+                FARSITE_initial_perim = 0
+                farsite_burn = 0
+
+                for i in range(0, h):
+                    for j in range(0, w):
+                        # if day.startingPerim.astype(np.uint8)[i][j] == 1:
+                        #     FARSITE_initial_perim = FARSITE_initial_perim + 1
+                        # if day.startingPerim.astype(np.uint8)[i][j] == 0 and day.endingPerim.astype(np.uint8)[i][j] == 1:
+                        #     FARSITE_new_burn = FARSITE_new_burn + 1
+                        if day.startingPerim.astype(np.uint8)[i][j] == 0 and farsite[i][j] == 1:
+                            farsite_burn = farsite_burn + 1
+
+                FARSITE_perc_burned = farsite_burn / initial_perim
+
+
+
+                FARSITE_correct = 0
+                FARSITE_incorrect = 0
+                FARSITE_shouldBeBurnt = 0
+                FARSITE_didBurn = 0
+                
+                FARSITE_TP=0
+                FARSITE_FP=0
+                FARSITE_TN=0
+                FARSITE_FN=0
+
+                for pos in range(0, len(posx)):
+                    # print(day.startingPerim.astype(np.uint8)[posy[pos]][posx[pos]])
+                    # print("far: ", farsite[posy[pos]][posx[pos]])
+                    if day.endingPerim.astype(np.uint8)[posy[pos]][posx[pos]] == 1:
+                        FARSITE_shouldBeBurnt = FARSITE_shouldBeBurnt + 1
+                        if farsite[posy[pos]][posx[pos]] == 1:
+                            FARSITE_didBurn = FARSITE_didBurn + 1
+                    if farsite[posy[pos]][posx[pos]] == 1 and day.endingPerim.astype(np.uint8)[posy[pos]][posx[pos]] == 1:
+                        FARSITE_correct = FARSITE_correct + 1
+                        FARSITE_TP = FARSITE_TP + 1
+                    elif farsite[posy[pos]][posx[pos]] == 0 and day.endingPerim.astype(np.uint8)[posy[pos]][posx[pos]] == 0:
+                        FARSITE_correct = FARSITE_correct + 1
+                        FARSITE_TN = FARSITE_TN + 1
+                    elif farsite[posy[pos]][posx[pos]] == 0 and day.endingPerim.astype(np.uint8)[posy[pos]][posx[pos]] == 1: #.03
+                        FARSITE_FN = FARSITE_FN + 1
+                        FARSITE_incorrect = FARSITE_incorrect + 1
+                    elif farsite[posy[pos]][posx[pos]] == 1 and day.endingPerim.astype(np.uint8)[posy[pos]][posx[pos]] == 0: #.97
+                        FARSITE_FP = FARSITE_FP + 1
+                        FARSITE_incorrect = FARSITE_incorrect + 1
+
+                try:
+                    FARSITE_precision = (FARSITE_TP/(FARSITE_TP + FARSITE_FP))
+                    FARSITE_recall = (FARSITE_TP/(FARSITE_TP + FARSITE_FN))
+                    FARSITE_f_frac = ((FARSITE_precision * FARSITE_recall)/(FARSITE_precision + FARSITE_recall))
+                    FARSITE_f_score = 2 * FARSITE_f_frac
+                    FARSITE_total_recall = FARSITE_total_recall + FARSITE_recall
+                    FARSITE_total_precision = FARSITE_total_precision + FARSITE_precision
+                except:
+                    print("ERROR: Not enough points to calculate FARSITE F-score")
+                    FARSITE_precision = 0
+                    FARSITE_recall = 0
+                    FARSITE_f_score = 0
+
+
+                FARSITE_total_f_score = FARSITE_total_f_score + FARSITE_f_score
+
+                print()
+                print("pixels tested " , len(posx))
+
+                try:
+                    FARSITE_burnAcc = float("%0.2f" % ((FARSITE_didBurn/FARSITE_shouldBeBurnt) * 100))
+                    FARSITE_accCor = float("%0.2f" % ((FARSITE_correct/(FARSITE_correct + FARSITE_incorrect)) * 100))
+                except:
+                    FARSITE_burnAcc = 0
+                    FARSITE_accCor = 0
+                    print("ERROR: No pixels tested are inside of the next fire perimeter")
+
+                FARSITE_f_score_print = float("%0.4f" % FARSITE_f_score)
+                FARSITE_accIncor = float("%0.2f" % ((FARSITE_incorrect/len(posx)) * 100))
+
+                if FARSITE_f_score > FARSITE_max_f_score:
+                    FARSITE_max_f_score = FARSITE_f_score_print
+#if dry
+                    FARSITE_max_f_score_date = farsite_days[farsite_day_idx]
+#endif
+# # if wet
+#                     FARSITE_max_f_score_date = farsite_wet[farsite_day_idx]
+# # endif
+                    FARSITE_max_burn_name = burnName
+                elif FARSITE_f_score < FARSITE_min_f_score:
+                    FARSITE_min_f_score = FARSITE_f_score_print
+#if dry
+                    FARSITE_min_f_score_date = farsite_days[farsite_day_idx]
+#endif
+# # if wet
+#                     FARSITE_min_f_score_date = farsite_wet[farsite_day_idx]
+# # endif
+                    FARSITE_min_burn_name = burnName
+
+# if dry
+                print(farsite_days[farsite_day_idx], " dry farsite fire: ", burnName)
+                print(farsite_days[farsite_day_idx] , " dry farsite precision: ", FARSITE_precision)
+                print(farsite_days[farsite_day_idx] , " dry farsite recall: ", FARSITE_recall)
+                print(farsite_days[farsite_day_idx] , " dry farsite F score: ", FARSITE_f_score_print)
+                print(farsite_days[farsite_day_idx] , " dry farsite percent model thinks burned that actually did: ", FARSITE_burnAcc,  " %")
+                print(farsite_days[farsite_day_idx] , " dry farsite accuracy correct: ", FARSITE_accCor,  " %")
+                print(farsite_days[farsite_day_idx] , " dry farsite accuracy incorrect: ", FARSITE_accIncor, " %")
+                print(farsite_days[farsite_day_idx] , " dry farsite percent growth: ", FARSITE_perc_burned)
+                farsite_day_idx = farsite_day_idx + 1
+                print("TOTAL F SCORE AND PERIM NUM DRY: ", FARSITE_total_f_score, " ", farsite_day_idx)
+#endif
+# # if wet
+#                 print(farsite_wet[farsite_day_idx], " wet farsite fire: ", burnName)
+#                 print(farsite_wet[farsite_day_idx] , " wet farsite precision: ", FARSITE_precision)
+#                 print(farsite_wet[farsite_day_idx] , " wet farsite recall: ", FARSITE_recall)
+#                 print(farsite_wet[farsite_day_idx] , " wet farsite F score: ", FARSITE_f_score_print)
+#                 print(farsite_wet[farsite_day_idx] , " wet farsite percent model thinks burned that actually did: ", FARSITE_burnAcc,  " %")
+#                 print(farsite_wet[farsite_day_idx] , " wet farsite accuracy correct: ", FARSITE_accCor,  " %")
+#                 print(farsite_wet[farsite_day_idx] , " wet farsite accuracy incorrect: ", FARSITE_accIncor, " %")
+#                 print(farsite_wet[farsite_day_idx] , " wet farsite percent growth: ", FARSITE_perc_burned)
+#                 farsite_day_idx = farsite_day_idx + 1
+#                 print("TOTAL F SCORE AND PERIM NUM WET: ", FARSITE_total_f_score, " ", farsite_day_idx)
+# # endif
 
 
 
@@ -113,26 +276,40 @@ def compare_farsite(dataset, loc, res, size, fireDate):
             FP=0
             TN=0
             FN=0
+            unsure = 0
 
             for pos in range(0, len(posx)):
                 # print(day.startingPerim.astype(np.uint8)[posy[pos]][posx[pos]])
-                # print("far: ", farsite[posy[pos]][posx[pos]])
                 if day.endingPerim.astype(np.uint8)[posy[pos]][posx[pos]] == 1:
                     shouldBeBurnt = shouldBeBurnt + 1
-                    if farsite[posy[pos]][posx[pos]] == 1:
+                    if curRes[pos] >= 0.5:
                         didBurn = didBurn + 1
-                if farsite[posy[pos]][posx[pos]] == 1 and day.endingPerim.astype(np.uint8)[posy[pos]][posx[pos]] == 1:
+                if curRes[pos] >= 0.5 and day.endingPerim.astype(np.uint8)[posy[pos]][posx[pos]] == 1:
                     correct = correct + 1
                     TP = TP + 1
-                elif farsite[posy[pos]][posx[pos]] == 0 and day.endingPerim.astype(np.uint8)[posy[pos]][posx[pos]] == 0:
+                elif curRes[pos] < 0.5 and day.endingPerim.astype(np.uint8)[posy[pos]][posx[pos]] == 0:
                     correct = correct + 1
                     TN = TN + 1
-                elif farsite[posy[pos]][posx[pos]] == 0 and day.endingPerim.astype(np.uint8)[posy[pos]][posx[pos]] == 1: #.03
+                elif curRes[pos] < 0.5 and day.endingPerim.astype(np.uint8)[posy[pos]][posx[pos]] == 1: #.03
                     FN = FN + 1
                     incorrect = incorrect + 1
-                elif farsite[posy[pos]][posx[pos]] == 1 and day.endingPerim.astype(np.uint8)[posy[pos]][posx[pos]] == 0: #.97
+                elif curRes[pos] >= 0.5 and day.endingPerim.astype(np.uint8)[posy[pos]][posx[pos]] == 0: #.97
                     FP = FP + 1
                     incorrect = incorrect + 1
+                # elif curRes[pos] < 0.97 and curRes[pos] > 0.03:
+                #     unsure = unsure + 1
+                # elif curRes[pos] > 0.03 and curRes[pos] < 0.97:
+                #     middle = middle + 1
+
+
+            # print(len(posx), " ", TP, " ", TN, " ", FP, " ", FN, " total: ", FN+FP+TP+TN)
+
+
+                # else:
+                #     incorrect = incorrect + 1
+            #
+            # print("these are here: ", TP, TN, FN, FP)
+            # print("This is middle: ", middle)
 
             try:
                 precision = (TP/(TP + FP))
@@ -175,18 +352,60 @@ def compare_farsite(dataset, loc, res, size, fireDate):
 
             # print(didBurn)
             # print(shouldBeBurnt)
-            print(date, " farsite fire: ", burnName)
-            print(date , " farsite precision: ", precision)
-            print(date , " farsite recall: ", recall)
-            print(date , " farsite F score: ", f_score_print)
+            print(date, " fire: ", burnName)
+            print(date, " unsure amount: ", unsure)
+            print(date , " precision: ", precision)
+            print(date , " recall: ", recall)
+            print(date , " F score: ", f_score_print)
             #This is the percent of pixels that actually burned that the model was correct on (doesn't count what
             #the model said would burn that didnt)
-            print(date , " farsite percent model thinks burned that actually did: ", burnAcc,  " %")
-            print(date , " farsite accuracy correct: ", accCor,  " %")
-            print(date , " farsite accuracy incorrect: ", accIncor, " %")
-            print(date , " farsite percent fire grew: ", perc_burned)
-            # print("TOTAL F SCORE AND PERIM NUM: ", total_f_score, " ", perim_num)
-            exit()
+            print(date , " percent model thinks burned that actually did: ", burnAcc,  " %")
+            print(date , " accuracy correct: ", accCor,  " %")
+            print(date , " accuracy incorrect: ", accIncor, " %")
+            print(date , " percent fire actually grew: ", perc_burned)
+            perim_num = perim_num + 1
+            print("TOTAL F SCORE AND PERIM NUM: ", total_f_score, " ", perim_num)
+
+    #print avg f_score
+    try:
+        avg_f_score = float("%0.4f" % (total_f_score/perim_num))
+    except:
+        avg_f_score = 0
+
+
+#fun exercise would be to do quicksort on a list/dict of these and print the whole thing out to see which fires are better
+
+    print("AVERAGE recall: ", total_recall/perim_num)
+    print("AVERAGE percision: ", total_precision/perim_num)
+
+    print("AVERAGE F SCORE: ", avg_f_score)
+    print("Maximum F-score: ", max_f_score)
+    print("Maximum F-score date: ", max_f_score_date)
+    print("Maximum F-score fire: ", max_burn_name)
+    print("Minimum F-score: ", min_f_score)
+    print("Minimum F-score date: ", min_f_score_date)
+    print("Minimum F-score fire: ", min_burn_name)
+
+    #print avg f_score
+    try:
+        FARSITE_avg_f_score = float("%0.4f" % (FARSITE_total_f_score/farsite_day_idx))
+    except:
+        FARSITE_avg_f_score = 0
+
+
+#fun exercise would be to do quicksort on a list/dict of these and print the whole thing out to see which fires are better
+
+    print("AVERAGE FARSITE recall: ", FARSITE_total_recall/farsite_day_idx)
+    print("AVERAGE FARSITE percision: ", FARSITE_total_precision/farsite_day_idx)
+
+    print("AVERAGE FARSITE F SCORE: ", FARSITE_avg_f_score)
+    print("Maximum FARSITE F-score: ", FARSITE_max_f_score)
+    print("Maximum FARSITE F-score date: ", FARSITE_max_f_score_date)
+    print("Maximum FARSITE F-score fire: ", FARSITE_max_burn_name)
+    print("Minimum FARSITE F-score: ", FARSITE_min_f_score)
+    print("Minimum FARSITE F-score date: ", FARSITE_min_f_score_date)
+    print("Minimum FARSITE F-score fire: ", FARSITE_min_burn_name)
+    exit()
 
 
 
@@ -280,14 +499,15 @@ def getNumbers(dataset, loc, res, size, fireDate):
         FP=0
         TN=0
         FN=0
+        unsure = 0
 
         for pos in range(0, len(posx)):
             # print(day.startingPerim.astype(np.uint8)[posy[pos]][posx[pos]])
             if day.endingPerim.astype(np.uint8)[posy[pos]][posx[pos]] == 1:
                 shouldBeBurnt = shouldBeBurnt + 1
-                if curRes[pos] > 0.97:
+                if curRes[pos] >= 0.5:
                     didBurn = didBurn + 1
-            if curRes[pos] > 0.5 and day.endingPerim.astype(np.uint8)[posy[pos]][posx[pos]] == 1:
+            if curRes[pos] >= 0.5 and day.endingPerim.astype(np.uint8)[posy[pos]][posx[pos]] == 1:
                 correct = correct + 1
                 TP = TP + 1
             elif curRes[pos] < 0.5 and day.endingPerim.astype(np.uint8)[posy[pos]][posx[pos]] == 0:
@@ -296,14 +516,16 @@ def getNumbers(dataset, loc, res, size, fireDate):
             elif curRes[pos] < 0.5 and day.endingPerim.astype(np.uint8)[posy[pos]][posx[pos]] == 1: #.03
                 FN = FN + 1
                 incorrect = incorrect + 1
-            elif curRes[pos] > 0.5 and day.endingPerim.astype(np.uint8)[posy[pos]][posx[pos]] == 0: #.97
+            elif curRes[pos] >= 0.5 and day.endingPerim.astype(np.uint8)[posy[pos]][posx[pos]] == 0: #.97
                 FP = FP + 1
                 incorrect = incorrect + 1
+            # elif curRes[pos] < 0.97 and curRes[pos] > 0.03:
+            #     unsure = unsure + 1
             # elif curRes[pos] > 0.03 and curRes[pos] < 0.97:
             #     middle = middle + 1
 
 
-
+        print(len(posx), " ", TP, " ", TN, " ", FP, " ", FN, " total: ", FN+FP+TP+TN)
 
 
             # else:
@@ -354,6 +576,7 @@ def getNumbers(dataset, loc, res, size, fireDate):
         # print(didBurn)
         # print(shouldBeBurnt)
         print(date, " fire: ", burnName)
+        print(date, " unsure amount: ", unsure)
         print(date , " precision: ", precision)
         print(date , " recall: ", recall)
         print(date , " F score: ", f_score_print)
