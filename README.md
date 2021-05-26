@@ -1,6 +1,6 @@
 # Hot Topic
 
-Use python satellite imagery, historical weather data, and historical fire perimeters to predict wildfire spreading using artificial neural network.
+Use python, satellite imagery, historical weather data, and historical fire perimeters to predict wildfire growth using an artificial neural network.
 
 ![Example analysis](demo/gif_beaver_creek.gif)
 
@@ -18,8 +18,6 @@ members of congress at the 2018 [Posters on the Hill](https://www.cur.org/what/e
 - Read our [paper](https://drive.google.com/drive/folders/0B3llCHJfA43FU0Y2WkxLMFpLdjg)
 
 # Requirements
-
-the following python3 libraries should be installed
 
 - numpy
 - opencv
