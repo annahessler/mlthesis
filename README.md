@@ -2,6 +2,12 @@
 
 Use python satellite imagery, historical weather data, and historical fire perimeters to predict wildfire spreading using artificial neural network.
 
+![Example analysis](demo/gif_beaver_creek.gif)
+
+![Spatial data inputs](demo/input_overview.png)
+
+![Model architecture](demo/architecture.png)
+
 This was [Anna Hessler](https://github.com/annahessler),
 [Dave Radke](https://github.com/Dtradke), and
 [Nick Crews](https://github.com/NickCrews)'s 2018 senior project for the
