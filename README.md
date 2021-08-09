@@ -15,7 +15,7 @@ Computer Science department at Colorado College. We presented this research to
 members of congress at the 2018 [Posters on the Hill](https://www.cur.org/what/events/students/poh/) conference. To learn more about the project, you can
 
 - Browse our [powerpoint presentation](https://docs.google.com/presentation/d/1b8Vq5Vs4pBj6efoVFWEm659koZugY1I3jloaSPSPRrs).
-- Read our [paper](https://drive.google.com/drive/folders/0B3llCHJfA43FU0Y2WkxLMFpLdjg)
+- Read our [paper](https://drive.google.com/file/d/1mSLRjYIrYJPIlOwRuzqkknDpsbwtEAVY/view?usp=sharing)
 
 # Requirements
 
